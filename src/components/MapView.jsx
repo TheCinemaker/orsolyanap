@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { MapPin, ArrowRight, Compass, Waves, Trees, Castle } from 'lucide-react';
+import { MapPin, ArrowRight, Compass, Waves, Trees, Castle, Heart } from 'lucide-react';
 
 export default function MapView() {
-  const { exhibitors, menuItems, setActiveView, addToCart } = useOrsolya();
+  const { exhibitors, menuItems, favoriteExhibitorIds, setActiveView, addToCart } = useOrsolya();
   const [selectedExhibitorId, setSelectedExhibitorId] = useState(exhibitors[0]?.id || null);
 
   const selectedExhibitor = exhibitors.find((ex) => ex.id === selectedExhibitorId);
@@ -41,7 +41,7 @@ export default function MapView() {
           Diáksétány Vásári Térkép
         </h1>
         <p className="text-xs text-stone-600">
-          A Gyöngyös-patak mentén, a Jurisics Vártól a Parki Színpadig húzódó vásári standok és adagszámok.
+          A Gyöngyös-patak mentén húzódó vásári standok, beszkennelt kedvenceid és adagszámok.
         </p>
       </div>
 
@@ -85,17 +85,24 @@ export default function MapView() {
               const exItems = menuItems.filter((i) => i.exhibitor_id === ex.id);
               const totalStock = exItems.reduce((s, i) => s + i.stock, 0);
               const isSelected = ex.id === selectedExhibitorId;
+              const isFavorite = favoriteExhibitorIds.includes(ex.id);
 
               return (
                 <button
                   key={ex.id}
                   onClick={() => setSelectedExhibitorId(ex.id)}
-                  className={`flex-shrink-0 flex flex-col items-center gap-1.5 p-3 rounded-2xl border transition-all ${
+                  className={`flex-shrink-0 flex flex-col items-center gap-1.5 p-3 rounded-2xl border transition-all relative ${
                     isSelected
                       ? 'bg-amber-800 text-white border-amber-800 shadow-md scale-105'
                       : 'bg-white text-stone-900 border-stone-200 hover:border-amber-600'
                   }`}
                 >
+                  {isFavorite && (
+                    <span className="absolute -top-1 -right-1 bg-rose-600 text-white p-1 rounded-full shadow-xs">
+                      <Heart className="w-3 h-3 fill-white" />
+                    </span>
+                  )}
+
                   <div className="flex items-center gap-1 text-xs font-bold">
                     <MapPin className="w-3.5 h-3.5" />
                     <span>Stand #{idx + 1}</span>
@@ -123,9 +130,16 @@ export default function MapView() {
           <div className="bg-stone-50 border border-stone-200 rounded-2xl p-5 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-stone-200 pb-3">
               <div>
-                <span className="text-[10px] font-bold uppercase text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-200">
-                  KIVÁLASZTOTT STAND: {selectedExhibitor.location}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold uppercase text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-200">
+                    STAND: {selectedExhibitor.location}
+                  </span>
+                  {favoriteExhibitorIds.includes(selectedExhibitor.id) && (
+                    <span className="text-[10px] font-bold uppercase text-rose-700 bg-rose-100 px-2 py-0.5 rounded-full border border-rose-200 flex items-center gap-1">
+                      <Heart className="w-3 h-3 fill-rose-700" /> Beszkennelt Kedvenc
+                    </span>
+                  )}
+                </div>
                 <h3 className="text-xl font-extrabold text-stone-900 mt-1">
                   {selectedExhibitor.name}
                 </h3>
@@ -209,11 +223,16 @@ export default function MapView() {
                     onClick={() => setSelectedExhibitorId(ex.id)}
                     className="p-2.5 rounded-xl bg-stone-50 hover:bg-amber-100/60 cursor-pointer transition-colors flex justify-between items-center border border-stone-200/60"
                   >
-                    <div>
-                      <span className="font-bold text-stone-900 block">
-                        {ex.name}
-                      </span>
-                      <span className="text-[10px] text-stone-500 font-medium">{ex.location}</span>
+                    <div className="flex items-center gap-1.5">
+                      {favoriteExhibitorIds.includes(ex.id) && (
+                        <Heart className="w-3.5 h-3.5 fill-rose-600 text-rose-600" />
+                      )}
+                      <div>
+                        <span className="font-bold text-stone-900 block">
+                          {ex.name}
+                        </span>
+                        <span className="text-[10px] text-stone-500 font-medium">{ex.location}</span>
+                      </div>
                     </div>
                     <ArrowRight className="w-3.5 h-3.5 text-stone-400" />
                   </div>

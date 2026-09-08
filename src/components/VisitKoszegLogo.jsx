@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 
 /**
- * VisitKőszeg Clean Apple Light-Mode Logo
+ * VisitKőszeg Clean Apple Light-Mode Logo with 5-Second Long Press Admin Trigger
  */
 export function VisitKoszegIcon({ className = "w-7 h-8", color = "#d97706" }) {
   return (
@@ -29,9 +29,55 @@ export function VisitKoszegIcon({ className = "w-7 h-8", color = "#d97706" }) {
   );
 }
 
-export default function VisitKoszegLogo({ className = "" }) {
+export default function VisitKoszegLogo({ onLongPress5s, className = "" }) {
+  const [pressProgress, setPressProgress] = useState(0);
+  const timerRef = useRef(null);
+  const intervalRef = useRef(null);
+
+  const startPress = () => {
+    setPressProgress(0);
+    const startTime = Date.now();
+    const duration = 5000; // 5 seconds
+
+    intervalRef.current = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(100, (elapsed / duration) * 100);
+      setPressProgress(progress);
+    }, 50);
+
+    timerRef.current = setTimeout(() => {
+      clearInterval(intervalRef.current);
+      setPressProgress(0);
+      if (onLongPress5s) {
+        onLongPress5s();
+      }
+    }, duration);
+  };
+
+  const cancelPress = () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    setPressProgress(0);
+  };
+
   return (
-    <div className={`inline-flex items-center gap-2 select-none ${className}`}>
+    <div
+      onMouseDown={startPress}
+      onMouseUp={cancelPress}
+      onMouseLeave={cancelPress}
+      onTouchStart={startPress}
+      onTouchEnd={cancelPress}
+      className={`inline-flex items-center gap-2 select-none cursor-pointer relative py-1 px-1.5 rounded-xl transition-all ${className}`}
+      title="VisitKőszeg (Tartsd nyomva 5mp-ig az Árus Belépéshez)"
+    >
+      {/* 5-second long press progress bar indicator */}
+      {pressProgress > 0 && (
+        <div
+          className="absolute bottom-0 left-0 h-1 bg-amber-600 rounded-full transition-all"
+          style={{ width: `${pressProgress}%` }}
+        />
+      )}
+
       <VisitKoszegIcon className="w-6 h-7" color="#b45309" />
       <div className="flex items-baseline font-semibold tracking-tight text-xl">
         <span className="font-medium text-stone-900">visit</span>

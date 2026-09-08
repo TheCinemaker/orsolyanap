@@ -28,6 +28,12 @@ export function OrsolyaProvider({ children }) {
     return saved ? JSON.parse(saved) : INITIAL_ORDERS;
   });
 
+  // Scanned Favorite Exhibitors (by QR code or manual favorite)
+  const [favoriteExhibitorIds, setFavoriteExhibitorIds] = useState(() => {
+    const saved = localStorage.getItem('orsolya_favorite_exhibitor_ids');
+    return saved ? JSON.parse(saved) : ['ex-1'];
+  });
+
   // Visitor Cart state (Portions reservation)
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -65,6 +71,10 @@ export function OrsolyaProvider({ children }) {
   }, [myOrderIds]);
 
   useEffect(() => {
+    localStorage.setItem('orsolya_favorite_exhibitor_ids', JSON.stringify(favoriteExhibitorIds));
+  }, [favoriteExhibitorIds]);
+
+  useEffect(() => {
     if (activeExhibitorId) {
       localStorage.setItem('orsolya_logged_exhibitor_id', activeExhibitorId);
     } else {
@@ -72,15 +82,35 @@ export function OrsolyaProvider({ children }) {
     }
   }, [activeExhibitorId]);
 
+  // Check URL query parameters for QR code scans (e.g. ?stand=ex-1 or ?qr=ex-1)
   useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (e.key === 'orsolya_menu_items' && e.newValue) setMenuItems(JSON.parse(e.newValue));
-      if (e.key === 'orsolya_orders' && e.newValue) setOrders(JSON.parse(e.newValue));
-      if (e.key === 'orsolya_exhibitors' && e.newValue) setExhibitors(JSON.parse(e.newValue));
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    const params = new URLSearchParams(window.location.search);
+    const scannedStandParam = params.get('stand') || params.get('qr');
+    if (scannedStandParam) {
+      const found = exhibitors.find((ex) => ex.id === scannedStandParam || ex.pin === scannedStandParam);
+      if (found) {
+        addFavoriteExhibitor(found.id);
+        showToast(`📍 ${found.name} beszkennelve és hozzáadva a Kedvencekhez!`, 'success');
+      }
+    }
   }, []);
+
+  // Favorite Stand helper functions
+  const addFavoriteExhibitor = (exhibitorId) => {
+    setFavoriteExhibitorIds((prev) => {
+      if (!prev.includes(exhibitorId)) {
+        showToast('Stand elmentve a Kedvencek közé! ❤️', 'success');
+        return [...prev, exhibitorId];
+      }
+      return prev;
+    });
+  };
+
+  const toggleFavoriteExhibitor = (exhibitorId) => {
+    setFavoriteExhibitorIds((prev) =>
+      prev.includes(exhibitorId) ? prev.filter((id) => id !== exhibitorId) : [...prev, exhibitorId]
+    );
+  };
 
   // Login as Exhibitor with PIN
   const loginExhibitor = (pin) => {
@@ -250,6 +280,9 @@ export function OrsolyaProvider({ children }) {
         isMyOrdersOpen,
         setIsMyOrdersOpen,
         myOrderIds,
+        favoriteExhibitorIds,
+        addFavoriteExhibitor,
+        toggleFavoriteExhibitor,
         placeOrder,
         updateItemStock,
         updateItemStatus,

@@ -1,24 +1,22 @@
 import React, { useState } from 'react';
 import VisitKoszegLogo from './VisitKoszegLogo';
 import OrsolyaInfoModal from './OrsolyaInfoModal';
+import FavoritesModal from './FavoritesModal';
+import QRScannerModal from './QRScannerModal';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { Utensils, MapPin, Store, Clock, Key, Search, X, Info } from 'lucide-react';
+import { Utensils, MapPin, Store, Heart, Search, X, Info, QrCode } from 'lucide-react';
 
 export default function Header({ searchQuery, setSearchQuery, selectedCategory, setSelectedCategory }) {
   const {
     activeView,
     setActiveView,
     activeExhibitor,
-    myOrderIds,
-    orders,
-    setIsMyOrdersOpen
+    favoriteExhibitorIds
   } = useOrsolya();
 
   const [isInfoOpen, setIsInfoOpen] = useState(false);
-
-  const activeUserOrders = orders.filter(
-    (o) => myOrderIds.includes(o.id) && o.status !== 'completed'
-  );
+  const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
 
   const categories = [
     { id: 'all', label: 'Összes kínálat' },
@@ -44,10 +42,8 @@ export default function Header({ searchQuery, setSearchQuery, selectedCategory, 
 
         {/* Main Navbar */}
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-          {/* Logo */}
-          <button onClick={() => setActiveView('visitor')} className="text-left focus:outline-none">
-            <VisitKoszegLogo />
-          </button>
+          {/* Logo with 5-second long press to trigger Exhibitor Login */}
+          <VisitKoszegLogo onLongPress5s={() => setActiveView('login')} />
 
           {/* Navigation Tabs (Apple Segmented Style) */}
           <div className="hidden md:flex items-center gap-1 bg-stone-100 p-1 rounded-2xl border border-stone-200/80">
@@ -96,38 +92,38 @@ export default function Header({ searchQuery, setSearchQuery, selectedCategory, 
               <Info className="w-4 h-4" />
             </button>
 
-            {/* My Orders Button */}
-            {myOrderIds.length > 0 && (
-              <button
-                onClick={() => setIsMyOrdersOpen(true)}
-                className="flex items-center gap-2 px-3 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold transition-all border border-stone-200"
-              >
-                <Clock className="w-3.5 h-3.5 text-amber-700" />
-                <span className="hidden sm:inline">Foglalásaim</span>
-                {activeUserOrders.length > 0 && (
-                  <span className="bg-amber-700 text-white px-1.5 py-0.5 rounded-full text-[10px] font-bold">
-                    {activeUserOrders.length}
-                  </span>
-                )}
-              </button>
-            )}
+            {/* Kedvencek (Beszkennelt Standok) Button */}
+            <button
+              onClick={() => setIsFavoritesOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold transition-all border border-stone-200"
+            >
+              <Heart className="w-3.5 h-3.5 text-rose-700 fill-rose-700" />
+              <span className="hidden sm:inline">Kedvencek</span>
+              {favoriteExhibitorIds.length > 0 && (
+                <span className="bg-rose-700 text-white px-1.5 py-0.5 rounded-full text-[10px] font-bold">
+                  {favoriteExhibitorIds.length}
+                </span>
+              )}
+            </button>
 
-            {/* Exhibitor Login / Dashboard button */}
-            {activeExhibitor ? (
+            {/* QR Scan Button */}
+            <button
+              onClick={() => setIsScannerOpen(true)}
+              className="p-2 rounded-xl bg-amber-800 text-white hover:bg-amber-700 transition-all shadow-xs flex items-center gap-1.5 text-xs font-bold px-3"
+              title="QR Kód Beolvasása"
+            >
+              <QrCode className="w-4 h-4 text-white" />
+              <span className="hidden sm:inline">QR Olvasó</span>
+            </button>
+
+            {/* If Logged in as Exhibitor, show quick access button */}
+            {activeExhibitor && (
               <button
                 onClick={() => setActiveView('exhibitor')}
                 className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-amber-800 hover:bg-amber-700 text-white text-xs font-bold shadow-sm transition-all"
               >
                 <Store className="w-3.5 h-3.5" />
                 <span className="max-w-[100px] truncate">{activeExhibitor.name}</span>
-              </button>
-            ) : (
-              <button
-                onClick={() => setActiveView('login')}
-                className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-stone-800 text-white text-xs font-semibold shadow-sm transition-all"
-              >
-                <Key className="w-3.5 h-3.5" />
-                <span>Árus Belépés</span>
               </button>
             )}
           </div>
@@ -178,8 +174,14 @@ export default function Header({ searchQuery, setSearchQuery, selectedCategory, 
         )}
       </header>
 
-      {/* Orsolya Info Modal */}
+      {/* Modals */}
       <OrsolyaInfoModal isOpen={isInfoOpen} onClose={() => setIsInfoOpen(false)} />
+      <FavoritesModal
+        isOpen={isFavoritesOpen}
+        onClose={() => setIsFavoritesOpen(false)}
+        onOpenScanner={() => setIsScannerOpen(true)}
+      />
+      <QRScannerModal isOpen={isScannerOpen} onClose={() => setIsScannerOpen(false)} />
     </>
   );
 }
