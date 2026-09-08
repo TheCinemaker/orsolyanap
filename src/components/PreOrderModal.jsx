@@ -12,8 +12,6 @@ export default function PreOrderModal({ exhibitor, onClose }) {
   const [completedOrder, setCompletedOrder] = useState(null);
 
   const exhibitorItems = cart.filter((c) => c.item.exhibitor_id === exhibitor.id);
-  const totalAmount = exhibitorItems.reduce((sum, c) => sum + c.item.price * c.quantity, 0);
-
   const timeSlots = ['12:15', '12:30', '12:45', '13:00', '13:15', '13:30', '14:00', '14:30'];
 
   const handleSubmit = (e) => {
@@ -24,62 +22,48 @@ export default function PreOrderModal({ exhibitor, onClose }) {
     if (order) {
       setCompletedOrder(order);
       try {
-        confetti({
-          particleCount: 80,
-          spread: 70,
-          origin: { y: 0.6 }
-        });
-      } catch (err) {
-        console.warn('Confetti fail', err);
-      }
+        confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+      } catch (err) {}
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-amber-500/30 rounded-3xl p-6 w-full max-w-lg shadow-2xl relative">
+    <div className="fixed inset-0 z-50 bg-zinc-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 w-full max-w-lg shadow-2xl relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg"
+          className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-600 p-1"
         >
           <X className="w-5 h-5" />
         </button>
 
         {!completedOrder ? (
           <>
-            <div className="mb-6">
-              <span className="text-[10px] font-extrabold text-amber-400 uppercase tracking-widest bg-amber-500/10 px-2.5 py-1 rounded-md">
-                STAND ELŐRENDELÉS
+            <div className="mb-6 space-y-1">
+              <span className="text-[10px] font-bold text-amber-600 dark:text-amber-500 uppercase tracking-wider bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
+                KÓSTOLÓ FOGLALÁS
               </span>
-              <h2 className="text-2xl font-bold text-white mt-1">{exhibitor.name}</h2>
-              <p className="text-xs text-slate-400">📍 {exhibitor.location}</p>
+              <h2 className="text-xl font-bold text-zinc-900 dark:text-white">{exhibitor.name}</h2>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">📍 {exhibitor.location}</p>
             </div>
 
-            {/* Order Items Summary */}
-            <div className="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-4 mb-5 space-y-2">
-              <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
-                Rendelt Ételek:
+            {/* Reserved Items */}
+            <div className="bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/60 rounded-2xl p-4 mb-5 space-y-2">
+              <h4 className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-2">
+                Foglalt ételek adagszáma:
               </h4>
               {exhibitorItems.map(({ item, quantity }) => (
-                <div key={item.id} className="flex justify-between text-xs text-slate-200">
-                  <span>
-                    {quantity}x {item.name}
-                  </span>
-                  <span className="font-bold">
-                    {(item.price * quantity).toLocaleString('hu-HU')} Ft
-                  </span>
+                <div key={item.id} className="flex justify-between text-xs text-zinc-800 dark:text-zinc-200">
+                  <span>{item.name}</span>
+                  <span className="font-bold">{quantity} adag</span>
                 </div>
               ))}
-              <div className="border-t border-slate-700 pt-2 flex justify-between text-sm font-extrabold text-amber-400">
-                <span>Fizetendő helyszínen:</span>
-                <span>{totalAmount.toLocaleString('hu-HU')} Ft</span>
-              </div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5 text-amber-400" />
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5 text-amber-600" />
                   <span>Neved</span>
                 </label>
                 <input
@@ -88,14 +72,14 @@ export default function PreOrderModal({ exhibitor, onClose }) {
                   required
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-amber-500"
+                  className="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl text-xs text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                  <Phone className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Telefonszámod (Értesítéshez)</span>
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                  <Phone className="w-3.5 h-3.5 text-amber-600" />
+                  <span>Telefonszámod</span>
                 </label>
                 <input
                   type="tel"
@@ -103,14 +87,14 @@ export default function PreOrderModal({ exhibitor, onClose }) {
                   required
                   value={userPhone}
                   onChange={(e) => setUserPhone(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-amber-500"
+                  className="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl text-xs text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Kívánt Átvételi Idősáv</span>
+                <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-amber-600" />
+                  <span>Kívánt Átvételi Időpont</span>
                 </label>
                 <div className="grid grid-cols-4 gap-2">
                   {timeSlots.map((slot) => (
@@ -118,10 +102,10 @@ export default function PreOrderModal({ exhibitor, onClose }) {
                       type="button"
                       key={slot}
                       onClick={() => setPickupTime(slot)}
-                      className={`py-2 text-xs font-bold rounded-xl border transition-all ${
+                      className={`py-2 text-xs font-medium rounded-xl border transition-all ${
                         pickupTime === slot
-                          ? 'bg-amber-500 text-slate-950 border-amber-500 shadow-md shadow-amber-500/20'
-                          : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                          ? 'bg-amber-600 text-white border-amber-600 font-semibold'
+                          : 'bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700'
                       }`}
                     >
                       {slot}
@@ -132,57 +116,50 @@ export default function PreOrderModal({ exhibitor, onClose }) {
 
               <button
                 type="submit"
-                className="w-full py-3.5 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-500 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm rounded-xl shadow-xl shadow-amber-500/25 transition-all flex items-center justify-center gap-2 mt-2"
+                className="w-full py-3 bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 mt-2"
               >
                 <Utensils className="w-4 h-4" />
-                <span>Rendelés & Foglalás Véglegesítése</span>
+                <span>Kóstoló Foglalás Véglegesítése</span>
               </button>
             </form>
           </>
         ) : (
           <div className="text-center py-4 space-y-4">
-            <div className="w-16 h-16 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 rounded-full flex items-center justify-center mx-auto">
-              <CheckCircle className="w-10 h-10 animate-bounce" />
+            <div className="w-12 h-12 bg-emerald-500/10 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
+              <CheckCircle className="w-8 h-8" />
             </div>
 
             <div>
-              <span className="bg-emerald-500/20 text-emerald-300 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
-                SIKERES FOGLALÁS
-              </span>
-              <h2 className="text-2xl font-black text-white mt-2">Köszönjük a rendelést!</h2>
-              <p className="text-xs text-slate-400 mt-1">
+              <h2 className="text-xl font-bold text-zinc-900 dark:text-white">Köszönjük a foglalást!</h2>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
                 A stand elmentette a foglalásod. Várunk szeretettel a helyszínen!
               </p>
             </div>
 
-            <div className="bg-slate-800 border border-slate-700 rounded-2xl p-4 text-left space-y-2">
-              <div className="flex justify-between items-center border-b border-slate-700 pb-2">
-                <span className="text-xs text-slate-400">Rendelés azonosító:</span>
-                <span className="font-mono text-base font-black text-amber-400">
-                  #{completedOrder.id}
-                </span>
+            <div className="bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/60 rounded-2xl p-4 text-left space-y-1.5 text-xs">
+              <div className="flex justify-between items-center border-b border-zinc-200/60 dark:border-zinc-700/60 pb-2">
+                <span className="text-zinc-500">Foglalás azonosító:</span>
+                <span className="font-mono font-bold text-amber-600">#{completedOrder.id}</span>
               </div>
-              <div className="flex justify-between items-center text-xs text-slate-300">
+              <div className="flex justify-between items-center text-zinc-700 dark:text-zinc-300">
                 <span>Stand:</span>
-                <span className="font-bold text-white">{exhibitor.name}</span>
+                <span className="font-semibold">{exhibitor.name}</span>
               </div>
-              <div className="flex justify-between items-center text-xs text-slate-300">
-                <span>Átvételi időpont:</span>
-                <span className="font-bold text-amber-400">kb. {completedOrder.pickup_time}-kor</span>
+              <div className="flex justify-between items-center text-zinc-700 dark:text-zinc-300">
+                <span>Várható átvétel:</span>
+                <span className="font-semibold text-amber-600">{completedOrder.pickup_time}-kor</span>
               </div>
             </div>
 
-            <div className="flex gap-3 pt-2">
-              <button
-                onClick={() => {
-                  onClose();
-                  setIsMyOrdersOpen(true);
-                }}
-                className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg"
-              >
-                Rendelés Nyomonkövetése
-              </button>
-            </div>
+            <button
+              onClick={() => {
+                onClose();
+                setIsMyOrdersOpen(true);
+              }}
+              className="w-full py-3 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-semibold text-xs rounded-2xl"
+            >
+              Foglalásaim Megtekintése
+            </button>
           </div>
         )}
       </div>

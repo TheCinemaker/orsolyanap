@@ -2,26 +2,28 @@ export const INITIAL_EXHIBITORS = [
   {
     id: 'ex-1',
     name: 'Jurisics Vár Bográcsozója',
-    location: 'Jurisics tér 1. (Önkormányzat előtt)',
+    location: 'Jurisics tér 1.',
     pin: '1234',
     category: 'bogracs',
     isOpen: true,
-    description: 'Tradicionális kőszegi bográcsos ételek, szabad tűzön, helyi alapanyagokból főzve.',
+    story: 'Kőszegi hagyományőrző baráti társaság vagyunk. Minden évben szabad tűzön, eredeti vasi receptek alapján főzünk a városapáknak és a látogatóknak.',
+    cause: 'A kőszegi gyermekmentők és a helyi cserkészcsapat javára gyűjtünk adományokat.',
     phone: '+36 94 563 100',
     image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80',
-    notice: '🔥 A marhapörkölt most frissen rotyog! Várható elkészülés 12:45-kor.'
+    notice: 'A marhapörkölt frissen rotyog, várható elkészülés: 12:45!'
   },
   {
     id: 'ex-2',
     name: 'Kőszegi Borosgazdák Egyesülete',
-    location: 'Jurisics tér 5. (Várostorony mellett)',
+    location: 'Jurisics tér 5.',
     pin: '2345',
     category: 'ital',
     isOpen: true,
-    description: 'Eredeti kőszegi Kékfrankos, forralt bor fűszeres titkos recept alapján és friss szőlőmust.',
+    story: 'A Kőszegi Hegyközség szőlősgazdái. A kőszegi Kékfrankos és a helyi borkultúra ápolása a szívügyünk.',
+    cause: 'A kőszegi szőlőjövő és a történelmi szőlőskert felújítására gyűjtünk.',
     phone: '+36 30 998 7654',
     image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=800&q=80',
-    notice: '🍷 Forró fűszeres forralt Kékfrankos azonnal kapható!'
+    notice: 'Forró fűszeres forralt bor és friss szőlőmust kapható!'
   },
   {
     id: 'ex-3',
@@ -30,22 +32,24 @@ export const INITIAL_EXHIBITORS = [
     pin: '3456',
     category: 'desszert',
     isOpen: true,
-    description: 'Hagyományos kézzel nyújtott házi rétesek és kemencés kézműves sós sütemények.',
+    story: 'Kézműves családi pékség. Dédszüleink receptjei alapján, kézzel nyújtott tésztából sütjük a kőszegi réteseket.',
+    cause: 'A helyi kézműves hagyományőrző iskola javára.',
     phone: '+36 30 445 1122',
     image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80',
-    notice: '🥐 Friss meleg meggyes-mákos rétes a kemencéből 10 percenként!'
+    notice: 'Friss meleg meggyes-mákos rétes a kemencéből!'
   },
   {
     id: 'ex-4',
-    name: 'Kőszegi Kézműves Kürtőskalács',
+    name: 'Kőszegi Kürtőskalács',
     location: 'Fő tér A-6 Stand',
     pin: '4567',
     category: 'desszert',
     isOpen: true,
-    description: 'Faszénparázson sült, kívül ropogós, belül puha kürtőskalácsok 8 féle ízben.',
+    story: 'Hagyományos faszénparázson sült kürtőskalácsok mesterei.',
+    cause: 'Gyermeknevelési alapítvány támogatása.',
     phone: '+36 20 334 5566',
     image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=800&q=80',
-    notice: '⚡ Előrendelhető frissen sütve, várakozás nélkül!'
+    notice: 'Friss meleg kürtőskalács sütés folyamatosan!'
   },
   {
     id: 'ex-5',
@@ -54,10 +58,11 @@ export const INITIAL_EXHIBITORS = [
     pin: '5678',
     category: 'bogracs',
     isOpen: true,
-    description: 'Ínycsiklandó erdei vadételek kőszegi gombával és vasi dödöllével.',
+    story: 'A Kőszegi-hegység erdészei és vadászai. Kőszegi erdei gombákkal és vadételekkel várunk mindenkit.',
+    cause: 'Az erdei tanösvények és vadrezervátum támogatására.',
     phone: '+36 30 777 8899',
     image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80',
-    notice: '🌲 Szarvaspörkölt dödöllével kész a Várudvarban!'
+    notice: 'Erdei szarvaspörkölt dödöllével kész a Várudvarban!'
   }
 ];
 
@@ -67,12 +72,11 @@ export const INITIAL_MENU_ITEMS = [
     exhibitor_id: 'ex-1',
     name: 'Bográcsos Marhapörkölt Tarhonyával',
     description: 'Szabad tűzön, vörösborral és kőszegi fűszerpaprikával főzött szaftos marhapörkölt, házi tarhonyával.',
-    price: 3200,
-    stock: 18,
+    stock: 25,
     initial_stock: 40,
     status: 'ready', // 'ready', 'cooking', 'sold_out'
     eta_minutes: 0,
-    tags: ['🔥 Bográcsos', 'Kőszegi Recept', 'Tartalmas'],
+    tags: ['Bográcsos', 'Kőszegi Recept'],
     category: 'bogracs',
     image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80'
   },
@@ -81,82 +85,76 @@ export const INITIAL_MENU_ITEMS = [
     exhibitor_id: 'ex-1',
     name: 'Kőszegi Szüretes Gulyásleves',
     description: 'Gazdag gulyásleves füstölt csülökkel, házi csipetkével és friss kőszegi kenyérrel.',
-    price: 2400,
-    stock: 12,
+    stock: 15,
     initial_stock: 35,
     status: 'ready',
     eta_minutes: 0,
-    tags: ['Friss kenyérrel', 'Klasszikus'],
+    tags: ['Gulyás', 'Friss kenyérrel'],
     category: 'bogracs',
     image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80'
   },
   {
     id: 'item-201',
     exhibitor_id: 'ex-2',
-    name: 'Fűszeres Forralt Kékfrankos (3dl)',
+    name: 'Fűszeres Forralt Kékfrankos',
     description: 'Minőségi kőszegi Kékfrankos bor narancshéjjal, fahéjjal és szegfűszeggel melegítve.',
-    price: 1100,
-    stock: 85,
+    stock: 80,
     initial_stock: 150,
     status: 'ready',
     eta_minutes: 0,
-    tags: ['🍷 Forró', 'Helyi Bor', 'Őszi Kedvenc'],
+    tags: ['Forró bor', 'Helyi Kékfrankos'],
     category: 'ital',
     image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=800&q=80'
   },
   {
     id: 'item-202',
     exhibitor_id: 'ex-2',
-    name: 'Friss Kőszegi Szőlőmust (3dl)',
-    description: 'Alkoholmentes, frissen préselt édes Kőszegi Kékfrankos és Olaszrizling szőlőlé.',
-    price: 700,
-    stock: 50,
+    name: 'Friss Kőszegi Szőlőmust',
+    description: 'Alkoholmentes, frissen préselt édes Kőszegi Kékfrankos szőlőlé.',
+    stock: 45,
     initial_stock: 100,
     status: 'ready',
     eta_minutes: 0,
-    tags: ['🍇 Alkoholmentes', '100% Gyümölcs'],
+    tags: ['Alkoholmentes', '100% Gyümölcs'],
     category: 'ital',
     image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=800&q=80'
   },
   {
     id: 'item-301',
     exhibitor_id: 'ex-3',
-    name: 'Házi Meggyes-Mákos Rétes (Szelet)',
-    description: 'Kézzel nyújtott vékony tészta, bőséges meggyes-mákos töltelékkel, porcukorral.',
-    price: 850,
-    stock: 24,
+    name: 'Házi Meggyes-Mákos Rétes',
+    description: 'Kézzel nyújtott vékony tészta, bőséges meggyes-mákos töltelékkel.',
+    stock: 20,
     initial_stock: 60,
     status: 'ready',
     eta_minutes: 0,
-    tags: ['🥐 Kemencés', 'Kézműves'],
+    tags: ['Házi Rétes', 'Kemencés'],
     category: 'desszert',
     image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80'
   },
   {
     id: 'item-302',
     exhibitor_id: 'ex-3',
-    name: 'Vasi Tökös-Mákos Rétes (Szelet)',
+    name: 'Vasi Tökös-Mákos Rétes',
     description: 'Tradicionális vas megyei sült tökös és darált mákos rétes különlegesség.',
-    price: 850,
-    stock: 15,
+    stock: 12,
     initial_stock: 45,
     status: 'ready',
     eta_minutes: 0,
-    tags: ['🎃 Vasi Specialitás'],
+    tags: ['Vasi Specialitás'],
     category: 'desszert',
     image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80'
   },
   {
     id: 'item-401',
     exhibitor_id: 'ex-4',
-    name: 'Klasszikus Diós Kürtőskalács',
+    name: 'Diós Kürtőskalács',
     description: 'Faszénfelett forgatott, karamellizált dióburokban.',
-    price: 1800,
-    stock: 30,
+    stock: 28,
     initial_stock: 80,
     status: 'ready',
     eta_minutes: 0,
-    tags: ['🔥 Meleg', 'Diós'],
+    tags: ['Friss Kürtős', 'Meleg'],
     category: 'desszert',
     image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=800&q=80'
   },
@@ -164,13 +162,12 @@ export const INITIAL_MENU_ITEMS = [
     id: 'item-501',
     exhibitor_id: 'ex-5',
     name: 'Erdei Gombás Szarvaspörkölt Dödöllével',
-    description: 'Kőszegi erdei gombákkal, vörösborral párolt szarvascomb, serpenyőben pirított vasi dödöllével.',
-    price: 3800,
-    stock: 9,
+    description: 'Kőszegi erdei gombákkal párolt szarvascomb, serpenyőben pirított vasi dödöllével.',
+    stock: 10,
     initial_stock: 30,
     status: 'ready',
     eta_minutes: 0,
-    tags: ['🌲 Vadétel', 'Vasi Dödölle', 'Prémium'],
+    tags: ['Erdei Vadétel', 'Dödölle'],
     category: 'bogracs',
     image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80'
   }
@@ -183,11 +180,10 @@ export const INITIAL_ORDERS = [
     user_phone: '+36 30 123 4567',
     exhibitor_id: 'ex-1',
     items: [
-      { id: 'item-101', name: 'Bográcsos Marhapörkölt Tarhonyával', quantity: 2, price: 3200 }
+      { id: 'item-101', name: 'Bográcsos Marhapörkölt Tarhonyával', quantity: 2 }
     ],
-    total_price: 6400,
     pickup_time: '12:30',
-    status: 'ready', // 'pending', 'accepted', 'ready', 'completed', 'cancelled'
+    status: 'ready',
     created_at: new Date(Date.now() - 15 * 60000).toISOString()
   }
 ];

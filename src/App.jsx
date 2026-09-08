@@ -3,27 +3,27 @@ import { OrsolyaProvider, useOrsolya } from './context/OrsolyaContext';
 import Header from './components/Header';
 import ExhibitorCard from './components/ExhibitorCard';
 import ExhibitorDashboard from './components/ExhibitorAdmin/ExhibitorDashboard';
+import ExhibitorAuthPage from './components/ExhibitorAuthPage';
 import CartDrawer from './components/CartDrawer';
 import MyOrdersModal from './components/MyOrdersModal';
 import MapView from './components/MapView';
-import LiveTVBoard from './components/LiveTVBoard';
 import VisitKoszegLogo from './components/VisitKoszegLogo';
-import { Flame, Utensils, MapPin, Clock, Info, CheckCircle2, Tv } from 'lucide-react';
+import { Flame, Utensils, Info, CheckCircle2, Heart } from 'lucide-react';
 import './App.css';
 
 function MainApp() {
-  const { activeView, exhibitors, menuItems, activeExhibitor, toastMessage } = useOrsolya();
+  const { activeView, exhibitors, menuItems, toastMessage } = useOrsolya();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  // Filter exhibitors & items based on search & category
   const filteredExhibitors = exhibitors.filter((ex) => {
     const exItems = menuItems.filter((i) => i.exhibitor_id === ex.id);
 
     const matchesSearch =
       ex.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       ex.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (ex.story && ex.story.toLowerCase().includes(searchQuery.toLowerCase())) ||
       exItems.some(
         (i) =>
           i.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -38,21 +38,17 @@ function MainApp() {
     return matchesSearch && matchesCategory;
   });
 
-  if (activeView === 'tv') {
-    return <LiveTVBoard />;
-  }
-
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between font-sans selection:bg-amber-500 selection:text-slate-950">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col justify-between font-sans selection:bg-amber-500 selection:text-white transition-colors">
       {/* Toast Notification */}
       {toastMessage && (
         <div
-          className={`fixed bottom-6 right-6 z-50 px-5 py-3 rounded-2xl shadow-2xl font-bold text-xs sm:text-sm flex items-center gap-2 border animate-in slide-in-from-bottom duration-300 ${
+          className={`fixed bottom-6 right-6 z-50 px-4 py-3 rounded-2xl shadow-xl font-semibold text-xs flex items-center gap-2 border animate-in slide-in-from-bottom duration-200 ${
             toastMessage.type === 'error'
               ? 'bg-red-600 text-white border-red-500'
               : toastMessage.type === 'success'
-              ? 'bg-emerald-500 text-slate-950 border-emerald-400'
-              : 'bg-slate-800 text-amber-300 border-amber-500/40'
+              ? 'bg-emerald-600 text-white border-emerald-500'
+              : 'bg-zinc-900 text-white border-zinc-700'
           }`}
         >
           <CheckCircle2 className="w-4 h-4" />
@@ -68,87 +64,78 @@ function MainApp() {
         setSelectedCategory={setSelectedCategory}
       />
 
-      {/* Main Content Area */}
+      {/* Main View Switcher */}
       <main className="flex-1">
         {activeView === 'exhibitor' ? (
           <ExhibitorDashboard />
+        ) : activeView === 'login' ? (
+          <ExhibitorAuthPage />
         ) : activeView === 'map' ? (
           <MapView />
         ) : (
           /* Visitor Main View */
-          <div className="max-w-7xl mx-auto px-4 py-6 space-y-8">
-            {/* Hero Section */}
-            <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-slate-900 via-slate-900 to-amber-950/50 border border-amber-500/20 p-6 sm:p-10 shadow-2xl">
-              <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
+          <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+            {/* Hero Section (Apple Clean) */}
+            <div className="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 rounded-3xl p-6 sm:p-10 shadow-sm relative overflow-hidden">
+              <div className="max-w-2xl space-y-3 relative z-10">
+                <span className="text-[10px] font-bold tracking-widest text-amber-600 dark:text-amber-500 uppercase bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+                  KŐSZEGI ORSOLYA-NAPI VÁSÁR
+                </span>
 
-              <div className="relative z-10 max-w-3xl space-y-3">
-                <div className="inline-flex items-center gap-2 bg-amber-500/15 border border-amber-500/30 px-3.5 py-1 rounded-full text-amber-400 text-xs font-bold uppercase tracking-wider">
-                  <Flame className="w-4 h-4 text-amber-400 animate-pulse" />
-                  <span>KŐSZEGI ORSOLYA-NAPI GASZTRO & KÉZMŰVES VÁSÁR</span>
-                </div>
-
-                <h1 className="text-3xl sm:text-5xl font-black text-white leading-tight">
-                  Kóstolj bele a kőszegi ősz ízeibe valós időben!
+                <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900 dark:text-white leading-tight">
+                  Kőszegi ősz ízei & adományos főzései valós időben
                 </h1>
 
-                <p className="text-slate-300 text-xs sm:text-base leading-relaxed">
-                  Kövesd a Jurisics tér és a Fő tér bográcsainak rotyogását élőben! Rendelj elő, foglald le kedvenc ételeidet és réteseidet várakozás nélkül.
+                <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                  Kövesd nyomon a Jurisics tér és a Fő tér bográcsainak rotyogását, ismerd meg az árusok történetét és foglald le a kóstoló adagokat várakozás nélkül.
                 </p>
 
-                {/* Stats Bar */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-slate-800">
-                  <div className="bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
-                    <span className="text-[10px] font-bold text-slate-400 block uppercase">
-                      Nyitvatartás
-                    </span>
-                    <span className="text-sm font-extrabold text-amber-400">09:00 - 20:00</span>
-                  </div>
-
-                  <div className="bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
-                    <span className="text-[10px] font-bold text-slate-400 block uppercase">
+                {/* Stats */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-4 border-t border-zinc-100 dark:border-zinc-800 text-xs">
+                  <div>
+                    <span className="text-[10px] font-semibold text-zinc-400 block uppercase">
                       Helyszínek
                     </span>
-                    <span className="text-sm font-extrabold text-white">Jurisics & Fő tér</span>
+                    <span className="font-bold text-zinc-900 dark:text-white">Jurisics tér & Fő tér</span>
                   </div>
 
-                  <div className="bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
-                    <span className="text-[10px] font-bold text-slate-400 block uppercase">
-                      Árusok száma
+                  <div>
+                    <span className="text-[10px] font-semibold text-zinc-400 block uppercase">
+                      Árusok
                     </span>
-                    <span className="text-sm font-extrabold text-emerald-400">
+                    <span className="font-bold text-amber-600 dark:text-amber-500">
                       {exhibitors.length} Stand
                     </span>
                   </div>
 
-                  <div className="bg-slate-900/80 p-3 rounded-2xl border border-slate-800">
-                    <span className="text-[10px] font-bold text-slate-400 block uppercase">
-                      Friss adagok
+                  <div className="col-span-2 sm:col-span-1">
+                    <span className="text-[10px] font-semibold text-zinc-400 block uppercase">
+                      Kapható adagok
                     </span>
-                    <span className="text-sm font-extrabold text-amber-400">
-                      {menuItems.reduce((s, i) => s + i.stock, 0)} adag kapható
+                    <span className="font-bold text-emerald-600 dark:text-emerald-400">
+                      {menuItems.reduce((s, i) => s + i.stock, 0)} adag
                     </span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Exhibitors List */}
+            {/* Exhibitors Feed */}
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
-                  <Utensils className="w-6 h-6 text-amber-500" />
-                  <span>Orsolya-Napi Kiállítók & Ételkínálat</span>
+                <h2 className="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+                  <Utensils className="w-4 h-4 text-amber-600" />
+                  <span>Vásári Árusok & Főzés Státusz</span>
                 </h2>
-                <span className="text-xs text-slate-400 font-semibold">
-                  {filteredExhibitors.length} találat
+                <span className="text-xs text-zinc-400">
+                  {filteredExhibitors.length} stand
                 </span>
               </div>
 
               {filteredExhibitors.length === 0 ? (
-                <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-12 text-center text-slate-400">
-                  <Info className="w-12 h-12 mx-auto mb-3 text-slate-600" />
-                  <p className="text-base font-bold text-white">Sajnos nincs találat a keresési feltételekre.</p>
-                  <p className="text-xs text-slate-500 mt-1">Próbáld meg törölni a keresőt vagy válaszd az "Összes kínálat" kategóriát.</p>
+                <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-12 text-center text-zinc-400">
+                  <Info className="w-8 h-8 mx-auto mb-2 opacity-40" />
+                  <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">Nincs találat.</p>
                 </div>
               ) : (
                 filteredExhibitors.map((exhibitor) => {
@@ -172,26 +159,16 @@ function MainApp() {
         )}
       </main>
 
-      {/* Cart Drawer & Modals */}
+      {/* Cart & Modals */}
       <CartDrawer />
       <MyOrdersModal />
 
-      {/* Official Footer with VisitKoszeg Logo */}
-      <footer className="bg-slate-950 border-t border-slate-800 text-slate-400 py-10 mt-12">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
-          <div className="flex flex-col items-center md:items-start gap-2">
-            <VisitKoszegLogo showTagline={true} size="md" />
-            <p className="text-xs text-slate-300 max-w-md mt-1">
-              Az Orsolya-napi országos vásár hivatalos valós idejű látogatói és kiállítói alkalmazása. A VisitKőszeg városi platform része.
-            </p>
-          </div>
-
-          <div className="flex flex-col items-center md:items-end text-xs text-slate-400 gap-1">
-            <span className="font-semibold text-slate-300">© 2026 VisitKőszeg.hu & OrsolyaApp</span>
-            <span>Jurisics tér • Fő tér • Kőszeg</span>
-            <span className="text-amber-500/80 font-mono text-[10px] mt-1">
-              Powered by KőszegApp Realtime Engine
-            </span>
+      {/* Footer */}
+      <footer className="bg-white dark:bg-zinc-950 border-t border-zinc-200/80 dark:border-zinc-800/80 py-8 text-xs text-zinc-500 dark:text-zinc-400 mt-12">
+        <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+          <VisitKoszegLogo />
+          <div>
+            <span>© 2026 VisitKőszeg.hu • Orsolya-Napi Vásár</span>
           </div>
         </div>
       </footer>

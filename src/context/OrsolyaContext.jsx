@@ -1,11 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { INITIAL_EXHIBITORS, INITIAL_MENU_ITEMS, INITIAL_ORDERS } from '../data/mockOrsolyaData';
-import { supabase } from '../lib/supabaseClient';
 
 const OrsolyaContext = createContext();
 
 export function OrsolyaProvider({ children }) {
-  // Active View Mode: 'visitor' | 'exhibitor' | 'map'
+  // Active View Mode: 'visitor' | 'exhibitor' | 'map' | 'login'
   const [activeView, setActiveView] = useState('visitor');
 
   // Logged-in exhibitor ID (null if guest/visitor)
@@ -29,27 +28,26 @@ export function OrsolyaProvider({ children }) {
     return saved ? JSON.parse(saved) : INITIAL_ORDERS;
   });
 
-  // Visitor Cart state
+  // Visitor Cart state (Portions reservation)
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isPreOrderModalOpen, setIsPreOrderModalOpen] = useState(false);
   const [isMyOrdersOpen, setIsMyOrdersOpen] = useState(false);
   const [myOrderIds, setMyOrderIds] = useState(() => {
     const saved = localStorage.getItem('orsolya_my_order_ids');
     return saved ? JSON.parse(saved) : ['ORD-1001'];
   });
 
-  // Notifications / Toast message
+  // Toast message
   const [toastMessage, setToastMessage] = useState(null);
 
   const showToast = (msg, type = 'info') => {
     setToastMessage({ text: msg, type, id: Date.now() });
     setTimeout(() => {
       setToastMessage((prev) => (prev?.text === msg ? null : prev));
-    }, 4000);
+    }, 3500);
   };
 
-  // Sync state to LocalStorage & broadcast to other open tabs
+  // Sync to LocalStorage & cross-tab sync
   useEffect(() => {
     localStorage.setItem('orsolya_exhibitors', JSON.stringify(exhibitors));
   }, [exhibitors]);
@@ -74,18 +72,11 @@ export function OrsolyaProvider({ children }) {
     }
   }, [activeExhibitorId]);
 
-  // Sync across tabs via window storage event
   useEffect(() => {
     const handleStorageChange = (e) => {
-      if (e.key === 'orsolya_menu_items' && e.newValue) {
-        setMenuItems(JSON.parse(e.newValue));
-      }
-      if (e.key === 'orsolya_orders' && e.newValue) {
-        setOrders(JSON.parse(e.newValue));
-      }
-      if (e.key === 'orsolya_exhibitors' && e.newValue) {
-        setExhibitors(JSON.parse(e.newValue));
-      }
+      if (e.key === 'orsolya_menu_items' && e.newValue) setMenuItems(JSON.parse(e.newValue));
+      if (e.key === 'orsolya_orders' && e.newValue) setOrders(JSON.parse(e.newValue));
+      if (e.key === 'orsolya_exhibitors' && e.newValue) setExhibitors(JSON.parse(e.newValue));
     };
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
@@ -97,10 +88,10 @@ export function OrsolyaProvider({ children }) {
     if (found) {
       setActiveExhibitorId(found.id);
       setActiveView('exhibitor');
-      showToast(`Üdvözlünk, ${found.name}! Stand bejelentkezés sikeres. 🎉`, 'success');
+      showToast(`Üdvözlünk, ${found.name}! Stand belépés sikeres.`, 'success');
       return true;
     } else {
-      showToast('Hibás Stand PIN kód! Próbáld újra (pl. 1234, 2345, 3456).', 'error');
+      showToast('Hibás PIN kód! Próbáld újra (pl. 1234, 2345, 3456).', 'error');
       return false;
     }
   };
@@ -108,10 +99,18 @@ export function OrsolyaProvider({ children }) {
   const logoutExhibitor = () => {
     setActiveExhibitorId(null);
     setActiveView('visitor');
-    showToast('Sikeres kijelentkezés az áruhi felületről.');
+    showToast('Kijelentkeztél az árus felületről.');
   };
 
-  // Real-time Stock Adjustment
+  // Exhibitor Profile update (Bio, Story, Cause)
+  const updateExhibitorProfile = (exhibitorId, updatedData) => {
+    setExhibitors((prev) =>
+      prev.map((ex) => (ex.id === exhibitorId ? { ...ex, ...updatedData } : ex))
+    );
+    showToast('Stand adatok és történet frissítve!', 'success');
+  };
+
+  // Real-time Stock Adjustments
   const updateItemStock = (itemId, delta) => {
     setMenuItems((prevItems) =>
       prevItems.map((item) => {
@@ -125,20 +124,7 @@ export function OrsolyaProvider({ children }) {
     );
   };
 
-  const setItemStockDirect = (itemId, stockAmount) => {
-    setMenuItems((prevItems) =>
-      prevItems.map((item) => {
-        if (item.id === itemId) {
-          const newStock = Math.max(0, stockAmount);
-          const newStatus = newStock === 0 ? 'sold_out' : item.status === 'sold_out' ? 'ready' : item.status;
-          return { ...item, stock: newStock, status: newStatus };
-        }
-        return item;
-      })
-    );
-  };
-
-  // Update item cooking/preparation status
+  // Update item status
   const updateItemStatus = (itemId, status, etaMinutes = 0) => {
     setMenuItems((prevItems) =>
       prevItems.map((item) => {
@@ -148,14 +134,14 @@ export function OrsolyaProvider({ children }) {
         return item;
       })
     );
-    showToast('Étel állapota frissítve!');
+    showToast('Állapot frissítve!');
   };
 
-  // Add / Edit menu item
+  // Save/Add menu item dynamically
   const saveMenuItem = (itemData) => {
     if (itemData.id) {
       setMenuItems((prev) => prev.map((i) => (i.id === itemData.id ? { ...i, ...itemData } : i)));
-      showToast('Ajánlat sikeresen frissítve!');
+      showToast('Étel frissítve!', 'success');
     } else {
       const newItem = {
         ...itemData,
@@ -166,24 +152,17 @@ export function OrsolyaProvider({ children }) {
         status: 'ready'
       };
       setMenuItems((prev) => [...prev, newItem]);
-      showToast('Új étel/ajánlat felvéve!');
+      showToast('Új étel hozzáadva a standodhoz!', 'success');
     }
   };
 
-  // Update exhibitor notice / open state
-  const updateExhibitorNotice = (exhibitorId, noticeText, isOpen) => {
-    setExhibitors((prev) =>
-      prev.map((ex) => {
-        if (ex.id === exhibitorId) {
-          return { ...ex, notice: noticeText, isOpen: isOpen !== undefined ? isOpen : ex.isOpen };
-        }
-        return ex;
-      })
-    );
-    showToast('Stand közlemény elmentve!');
+  // Delete menu item
+  const deleteMenuItem = (itemId) => {
+    setMenuItems((prev) => prev.filter((i) => i.id !== itemId));
+    showToast('Étel eltávolítva.');
   };
 
-  // Cart operations
+  // Cart operations (Portions reservation)
   const addToCart = (item, quantity = 1) => {
     setCart((prevCart) => {
       const existing = prevCart.find((c) => c.item.id === item.id);
@@ -194,7 +173,7 @@ export function OrsolyaProvider({ children }) {
       }
       return [...prevCart, { item, quantity: Math.min(item.stock, quantity) }];
     });
-    showToast(`"${item.name}" hozzáadva a kosárhoz!`, 'success');
+    showToast(`"${item.name}" hozzáadva a kóstoló foglaláshoz!`, 'success');
   };
 
   const removeFromCart = (itemId) => {
@@ -212,8 +191,6 @@ export function OrsolyaProvider({ children }) {
     const exhibitorCartItems = cart.filter((c) => c.item.exhibitor_id === exhibitorId);
     if (exhibitorCartItems.length === 0) return null;
 
-    const totalPrice = exhibitorCartItems.reduce((sum, c) => sum + c.item.price * c.quantity, 0);
-
     const newOrder = {
       id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
       user_name: userName,
@@ -222,10 +199,8 @@ export function OrsolyaProvider({ children }) {
       items: exhibitorCartItems.map((c) => ({
         id: c.item.id,
         name: c.item.name,
-        quantity: c.quantity,
-        price: c.item.price
+        quantity: c.quantity
       })),
-      total_price: totalPrice,
       pickup_time: pickupTime,
       status: 'pending',
       created_at: new Date().toISOString()
@@ -238,11 +213,9 @@ export function OrsolyaProvider({ children }) {
 
     setOrders((prev) => [newOrder, ...prev]);
     setMyOrderIds((prev) => [newOrder.id, ...prev]);
-
-    // Remove ordered items from cart
     setCart((prev) => prev.filter((c) => c.item.exhibitor_id !== exhibitorId));
 
-    showToast(`Rendelés leadva! Azonosító: #${newOrder.id}`, 'success');
+    showToast(`Kóstoló foglalás elküldve! Azonosító: #${newOrder.id}`, 'success');
     return newOrder;
   };
 
@@ -251,7 +224,7 @@ export function OrsolyaProvider({ children }) {
     setOrders((prev) =>
       prev.map((ord) => (ord.id === orderId ? { ...ord, status: newStatus } : ord))
     );
-    showToast(`Rendelés #${orderId} állapota: ${newStatus.toUpperCase()}`);
+    showToast(`Foglalás #${orderId} frissítve!`);
   };
 
   const activeExhibitor = exhibitors.find((ex) => ex.id === activeExhibitorId) || null;
@@ -274,17 +247,15 @@ export function OrsolyaProvider({ children }) {
         clearCart,
         isCartOpen,
         setIsCartOpen,
-        isPreOrderModalOpen,
-        setIsPreOrderModalOpen,
         isMyOrdersOpen,
         setIsMyOrdersOpen,
         myOrderIds,
         placeOrder,
         updateItemStock,
-        setItemStockDirect,
         updateItemStatus,
         saveMenuItem,
-        updateExhibitorNotice,
+        deleteMenuItem,
+        updateExhibitorProfile,
         updateOrderStatus,
         toastMessage,
         showToast
