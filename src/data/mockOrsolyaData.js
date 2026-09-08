@@ -2,20 +2,20 @@ export const INITIAL_EXHIBITORS = [
   {
     id: 'ex-1',
     name: 'Jurisics Vár Bográcsozója',
-    location: 'Jurisics tér 1.',
+    location: 'Diáksétány 1. (Vár felőli bejárat)',
     pin: '1234',
     category: 'bogracs',
     isOpen: true,
-    story: 'Kőszegi hagyományőrző baráti társaság vagyunk. Minden évben szabad tűzön, eredeti vasi receptek alapján főzünk a városapáknak és a látogatóknak.',
+    story: 'Kőszegi hagyományőrző baráti társaság vagyunk. Minden évben szabad tűzön, eredeti vasi receptek alapján főzünk a Diáksétányon.',
     cause: 'A kőszegi gyermekmentők és a helyi cserkészcsapat javára gyűjtünk adományokat.',
     phone: '+36 94 563 100',
     image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80',
-    notice: 'A marhapörkölt frissen rotyog, várható elkészülés: 12:45!'
+    notice: 'A marhapörkölt frissen rotyog a Diáksétányon, várható elkészülés: 12:45!'
   },
   {
     id: 'ex-2',
     name: 'Kőszegi Borosgazdák Egyesülete',
-    location: 'Jurisics tér 5.',
+    location: 'Diáksétány 3. (Gyöngyös-patak hídjánál)',
     pin: '2345',
     category: 'ital',
     isOpen: true,
@@ -23,12 +23,12 @@ export const INITIAL_EXHIBITORS = [
     cause: 'A kőszegi szőlőjövő és a történelmi szőlőskert felújítására gyűjtünk.',
     phone: '+36 30 998 7654',
     image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=800&q=80',
-    notice: 'Forró fűszeres forralt bor és friss szőlőmust kapható!'
+    notice: 'Forró fűszeres forralt bor és friss szőlőmust kapható a patakparton!'
   },
   {
     id: 'ex-3',
     name: 'Pékegér & Kőszegi Rétesház',
-    location: 'Fő tér A-2 Stand',
+    location: 'Diáksétány 5. (Központi sétány)',
     pin: '3456',
     category: 'desszert',
     isOpen: true,
@@ -41,7 +41,7 @@ export const INITIAL_EXHIBITORS = [
   {
     id: 'ex-4',
     name: 'Kőszegi Kürtőskalács',
-    location: 'Fő tér A-6 Stand',
+    location: 'Diáksétány 8. (Park felőli oldal)',
     pin: '4567',
     category: 'desszert',
     isOpen: true,
@@ -54,7 +54,7 @@ export const INITIAL_EXHIBITORS = [
   {
     id: 'ex-5',
     name: 'Vasi Vadászok & Erdészklub',
-    location: 'Jurisics Várudvar B-3',
+    location: 'Diáksétány 12. (Színpad mellett)',
     pin: '5678',
     category: 'bogracs',
     isOpen: true,
@@ -62,7 +62,7 @@ export const INITIAL_EXHIBITORS = [
     cause: 'Az erdei tanösvények és vadrezervátum támogatására.',
     phone: '+36 30 777 8899',
     image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80',
-    notice: 'Erdei szarvaspörkölt dödöllével kész a Várudvarban!'
+    notice: 'Erdei szarvaspörkölt dödöllével kész a Színpad mellett!'
   }
 ];
 
@@ -74,9 +74,9 @@ export const INITIAL_MENU_ITEMS = [
     description: 'Szabad tűzön, vörösborral és kőszegi fűszerpaprikával főzött szaftos marhapörkölt, házi tarhonyával.',
     stock: 25,
     initial_stock: 40,
-    status: 'ready', // 'ready', 'cooking', 'sold_out'
+    status: 'ready',
     eta_minutes: 0,
-    tags: ['Bográcsos', 'Kőszegi Recept'],
+    tags: ['Bográcsos', 'Diáksétány Recept'],
     category: 'bogracs',
     image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80'
   },

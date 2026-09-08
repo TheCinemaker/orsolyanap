@@ -8,7 +8,7 @@ import CartDrawer from './components/CartDrawer';
 import MyOrdersModal from './components/MyOrdersModal';
 import MapView from './components/MapView';
 import VisitKoszegLogo from './components/VisitKoszegLogo';
-import { Flame, Utensils, Info, CheckCircle2, Heart } from 'lucide-react';
+import { Flame, Utensils, Info, CheckCircle2, MapPin } from 'lucide-react';
 import './App.css';
 
 function MainApp() {
@@ -75,28 +75,31 @@ function MainApp() {
         ) : (
           /* Visitor Main View */
           <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
-            {/* Hero Section (Apple Clean) */}
+            {/* Hero Section */}
             <div className="bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800/80 rounded-3xl p-6 sm:p-10 shadow-sm relative overflow-hidden">
               <div className="max-w-2xl space-y-3 relative z-10">
                 <span className="text-[10px] font-bold tracking-widest text-amber-600 dark:text-amber-500 uppercase bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
-                  KŐSZEGI ORSOLYA-NAPI VÁSÁR
+                  📍 KŐSZEG DIÁKSÉTÁNY • ORSOLYA-NAPI VÁSÁR
                 </span>
 
                 <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-900 dark:text-white leading-tight">
-                  Kőszegi ősz ízei & adományos főzései valós időben
+                  Kőszegi ősz ízei & adományos főzései a Diáksétányon
                 </h1>
 
                 <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-                  Kövesd nyomon a Jurisics tér és a Fő tér bográcsainak rotyogását, ismerd meg az árusok történetét és foglald le a kóstoló adagokat várakozás nélkül.
+                  Kövesd nyomon a Diáksétányon rotyogó bográcsokat, ismerd meg az árusok történetét és foglald le a kóstoló adagokat várakozás nélkül.
                 </p>
 
                 {/* Stats */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-4 border-t border-zinc-100 dark:border-zinc-800 text-xs">
                   <div>
                     <span className="text-[10px] font-semibold text-zinc-400 block uppercase">
-                      Helyszínek
+                      Helyszín
                     </span>
-                    <span className="font-bold text-zinc-900 dark:text-white">Jurisics tér & Fő tér</span>
+                    <span className="font-bold text-zinc-900 dark:text-white flex items-center gap-1">
+                      <MapPin className="w-3.5 h-3.5 text-amber-600" />
+                      Kőszeg Diáksétány
+                    </span>
                   </div>
 
                   <div>
@@ -125,7 +128,7 @@ function MainApp() {
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold text-zinc-900 dark:text-white flex items-center gap-2">
                   <Utensils className="w-4 h-4 text-amber-600" />
-                  <span>Vásári Árusok & Főzés Státusz</span>
+                  <span>Diáksétány Árusok & Főzés Státusz</span>
                 </h2>
                 <span className="text-xs text-zinc-400">
                   {filteredExhibitors.length} stand
@@ -168,7 +171,7 @@ function MainApp() {
         <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <VisitKoszegLogo />
           <div>
-            <span>© 2026 VisitKőszeg.hu • Orsolya-Napi Vásár</span>
+            <span>© 2026 VisitKőszeg.hu • Orsolya-Napi Vásár • Kőszeg Diáksétány</span>
           </div>
         </div>
       </footer>
