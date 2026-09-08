@@ -1,8 +1,16 @@
+export const FESTIVAL_BOUNDS = [
+  [47.38890538441469, 16.538691475076607],
+  [47.38953425187408, 16.537956904927757],
+  [47.39001943732405, 16.539127719901042],
+  [47.389622403025804, 16.539972560296093]
+];
+
 export const INITIAL_EXHIBITORS = [
   {
     id: 'ex-1',
     name: 'Jurisics Vár Bográcsozója',
     location: 'Diáksétány 1. (Vár felőli bejárat)',
+    coordinates: [47.38988, 16.53895],
     pin: '1234',
     category: 'bogracs',
     isOpen: true,
@@ -16,6 +24,7 @@ export const INITIAL_EXHIBITORS = [
     id: 'ex-2',
     name: 'Kőszegi Borosgazdák Egyesülete',
     location: 'Diáksétány 3. (Gyöngyös-patak hídjánál)',
+    coordinates: [47.38962, 16.53835],
     pin: '2345',
     category: 'ital',
     isOpen: true,
@@ -29,6 +38,7 @@ export const INITIAL_EXHIBITORS = [
     id: 'ex-3',
     name: 'Pékegér & Kőszegi Rétesház',
     location: 'Diáksétány 5. (Központi sétány)',
+    coordinates: [47.38948, 16.53885],
     pin: '3456',
     category: 'desszert',
     isOpen: true,
@@ -42,6 +52,7 @@ export const INITIAL_EXHIBITORS = [
     id: 'ex-4',
     name: 'Kőszegi Kürtőskalács',
     location: 'Diáksétány 8. (Park felőli oldal)',
+    coordinates: [47.38918, 16.53870],
     pin: '4567',
     category: 'desszert',
     isOpen: true,
@@ -55,6 +66,7 @@ export const INITIAL_EXHIBITORS = [
     id: 'ex-5',
     name: 'Vasi Vadászok & Erdészklub',
     location: 'Diáksétány 12. (Színpad mellett)',
+    coordinates: [47.38935, 16.53950],
     pin: '5678',
     category: 'bogracs',
     isOpen: true,
