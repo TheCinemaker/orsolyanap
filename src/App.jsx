@@ -39,11 +39,11 @@ function MainApp() {
   });
 
   return (
-    <div className="min-h-screen bg-[#fdfbf7] text-stone-900 flex flex-col justify-between font-sans selection:bg-amber-600 selection:text-white">
+    <div className="min-h-screen bg-[#fdfbf7] text-stone-900 flex flex-col justify-between font-sans selection:bg-amber-600 selection:text-white pb-20 md:pb-0">
       {/* Toast Notification */}
       {toastMessage && (
         <div
-          className={`fixed bottom-6 right-6 z-50 px-4 py-3 rounded-2xl shadow-lg font-semibold text-xs flex items-center gap-2 border animate-in slide-in-from-bottom duration-200 ${
+          className={`fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 px-4 py-3 rounded-2xl shadow-xl font-semibold text-xs flex items-center gap-2 border animate-in slide-in-from-bottom duration-200 ${
             toastMessage.type === 'error'
               ? 'bg-rose-800 text-white border-rose-700'
               : toastMessage.type === 'success'
@@ -51,7 +51,7 @@ function MainApp() {
               : 'bg-stone-900 text-white border-stone-800'
           }`}
         >
-          <CheckCircle2 className="w-4 h-4" />
+          <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
           <span>{toastMessage.text}</span>
         </div>
       )}
@@ -74,15 +74,15 @@ function MainApp() {
           <MapView />
         ) : (
           /* Visitor Main View */
-          <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+          <div className="max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8 space-y-6 sm:space-y-8">
             {/* Hero Section */}
-            <div className="bg-white border border-stone-200/90 rounded-3xl p-6 sm:p-10 shadow-xs relative overflow-hidden">
+            <div className="bg-white border border-stone-200/90 rounded-3xl p-5 sm:p-10 shadow-xs relative overflow-hidden">
               <div className="max-w-2xl space-y-3 relative z-10">
-                <span className="text-[10px] font-extrabold tracking-widest text-amber-800 uppercase bg-amber-100/80 px-3 py-1 rounded-full border border-amber-300/60">
+                <span className="text-[10px] font-extrabold tracking-widest text-amber-800 uppercase bg-amber-100/80 px-3 py-1 rounded-full border border-amber-300/60 inline-block">
                   📍 KŐSZEG DIÁKSÉTÁNY • ORSOLYA-NAPI VÁSÁR
                 </span>
 
-                <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-stone-900 leading-tight">
+                <h1 className="text-2.5xl sm:text-4xl font-extrabold tracking-tight text-stone-900 leading-tight">
                   Kőszegi ősz ízei & adományos főzései a Diáksétányon
                 </h1>
 
@@ -91,14 +91,14 @@ function MainApp() {
                 </p>
 
                 {/* Stats */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-4 border-t border-stone-100 text-xs">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3 pt-3 sm:pt-4 border-t border-stone-100 text-xs">
                   <div>
                     <span className="text-[10px] font-bold text-stone-400 block uppercase">
                       Helyszín
                     </span>
                     <span className="font-bold text-stone-900 flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5 text-amber-700" />
-                      Kőszeg Diáksétány
+                      <MapPin className="w-3.5 h-3.5 text-amber-700 flex-shrink-0" />
+                      <span className="truncate">Kőszeg Diáksétány</span>
                     </span>
                   </div>
 
@@ -124,10 +124,10 @@ function MainApp() {
             </div>
 
             {/* Exhibitors Feed */}
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold text-stone-900 flex items-center gap-2">
-                  <Utensils className="w-4 h-4 text-amber-700" />
+                <h2 className="text-base sm:text-lg font-bold text-stone-900 flex items-center gap-2">
+                  <Utensils className="w-4 h-4 text-amber-700 flex-shrink-0" />
                   <span>Diáksétány Árusok & Főzés Státusz</span>
                 </h2>
                 <span className="text-xs text-stone-400 font-semibold">
@@ -136,7 +136,7 @@ function MainApp() {
               </div>
 
               {filteredExhibitors.length === 0 ? (
-                <div className="bg-white border border-stone-200 rounded-3xl p-12 text-center text-stone-400">
+                <div className="bg-white border border-stone-200 rounded-3xl p-8 sm:p-12 text-center text-stone-400">
                   <Info className="w-8 h-8 mx-auto mb-2 opacity-40" />
                   <p className="text-sm font-bold text-stone-700">Nincs találat.</p>
                 </div>
@@ -167,7 +167,7 @@ function MainApp() {
       <MyOrdersModal />
 
       {/* Footer */}
-      <footer className="bg-white border-t border-stone-200/80 py-8 text-xs text-stone-500 mt-12">
+      <footer className="bg-white border-t border-stone-200/80 py-6 sm:py-8 text-xs text-stone-500 mt-8 sm:mt-12 hidden md:block">
         <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <VisitKoszegLogo />
           <div>
