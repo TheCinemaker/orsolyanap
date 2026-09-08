@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
 import { FESTIVAL_BOUNDS } from '../data/mockOrsolyaData';
-import { MapPin, ArrowRight, Compass, Waves, Trees, Castle, Heart, Navigation, Layers } from 'lucide-react';
+import { MapPin, ArrowRight, Compass, Waves, Trees, Castle, Heart, Navigation, Layers, ExternalLink, Globe } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 export default function MapView() {
   const { exhibitors, menuItems, favoriteExhibitorIds, setActiveView, addToCart, showToast } = useOrsolya();
   const [selectedExhibitorId, setSelectedExhibitorId] = useState(exhibitors[0]?.id || null);
-  const [mapMode, setMapMode] = useState('gps'); // 'gps' | 'schematic'
+  const [mapMode, setMapMode] = useState('gps'); // 'gps' | 'eventigo' | 'schematic'
   const [userLocation, setUserLocation] = useState(null);
   const [isLocating, setIsLocating] = useState(false);
 
@@ -148,24 +148,24 @@ export default function MapView() {
       <div className="text-center max-w-xl mx-auto space-y-2">
         <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-800 bg-amber-100/80 px-3 py-1 rounded-full border border-amber-300/60 inline-flex items-center gap-1.5">
           <MapPin className="w-3 h-3 text-amber-700" />
-          <span>KŐSZEG DIÁKSÉTÁNY • GPS TÉRKÉP</span>
+          <span>KŐSZEG DIÁKSÉTÁNY • VÁSÁRI TÉRKÉPEK</span>
         </span>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
-          Interaktív Vásári Térkép
+          Interaktív Vásári Térkép & Eventigo Integráció
         </h1>
         <p className="text-xs sm:text-sm text-stone-600 font-medium">
-          A fesztivál pontos 4-sarok GPS lehatárolása a Gyöngyös-patak mentén.
+          Válts a valós idejű GPS diáksétányi térkép és a hivatalos Eventigo.hu térkép között.
         </p>
       </div>
 
       {/* Map Control Bar */}
       <div className="bg-white border border-stone-200/90 rounded-3xl p-4 sm:p-6 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-stone-100 pb-3">
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 border-b border-stone-100 pb-3">
           {/* Mode Switcher */}
-          <div className="flex items-center gap-1 bg-stone-100 p-1 rounded-2xl border border-stone-200 w-full sm:w-auto">
+          <div className="flex items-center gap-1 bg-stone-100 p-1 rounded-2xl border border-stone-200 overflow-x-auto scrollbar-none">
             <button
               onClick={() => setMapMode('gps')}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              className={`flex items-center justify-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                 mapMode === 'gps'
                   ? 'bg-white text-stone-900 shadow-xs'
                   : 'text-stone-600 hover:text-stone-900'
@@ -174,9 +174,22 @@ export default function MapView() {
               <Compass className="w-3.5 h-3.5 text-amber-700" />
               <span>GPS Műholdas Térkép</span>
             </button>
+
+            <button
+              onClick={() => setMapMode('eventigo')}
+              className={`flex items-center justify-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                mapMode === 'eventigo'
+                  ? 'bg-white text-stone-900 shadow-xs'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              <Globe className="w-3.5 h-3.5 text-amber-700" />
+              <span>Eventigo.hu Hivatalos Térkép</span>
+            </button>
+
             <button
               onClick={() => setMapMode('schematic')}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              className={`flex items-center justify-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                 mapMode === 'schematic'
                   ? 'bg-white text-stone-900 shadow-xs'
                   : 'text-stone-600 hover:text-stone-900'
@@ -192,7 +205,7 @@ export default function MapView() {
             <button
               onClick={handleGetLocation}
               disabled={isLocating}
-              className="w-full sm:w-auto px-4 py-2 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-50"
+              className="px-4 py-2 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-50"
             >
               <Navigation className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} />
               <span>{isLocating ? 'Helymeghatározás...' : 'Hol vagyok a fesztiválon?'}</span>
@@ -212,6 +225,47 @@ export default function MapView() {
                 Diáksétány Fesztiválterület
               </span>
               <span className="text-[10px] text-stone-500 block">47.3889N - 47.3900N • 16.5379E - 16.5399E</span>
+            </div>
+          </div>
+        ) : mapMode === 'eventigo' ? (
+          /* Eventigo.hu Official Map Embed Container */
+          <div className="bg-stone-50 border border-stone-200 rounded-2xl p-5 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-200/80 pb-3">
+              <div>
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-200">
+                  EVENTIGO.HU BEÁGYAZOTT TÉRKÉP
+                </span>
+                <h3 className="text-lg font-extrabold text-stone-900 mt-1">
+                  Kőszegi Orsolya-napi Vásár Hivatalos Térkép
+                </h3>
+                <p className="text-xs text-stone-600">
+                  Megmutatja a teljes városi vásár statikus árusait, parkolóit és színpadait.
+                </p>
+              </div>
+
+              <a
+                href="https://eventigo.hu"
+                target="_blank"
+                rel="noreferrer"
+                className="px-4 py-2 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 self-start sm:self-center whitespace-nowrap"
+              >
+                <span>Megnyitás az Eventigo.hu-n</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            </div>
+
+            {/* Embedded Iframe View */}
+            <div className="relative w-full h-[400px] bg-white rounded-xl border border-stone-200 overflow-hidden shadow-xs">
+              <iframe
+                src="https://eventigo.hu"
+                title="Eventigo Orsolya-Napi Vásár Térkép"
+                className="w-full h-full border-0"
+                loading="lazy"
+              />
+            </div>
+
+            <div className="bg-amber-100/60 border border-amber-300/60 p-3 rounded-xl text-xs text-amber-950 font-medium">
+              ℹ️ <strong>Tipp:</strong> Az Eventigo.hu a vásár teljes statikus elrendezését mutatja. Az élő adagszámokat és főzéseket a <strong>GPS Műholdas Térkép</strong> fülön követheted nyomon!
             </div>
           </div>
         ) : (
