@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { X, QrCode, Camera, CheckCircle2, Sparkles } from 'lucide-react';
+import { X, QrCode, Camera, CheckCircle2, Sparkles, MapPin } from 'lucide-react';
 
 export default function QRScannerModal({ isOpen, onClose }) {
   const { exhibitors, addFavoriteExhibitor } = useOrsolya();
@@ -126,8 +126,8 @@ export default function QRScannerModal({ isOpen, onClose }) {
                 SIKERES SZKENNELÉS
               </span>
               <h2 className="text-xl font-bold text-stone-900 mt-2">{scannedStand.name}</h2>
-              <p className="text-xs text-stone-500 font-medium mt-0.5">
-                📍 {scannedStand.location}
+              <p className="text-xs text-stone-500 font-medium mt-0.5 flex items-center justify-center gap-1">
+                <MapPin className="w-3.5 h-3.5 text-amber-700 inline" /> {scannedStand.location}
               </p>
             </div>
 

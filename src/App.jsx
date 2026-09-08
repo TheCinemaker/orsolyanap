@@ -8,7 +8,7 @@ import CartDrawer from './components/CartDrawer';
 import MyOrdersModal from './components/MyOrdersModal';
 import MapView from './components/MapView';
 import VisitKoszegLogo from './components/VisitKoszegLogo';
-import { Utensils, Info, CheckCircle2, MapPin } from 'lucide-react';
+import { Utensils, Info, CheckCircle2, MapPin, Calendar, Clock, Sparkles } from 'lucide-react';
 import './App.css';
 
 function MainApp() {
@@ -78,12 +78,13 @@ function MainApp() {
             {/* Hero Section */}
             <div className="bg-white border border-stone-200/90 rounded-3xl p-5 sm:p-10 shadow-xs relative overflow-hidden">
               <div className="max-w-2xl space-y-3 relative z-10">
-                <span className="text-[10px] font-extrabold tracking-widest text-amber-800 uppercase bg-amber-100/80 px-3 py-1 rounded-full border border-amber-300/60 inline-block">
-                  📍 KŐSZEG DIÁKSÉTÁNY • ORSOLYA-NAPI VÁSÁR
+                <span className="text-[10px] font-extrabold tracking-widest text-amber-800 uppercase bg-amber-100/80 px-3 py-1 rounded-full border border-amber-300/60 inline-flex items-center gap-1.5">
+                  <MapPin className="w-3 h-3 text-amber-700" />
+                  <span>KŐSZEG DIÁKSÉTÁNY • ORSOLYA-NAPI VÁSÁR</span>
                 </span>
 
-                <h1 className="text-2.5xl sm:text-4xl font-extrabold tracking-tight text-stone-900 leading-tight">
-                  Kőszegi ősz ízei & adományos főzései a Diáksétányon
+                <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-stone-900 leading-tight">
+                  Kőszegi Ősz Ízei
                 </h1>
 
                 <p className="text-xs sm:text-sm text-stone-600 leading-relaxed font-medium">

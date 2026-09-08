@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { X, Clock, User, Phone, CheckCircle, Utensils } from 'lucide-react';
+import { X, Clock, User, Phone, CheckCircle, Utensils, MapPin } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export default function PreOrderModal({ exhibitor, onClose }) {
@@ -44,7 +44,9 @@ export default function PreOrderModal({ exhibitor, onClose }) {
                 KÓSTOLÓ FOGLALÁS
               </span>
               <h2 className="text-xl font-bold text-zinc-900 dark:text-white">{exhibitor.name}</h2>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">📍 {exhibitor.location}</p>
+              <p className="text-xs text-zinc-500 flex items-center gap-1">
+                <MapPin className="w-3.5 h-3.5 text-amber-700 inline" /> {exhibitor.location}
+              </p>
             </div>
 
             {/* Reserved Items */}

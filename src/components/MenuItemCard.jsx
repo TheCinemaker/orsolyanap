@@ -31,8 +31,9 @@ export default function MenuItemCard({ item, exhibitor }) {
               Főzés alatt (~{item.eta_minutes || 15}p)
             </span>
           ) : (
-            <span className="bg-emerald-50 text-emerald-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full flex-shrink-0 border border-emerald-200">
-              🔥 {item.stock} adag
+            <span className="bg-emerald-50 text-emerald-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full flex items-center gap-1 flex-shrink-0 border border-emerald-200">
+              <Flame className="w-3 h-3 text-emerald-700 flex-shrink-0" />
+              <span>{item.stock} adag</span>
             </span>
           )}
         </div>

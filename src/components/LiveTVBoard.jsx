@@ -93,8 +93,9 @@ export default function LiveTVBoard() {
             <div>
               <div className="flex items-start justify-between gap-2 mb-3">
                 <div>
-                  <span className="text-[10px] font-black uppercase tracking-widest bg-amber-500/20 text-amber-300 px-2.5 py-0.5 rounded-md">
-                    📍 {exhibitor.location}
+                  <span className="text-[10px] font-black uppercase tracking-widest bg-amber-500/20 text-amber-300 px-2.5 py-0.5 rounded-md flex items-center gap-1 inline-flex">
+                    <MapPin className="w-3 h-3 text-amber-300" />
+                    <span>{exhibitor.location}</span>
                   </span>
                   <h2 className="text-2xl font-black text-white mt-1.5 leading-snug">
                     {exhibitor.name}
@@ -148,7 +149,7 @@ export default function LiveTVBoard() {
                           <h4 className="text-sm font-extrabold truncate">{item.name}</h4>
                         </div>
                         <span className="text-xs font-bold text-amber-400/90 block">
-                          {item.price.toLocaleString('hu-HU')} Ft
+                          Adományos kóstolás
                         </span>
                       </div>
 
@@ -185,7 +186,10 @@ export default function LiveTVBoard() {
             </div>
 
             <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
-              <span>📍 Státusz: <strong className="text-emerald-400">NYITVA</strong></span>
+              <span className="flex items-center gap-1">
+                <MapPin className="w-3 h-3 text-emerald-400" />
+                <span>Státusz: <strong className="text-emerald-400">NYITVA</strong></span>
+              </span>
               <span>Előrendelhető mobilról</span>
             </div>
           </div>
@@ -204,7 +208,7 @@ export default function LiveTVBoard() {
             <div className="inline-block animate-marquee font-bold text-xs sm:text-sm tracking-wide">
               {notices.length > 0
                 ? notices.join('   •••   ')
-                : '🔥 BOGRÁCSOS MARHAPÖRKÖLT A JURISICS TÉREN ••• 🍷 FORRÓ FORRALT KÉKFRANKOS A VÁROSTORONYNÁL ••• 🥐 FRISS MÉGGYES-MÁKOS RÉTES A FŐ TÉREN'}
+                : 'BOGRÁCSOS MARHAPÖRKÖLT A DIÁKSÉTÁNYON ••• FORRÓ FORRALT KÉKFRANKOS A DIÁKSÉTÁNYON ••• FRISS MEGGYES-MÁKOS RÉTES A DIÁKSÉTÁNYON'}
             </div>
           </div>
         </div>

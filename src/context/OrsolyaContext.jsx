@@ -90,7 +90,7 @@ export function OrsolyaProvider({ children }) {
       const found = exhibitors.find((ex) => ex.id === scannedStandParam || ex.pin === scannedStandParam);
       if (found) {
         addFavoriteExhibitor(found.id);
-        showToast(`📍 ${found.name} beszkennelve és hozzáadva a Kedvencekhez!`, 'success');
+        showToast(`${found.name} beszkennelve és hozzáadva a Kedvencekhez!`, 'success');
       }
     }
   }, []);
@@ -99,7 +99,7 @@ export function OrsolyaProvider({ children }) {
   const addFavoriteExhibitor = (exhibitorId) => {
     setFavoriteExhibitorIds((prev) => {
       if (!prev.includes(exhibitorId)) {
-        showToast('Stand elmentve a Kedvencek közé! ❤️', 'success');
+        showToast('Stand elmentve a Kedvencek közé!', 'success');
         return [...prev, exhibitorId];
       }
       return prev;

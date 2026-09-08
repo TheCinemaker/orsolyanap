@@ -40,8 +40,8 @@ export default function FavoritesModal({ isOpen, onClose, onOpenScanner }) {
             }}
             className="w-full py-3 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-2xl shadow-xs flex items-center justify-center gap-2"
           >
-            <QrCode className="w-4 h-4" />
-            <span>📷 Stand QR Kód Beolvasása Kamerával</span>
+            <QrCode className="w-4 h-4 text-white" />
+            <span>Stand QR Kód Beolvasása Kamerával</span>
           </button>
         </div>
 
@@ -51,7 +51,7 @@ export default function FavoritesModal({ isOpen, onClose, onOpenScanner }) {
             <div className="text-center py-12 text-stone-400 space-y-2">
               <Heart className="w-10 h-10 mx-auto opacity-30 text-rose-500" />
               <p className="text-xs font-bold text-stone-700">Még nincs beszkennelt kedvenc standod.</p>
-              <p className="text-[11px] text-stone-500 max-w-xs mx-auto">
+              <p className="text-[11px] text-stone-500 max-w-xs mx-auto font-medium">
                 Szkenneld be a Diáksétányon található standok QR kódját, hogy ne felejtsd el hol láttál szuper ételeket!
               </p>
             </div>
@@ -66,8 +66,9 @@ export default function FavoritesModal({ isOpen, onClose, onOpenScanner }) {
                 >
                   <div className="flex justify-between items-start">
                     <div>
-                      <span className="text-[10px] font-bold text-amber-800 uppercase block">
-                        📍 {ex.location}
+                      <span className="text-[10px] font-bold text-amber-800 uppercase flex items-center gap-1">
+                        <MapPin className="w-3 h-3 text-amber-700" />
+                        <span>{ex.location}</span>
                       </span>
                       <h4 className="text-sm font-extrabold text-stone-900 mt-0.5">{ex.name}</h4>
                     </div>

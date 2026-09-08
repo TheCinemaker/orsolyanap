@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { MapPin, ArrowRight, Compass, Waves, Trees, Castle, Heart } from 'lucide-react';
+import { MapPin, ArrowRight, Compass, Waves, Trees, Castle, Heart, Footprints } from 'lucide-react';
 
 export default function MapView() {
   const { exhibitors, menuItems, favoriteExhibitorIds, setActiveView, addToCart } = useOrsolya();
@@ -34,8 +34,9 @@ export default function MapView() {
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
       {/* Header */}
       <div className="text-center max-w-xl mx-auto space-y-2">
-        <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-800 bg-amber-100/80 px-3 py-1 rounded-full border border-amber-300/60">
-          📍 KŐSZEG DIÁKSÉTÁNY
+        <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-800 bg-amber-100/80 px-3 py-1 rounded-full border border-amber-300/60 inline-flex items-center gap-1.5">
+          <MapPin className="w-3 h-3 text-amber-700" />
+          <span>KŐSZEG DIÁKSÉTÁNY</span>
         </span>
         <h1 className="text-3xl font-extrabold text-stone-900">
           Diáksétány Vásári Térkép
@@ -61,9 +62,9 @@ export default function MapView() {
         <div className="relative bg-stone-50 border border-stone-200/90 rounded-2xl p-6 min-h-[300px] flex flex-col justify-between overflow-hidden">
           {/* Gyöngyös-patak Stream Line Graphic */}
           <div className="absolute top-1/2 left-0 right-0 h-10 -translate-y-1/2 bg-sky-100/90 border-y border-sky-300/70 flex items-center justify-around text-sky-800 text-[11px] font-bold tracking-widest pointer-events-none select-none">
-            <span className="flex items-center gap-1"><Waves className="w-3.5 h-3.5" /> Gyöngyös-patak</span>
-            <span className="flex items-center gap-1"><Waves className="w-3.5 h-3.5" /> Gyöngyös-patak</span>
-            <span className="flex items-center gap-1"><Waves className="w-3.5 h-3.5" /> Gyöngyös-patak</span>
+            <span className="flex items-center gap-1"><Waves className="w-3.5 h-3.5 text-sky-700" /> Gyöngyös-patak</span>
+            <span className="flex items-center gap-1"><Waves className="w-3.5 h-3.5 text-sky-700" /> Gyöngyös-patak</span>
+            <span className="flex items-center gap-1"><Waves className="w-3.5 h-3.5 text-sky-700" /> Gyöngyös-patak</span>
           </div>
 
           {/* West & East Landmarks */}
@@ -120,8 +121,9 @@ export default function MapView() {
             })}
           </div>
 
-          <div className="text-center text-[11px] font-bold text-stone-500 relative z-10">
-            🚶 DIÁKSÉTÁNY FESZTIVÁL SÉTÁNY (KŐSZEG)
+          <div className="text-center text-[11px] font-bold text-stone-500 relative z-10 flex items-center justify-center gap-1">
+            <Footprints className="w-3.5 h-3.5 text-stone-500" />
+            <span>DIÁKSÉTÁNY FESZTIVÁL SÉTÁNY (KŐSZEG)</span>
           </div>
         </div>
 
@@ -131,8 +133,9 @@ export default function MapView() {
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-stone-200 pb-3">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold uppercase text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-200">
-                    STAND: {selectedExhibitor.location}
+                  <span className="text-[10px] font-bold uppercase text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-200 flex items-center gap-1">
+                    <MapPin className="w-3 h-3 text-amber-700" />
+                    <span>STAND: {selectedExhibitor.location}</span>
                   </span>
                   {favoriteExhibitorIds.includes(selectedExhibitor.id) && (
                     <span className="text-[10px] font-bold uppercase text-rose-700 bg-rose-100 px-2 py-0.5 rounded-full border border-rose-200 flex items-center gap-1">
@@ -152,9 +155,10 @@ export default function MapView() {
 
               <button
                 onClick={() => setActiveView('visitor')}
-                className="px-4 py-2 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs self-start"
+                className="px-4 py-2 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs self-start flex items-center gap-1"
               >
-                Ugrás az ételekhez →
+                <span>Ugrás az ételekhez</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
 

@@ -5,7 +5,7 @@ import FavoritesModal from './FavoritesModal';
 import QRScannerModal from './QRScannerModal';
 import MobileBottomNav from './MobileBottomNav';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { Utensils, MapPin, Store, Heart, Search, X, Info, QrCode } from 'lucide-react';
+import { Utensils, MapPin, Store, Heart, Search, X, Info, QrCode, Calendar, Clock } from 'lucide-react';
 
 export default function Header({ searchQuery, setSearchQuery, selectedCategory, setSelectedCategory }) {
   const {
@@ -36,8 +36,8 @@ export default function Header({ searchQuery, setSearchQuery, selectedCategory, 
             <span className="truncate uppercase tracking-wider font-bold">KŐSZEGI ORSOLYA-NAPI VÁSÁR • DIÁKSÉTÁNY</span>
           </div>
           <div className="hidden sm:flex items-center gap-3 opacity-90 text-[11px]">
-            <span>🍁 Natúrpark Ízei</span>
-            <span>⏱️ 09:00 - 20:00</span>
+            <span className="flex items-center gap-1"><Calendar className="w-3 h-3 text-amber-300" /> Natúrpark Ízei</span>
+            <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-amber-300" /> 09:00 - 20:00</span>
           </div>
         </div>
 

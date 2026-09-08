@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
 import VisitKoszegLogo from './VisitKoszegLogo';
-import { Key, ArrowRight } from 'lucide-react';
+import { Key, ArrowRight, ArrowLeft } from 'lucide-react';
 
 export default function ExhibitorAuthPage() {
   const { loginExhibitor, setActiveView } = useOrsolya();
@@ -78,9 +78,10 @@ export default function ExhibitorAuthPage() {
 
         <button
           onClick={() => setActiveView('visitor')}
-          className="mt-6 w-full text-center text-xs font-semibold text-stone-500 hover:text-stone-900 transition-colors"
+          className="mt-6 w-full text-center text-xs font-semibold text-stone-500 hover:text-stone-900 transition-colors flex items-center justify-center gap-1.5"
         >
-          ← Vissza a látogatói felületre
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Vissza a látogatói felületre</span>
         </button>
       </div>
     </div>

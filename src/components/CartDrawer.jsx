@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react';
+import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, MapPin } from 'lucide-react';
 import PreOrderModal from './PreOrderModal';
 
 export default function CartDrawer() {
@@ -52,7 +52,7 @@ export default function CartDrawer() {
                   <div className="flex items-center justify-between pb-2 border-b border-zinc-200/60 dark:border-zinc-700/60">
                     <div>
                       <h4 className="text-xs font-bold text-zinc-900 dark:text-white">{exhibitor.name}</h4>
-                      <span className="text-[10px] text-zinc-400">📍 {exhibitor.location}</span>
+                      <span className="text-[10px] text-zinc-400 flex items-center gap-1"><MapPin className="w-3 h-3 text-amber-700 inline" /> {exhibitor.location}</span>
                     </div>
                   </div>
 
