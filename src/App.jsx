@@ -158,12 +158,12 @@ function MainApp() {
           <MapView />
         ) : (
           /* Visitor Main View */
-          <div className="max-w-5xl mx-auto px-3 sm:px-4 py-6 space-y-6">
+          <div className="max-w-5xl mx-auto px-3 sm:px-4 pt-2 pb-4 space-y-4">
             {/* Top Title & Category Section */}
-            <div className="space-y-4">
-              <div className="text-center py-1">
-                <h1 className="text-3xl sm:text-4xl font-black text-amber-950 tracking-tight">
-                  Civil Ízek Utcája
+            <div className="space-y-2">
+              <div className="text-center">
+                <h1 className="text-xs sm:text-sm font-black text-amber-950 uppercase tracking-widest">
+                  CIVIL ÍZEK UTCÁJA
                 </h1>
               </div>
 
