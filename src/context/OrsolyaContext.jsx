@@ -601,6 +601,14 @@ export function OrsolyaProvider({ children }) {
     return newOrder;
   };
 
+  // Update order status (by Exhibitor)
+  const updateOrderStatus = (orderId, newStatus) => {
+    setOrders((prev) =>
+      prev.map((ord) => (ord.id === orderId ? { ...ord, status: newStatus } : ord))
+    );
+    showToast(`Foglalás #${orderId} frissítve!`);
+  };
+
   // File to Base64 Image Conversion Helper
   const convertFileToBase64 = (file) => {
     return new Promise((resolve, reject) => {
