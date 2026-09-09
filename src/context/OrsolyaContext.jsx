@@ -59,6 +59,10 @@ export function OrsolyaProvider({ children }) {
     return saved ? JSON.parse(saved) : [];
   });
 
+  // Global Visitor Filter States (Day & Dietary Preferences)
+  const [selectedDay, setSelectedDay] = useState('all'); // 'all' | 'saturday' | 'sunday'
+  const [selectedDietary, setSelectedDietary] = useState('all'); // 'all' | 'gluten_free' | 'lactose_free' | 'sugar_free' | 'vegan'
+
   // Toast message
   const [toastMessage, setToastMessage] = useState(null);
 
@@ -269,7 +273,60 @@ export function OrsolyaProvider({ children }) {
     showToast('Kijelentkeztél az árus felületről.');
   };
 
-  // Exhibitor Profile update (Bio, Story, Cause)
+  // Add Brand New Exhibitor Team (Super Admin / Organizer helper)
+  const addExhibitorTeam = async (teamData) => {
+    const generatedPin = teamData.pin || Math.floor(1000 + Math.random() * 9000).toString();
+    const newTeam = {
+      id: `ex-${Date.now()}`,
+      name: teamData.name.trim(),
+      location: teamData.location?.trim() || 'Diáksétány',
+      pin: generatedPin,
+      category: teamData.category || 'meleg_etel',
+      hasDrinks: !!teamData.hasDrinks,
+      offerings: teamData.offerings.trim(),
+      days: teamData.days || 'both',
+      isOpen: true,
+      story: teamData.story || '',
+      cause: teamData.cause || '',
+      phone: teamData.phone || '',
+      email: teamData.email || '',
+      facebook_url: teamData.facebook_url || '',
+      instagram_url: teamData.instagram_url || '',
+      image: teamData.image || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80',
+      notice: teamData.notice || ''
+    };
+
+    setExhibitors((prev) => [...prev, newTeam]);
+
+    try {
+      await supabase.from('exhibitors').insert([{
+        id: newTeam.id,
+        name: newTeam.name,
+        location: newTeam.location,
+        pin: newTeam.pin,
+        category: newTeam.category,
+        has_drinks: newTeam.hasDrinks,
+        offerings: newTeam.offerings,
+        days: newTeam.days,
+        is_open: newTeam.isOpen,
+        story: newTeam.story,
+        cause: newTeam.cause,
+        phone: newTeam.phone,
+        email: newTeam.email,
+        facebook_url: newTeam.facebook_url,
+        instagram_url: newTeam.instagram_url,
+        image: newTeam.image,
+        notice: newTeam.notice
+      }]);
+    } catch (e) {
+      console.warn('Supabase insert warning:', e);
+    }
+
+    showToast(`Új csapat (${newTeam.name}) sikeresen regisztrálva! PIN: ${generatedPin}`, 'success');
+    return newTeam;
+  };
+
+  // Exhibitor Profile update (Bio, Story, Cause, Contacts, Days)
   const updateExhibitorProfile = async (exhibitorId, updatedData) => {
     setExhibitors((prev) =>
       prev.map((ex) => (ex.id === exhibitorId ? { ...ex, ...updatedData } : ex))
@@ -281,7 +338,12 @@ export function OrsolyaProvider({ children }) {
         notice: updatedData.notice,
         location: updatedData.location,
         offerings: updatedData.offerings,
-        has_drinks: updatedData.hasDrinks
+        has_drinks: updatedData.hasDrinks,
+        phone: updatedData.phone,
+        email: updatedData.email,
+        facebook_url: updatedData.facebook_url,
+        instagram_url: updatedData.instagram_url,
+        days: updatedData.days
       }).eq('id', exhibitorId);
     } catch (e) {
       console.warn('Supabase sync warning:', e);
@@ -330,17 +392,31 @@ export function OrsolyaProvider({ children }) {
     showToast('Állapot frissítve!');
   };
 
-  // Save/Add menu item dynamically
+  // Save/Add menu item dynamically (with Allergen flags and Available day)
   const saveMenuItem = async (itemData) => {
+    const formattedItem = {
+      ...itemData,
+      is_gluten_free: !!itemData.is_gluten_free,
+      is_lactose_free: !!itemData.is_lactose_free,
+      is_sugar_free: !!itemData.is_sugar_free,
+      is_vegan: !!itemData.is_vegan,
+      available_day: itemData.available_day || 'both'
+    };
+
     if (itemData.id) {
-      setMenuItems((prev) => prev.map((i) => (i.id === itemData.id ? { ...i, ...itemData } : i)));
+      setMenuItems((prev) => prev.map((i) => (i.id === itemData.id ? { ...i, ...formattedItem } : i)));
       try {
         await supabase.from('menu_items').update({
-          name: itemData.name,
-          description: itemData.description,
-          initial_stock: Number(itemData.initial_stock),
-          category: itemData.category,
-          tags: itemData.tags
+          name: formattedItem.name,
+          description: formattedItem.description,
+          initial_stock: Number(formattedItem.initial_stock),
+          category: formattedItem.category,
+          tags: formattedItem.tags,
+          available_day: formattedItem.available_day,
+          is_gluten_free: formattedItem.is_gluten_free,
+          is_lactose_free: formattedItem.is_lactose_free,
+          is_sugar_free: formattedItem.is_sugar_free,
+          is_vegan: formattedItem.is_vegan
         }).eq('id', itemData.id);
       } catch (e) {
         console.warn('Supabase sync warning:', e);
@@ -348,11 +424,11 @@ export function OrsolyaProvider({ children }) {
       showToast('Étel frissítve!', 'success');
     } else {
       const newItem = {
-        ...itemData,
+        ...formattedItem,
         id: `item-${Date.now()}`,
         exhibitor_id: activeExhibitorId,
-        stock: Number(itemData.initial_stock) || 30,
-        initial_stock: Number(itemData.initial_stock) || 30,
+        stock: Number(formattedItem.initial_stock) || 30,
+        initial_stock: Number(formattedItem.initial_stock) || 30,
         status: 'ready',
         votes: 0
       };
@@ -480,8 +556,13 @@ export function OrsolyaProvider({ children }) {
         updateItemStatus,
         saveMenuItem,
         deleteMenuItem,
+        addExhibitorTeam,
         updateExhibitorProfile,
         updateOrderStatus,
+        selectedDay,
+        setSelectedDay,
+        selectedDietary,
+        setSelectedDietary,
         toastMessage,
         showToast
       }}

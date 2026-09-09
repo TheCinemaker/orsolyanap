@@ -1,6 +1,6 @@
 import React from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { X, MapPin, Phone, Heart, Utensils, Map, ThumbsUp, CupSoda } from 'lucide-react';
+import { X, MapPin, Phone, Mail, Heart, Utensils, Map, ThumbsUp, CupSoda, Calendar, Share2 } from 'lucide-react';
 
 export default function ExhibitorDetailModal({ exhibitor, onClose }) {
   const {
@@ -18,6 +18,8 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
 
   const items = menuItems.filter((i) => i.exhibitor_id === exhibitor.id);
   const isFavorite = favoriteExhibitorIds.includes(exhibitor.id);
+
+  const dayText = exhibitor.days === 'saturday' ? 'Csak Szombat' : exhibitor.days === 'sunday' ? 'Csak Vasárnap' : 'Mindkét nap (Szombat & Vasárnap)';
 
   return (
     <div className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-150">
@@ -39,7 +41,7 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
-            <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between">
+            <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between flex-wrap gap-1.5">
               <span className="text-xs font-extrabold uppercase tracking-wider text-amber-200 bg-amber-900/80 backdrop-blur-md px-3 py-1 rounded-full border border-amber-500/40 inline-flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5 text-amber-300" />
                 <span>{exhibitor.location}</span>
@@ -57,6 +59,13 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
 
         {/* Title & Action Buttons */}
         <div className="space-y-3">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs font-bold text-amber-900 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-200 flex items-center gap-1">
+              <Calendar className="w-3 h-3 text-amber-800" />
+              <span>{dayText}</span>
+            </span>
+          </div>
+
           <h2 className="text-2xl sm:text-3xl font-black text-stone-900 leading-tight">
             {exhibitor.name}
           </h2>
@@ -87,6 +96,55 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
           </div>
         </div>
 
+        {/* Social Links & Contact Details */}
+        {(exhibitor.phone || exhibitor.email || exhibitor.facebook_url || exhibitor.instagram_url) && (
+          <div className="flex items-center gap-2 flex-wrap bg-stone-50 p-3 rounded-2xl border border-stone-200/80 text-xs">
+            {exhibitor.phone && (
+              <a
+                href={`tel:${exhibitor.phone}`}
+                className="flex items-center gap-1 text-stone-700 font-bold hover:text-amber-800 bg-white px-2.5 py-1 rounded-xl border border-stone-200"
+              >
+                <Phone className="w-3.5 h-3.5 text-stone-500" />
+                <span>{exhibitor.phone}</span>
+              </a>
+            )}
+
+            {exhibitor.email && (
+              <a
+                href={`mailto:${exhibitor.email}`}
+                className="flex items-center gap-1 text-stone-700 font-bold hover:text-amber-800 bg-white px-2.5 py-1 rounded-xl border border-stone-200"
+              >
+                <Mail className="w-3.5 h-3.5 text-stone-500" />
+                <span>Email</span>
+              </a>
+            )}
+
+            {exhibitor.facebook_url && (
+              <a
+                href={exhibitor.facebook_url}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-1 text-blue-800 font-bold bg-blue-50 px-2.5 py-1 rounded-xl border border-blue-200 hover:bg-blue-100"
+              >
+                <Share2 className="w-3.5 h-3.5 text-blue-700" />
+                <span>Facebook</span>
+              </a>
+            )}
+
+            {exhibitor.instagram_url && (
+              <a
+                href={exhibitor.instagram_url}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-1 text-pink-800 font-bold bg-pink-50 px-2.5 py-1 rounded-xl border border-pink-200 hover:bg-pink-100"
+              >
+                <Share2 className="w-3.5 h-3.5 text-pink-700" />
+                <span>Instagram</span>
+              </a>
+            )}
+          </div>
+        )}
+
         {/* Offerings Summary (Kínálat) */}
         {exhibitor.offerings && (
           <div className="bg-amber-50 border border-amber-200 p-4 rounded-2xl space-y-1">
@@ -101,7 +159,7 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
         )}
 
         {/* Story & Cause (Hide empty fields) */}
-        {(exhibitor.story || exhibitor.cause || exhibitor.phone) && (
+        {(exhibitor.story || exhibitor.cause) && (
           <div className="space-y-3 bg-stone-50 p-4 rounded-2xl border border-stone-200/80 text-xs">
             {exhibitor.story && (
               <div>
@@ -116,22 +174,15 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
                 <p className="text-amber-800 font-medium">{exhibitor.cause}</p>
               </div>
             )}
-
-            {exhibitor.phone && (
-              <div className="pt-2 border-t border-stone-200/60 flex items-center gap-1.5 text-stone-500">
-                <Phone className="w-3.5 h-3.5 text-stone-700" />
-                <span>{exhibitor.phone}</span>
-              </div>
-            )}
           </div>
         )}
 
-        {/* Specific Dishes List (If provided) */}
+        {/* Specific Dishes List */}
         {items.length > 0 && (
           <div className="space-y-3">
             <h4 className="text-xs font-black text-stone-900 uppercase tracking-wider flex items-center gap-1.5">
               <Utensils className="w-4 h-4 text-amber-800" />
-              <span>Konkrét ételek és árak / adományok ({items.length}):</span>
+              <span>Konkrét ételek ({items.length}):</span>
             </h4>
 
             <div className="space-y-2">
@@ -145,8 +196,28 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
                     className="bg-white border border-stone-200 p-3.5 rounded-2xl flex items-center justify-between gap-3 shadow-2xs"
                   >
                     <div className="flex-1 min-w-0 space-y-1">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 flex-wrap">
                         <h5 className="font-extrabold text-stone-900 text-xs sm:text-sm">{item.name}</h5>
+                        {item.is_gluten_free && (
+                          <span className="text-[8px] font-extrabold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-200">
+                            Gluténmentes
+                          </span>
+                        )}
+                        {item.is_lactose_free && (
+                          <span className="text-[8px] font-extrabold text-cyan-800 bg-cyan-100 px-1.5 py-0.5 rounded border border-cyan-200">
+                            Laktózmentes
+                          </span>
+                        )}
+                        {item.is_sugar_free && (
+                          <span className="text-[8px] font-extrabold text-purple-800 bg-purple-100 px-1.5 py-0.5 rounded border border-purple-200">
+                            Cukormentes
+                          </span>
+                        )}
+                        {item.is_vegan && (
+                          <span className="text-[8px] font-extrabold text-lime-800 bg-lime-100 px-1.5 py-0.5 rounded border border-lime-200">
+                            Vegán
+                          </span>
+                        )}
                       </div>
 
                       {item.description && (

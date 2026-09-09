@@ -15,7 +15,16 @@ import {
   MapPin,
   Heart,
   Save,
-  QrCode
+  QrCode,
+  UserPlus,
+  Phone,
+  Mail,
+  Share2,
+  Calendar,
+  WheatOff,
+  MilkOff,
+  Sparkles,
+  Leaf
 } from 'lucide-react';
 import ExhibitorQRCard from '../ExhibitorQRCard';
 
@@ -24,12 +33,12 @@ export default function ExhibitorDashboard() {
     activeExhibitor,
     logoutExhibitor,
     menuItems,
-    orders,
     updateItemStock,
     updateItemStatus,
     saveMenuItem,
     deleteMenuItem,
-    updateExhibitorProfile
+    updateExhibitorProfile,
+    addExhibitorTeam
   } = useOrsolya();
 
   if (!activeExhibitor) return null;
@@ -43,7 +52,27 @@ export default function ExhibitorDashboard() {
     notice: activeExhibitor.notice || '',
     location: activeExhibitor.location || '',
     offerings: activeExhibitor.offerings || '',
-    hasDrinks: activeExhibitor.hasDrinks || false
+    hasDrinks: activeExhibitor.hasDrinks || false,
+    days: activeExhibitor.days || 'both',
+    phone: activeExhibitor.phone || '',
+    email: activeExhibitor.email || '',
+    facebook_url: activeExhibitor.facebook_url || '',
+    instagram_url: activeExhibitor.instagram_url || ''
+  });
+
+  // Modal states for Super-Admin New Team Creation
+  const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
+  const [createdTeamPinModal, setCreatedTeamPinModal] = useState(null);
+  const [teamForm, setTeamForm] = useState({
+    name: '',
+    offerings: '',
+    location: 'Diáksétány',
+    days: 'both',
+    phone: '',
+    email: '',
+    facebook_url: '',
+    instagram_url: '',
+    hasDrinks: false
   });
 
   // Modal states for dishes
@@ -55,12 +84,37 @@ export default function ExhibitorDashboard() {
     description: '',
     initial_stock: 30,
     category: 'meleg_etel',
-    tags: 'Meleg étel'
+    tags: 'Meleg étel',
+    available_day: 'both',
+    is_gluten_free: false,
+    is_lactose_free: false,
+    is_sugar_free: false,
+    is_vegan: false
   });
 
   const handleProfileSave = (e) => {
     e.preventDefault();
     updateExhibitorProfile(activeExhibitor.id, profileData);
+  };
+
+  const handleNewTeamSubmit = async (e) => {
+    e.preventDefault();
+    if (!teamForm.name.trim() || !teamForm.offerings.trim()) return;
+
+    const createdTeam = await addExhibitorTeam(teamForm);
+    setCreatedTeamPinModal(createdTeam);
+    setIsTeamModalOpen(false);
+    setTeamForm({
+      name: '',
+      offerings: '',
+      location: 'Diáksétány',
+      days: 'both',
+      phone: '',
+      email: '',
+      facebook_url: '',
+      instagram_url: '',
+      hasDrinks: false
+    });
   };
 
   const handleDishSave = (e) => {
@@ -83,11 +137,16 @@ export default function ExhibitorDashboard() {
   const openEditDishModal = (dish) => {
     setEditingDish(dish);
     setDishForm({
-      name: dish.name,
-      description: dish.description,
+      name: dish.name || '',
+      description: dish.description || '',
       initial_stock: dish.initial_stock || 30,
-      category: dish.category || 'bogracs',
-      tags: dish.tags ? dish.tags.join(', ') : ''
+      category: dish.category || 'meleg_etel',
+      tags: dish.tags ? dish.tags.join(', ') : '',
+      available_day: dish.available_day || 'both',
+      is_gluten_free: !!dish.is_gluten_free,
+      is_lactose_free: !!dish.is_lactose_free,
+      is_sugar_free: !!dish.is_sugar_free,
+      is_vegan: !!dish.is_vegan
     });
     setIsDishModalOpen(true);
   };
@@ -98,24 +157,32 @@ export default function ExhibitorDashboard() {
       name: '',
       description: '',
       initial_stock: 30,
-      category: 'bogracs',
-      tags: 'Bográcsos'
+      category: 'meleg_etel',
+      tags: 'Meleg étel',
+      available_day: 'both',
+      is_gluten_free: false,
+      is_lactose_free: false,
+      is_sugar_free: false,
+      is_vegan: false
     });
     setIsDishModalOpen(true);
   };
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
-      {/* Top Header */}
+      {/* Top Header Bar */}
       <div className="bg-white border border-stone-200/90 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[10px] font-extrabold tracking-wider text-emerald-800 uppercase bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-200">
               STAND KEZELŐ PORTÁL
             </span>
             <span className="text-xs text-stone-500 font-semibold flex items-center gap-1">
               <MapPin className="w-3.5 h-3.5 text-amber-700" />
               {activeExhibitor.location}
+            </span>
+            <span className="text-xs text-amber-900 font-bold bg-amber-100 px-2 py-0.5 rounded-full border border-amber-200">
+              {activeExhibitor.days === 'saturday' ? 'Szombat' : activeExhibitor.days === 'sunday' ? 'Vasárnap' : 'Mindkét nap (Szo-Vas)'}
             </span>
           </div>
           <h1 className="text-2xl font-extrabold text-stone-900 mt-1">
@@ -126,13 +193,22 @@ export default function ExhibitorDashboard() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={() => setIsTeamModalOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 py-2.5 bg-amber-900 hover:bg-amber-950 text-white font-extrabold text-xs rounded-2xl shadow-xs transition-all border border-amber-950"
+            title="Új kiállító csapat felvétele a vásárra"
+          >
+            <UserPlus className="w-4 h-4 text-amber-300" />
+            <span>+ Új Csapat Regisztráció</span>
+          </button>
+
           <button
             onClick={openNewDishModal}
-            className="flex items-center gap-2 px-4 py-2.5 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-2xl shadow-xs transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-2.5 bg-amber-800 hover:bg-amber-700 text-white font-extrabold text-xs rounded-2xl shadow-xs transition-all"
           >
             <PlusCircle className="w-4 h-4" />
-            <span>Új Étel Hozzáadása</span>
+            <span>+ Étel Hozzáadása</span>
           </button>
 
           <button
@@ -149,52 +225,111 @@ export default function ExhibitorDashboard() {
       <div className="bg-white border border-stone-200/90 rounded-3xl p-6 shadow-sm space-y-4">
         <h3 className="text-sm font-bold text-stone-900 flex items-center gap-2">
           <Heart className="w-4 h-4 text-rose-700" />
-          <span>Stand Bemutatkozás & Történet ("Kik vagyunk, miért főzünk?")</span>
+          <span>Stand Bemutatkozás, Elérhetőségek & Kiállítási Napok</span>
         </h3>
 
         <form onSubmit={handleProfileSave} className="space-y-4">
-          <div>
-            <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
-              Kik vagyunk & Történetünk
-            </label>
-            <textarea
-              rows={2}
-              placeholder="Pl. Kőszegi hagyományőrző társaság vagyunk. Dédszüleink receptje alapján főzünk..."
-              value={profileData.story}
-              onChange={(e) => setProfileData({ ...profileData, story: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
-            />
-          <div>
-            <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
-              Kínálat összefoglaló (Nem kötelező konkrét ételeket felvinni)
-            </label>
-            <input
-              type="text"
-              placeholder="Pl. Sütemények, házi rétesek, pogácsa, forró tea..."
-              value={profileData.offerings}
-              onChange={(e) => setProfileData({ ...profileData, offerings: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40 font-semibold"
-            />
-          </div>
-
-          <div className="flex items-center justify-between bg-stone-50 p-3.5 rounded-2xl border border-stone-200">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <span className="font-extrabold text-stone-900 text-xs block">Ital kapható nálatok a standnál?</span>
-              <span className="text-[11px] text-stone-500 font-medium">Ha bekapcsolod, az árus bekerül az "Ital kapható" szűrőbe és a térképre.</span>
+              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                Kik vagyunk & Történetünk
+              </label>
+              <textarea
+                rows={3}
+                placeholder="Pl. Kőszegi hagyományőrző társaság vagyunk. Dédszüleink receptje alapján főzünk..."
+                value={profileData.story}
+                onChange={(e) => setProfileData({ ...profileData, story: e.target.value })}
+                className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+              />
             </div>
 
-            <button
-              type="button"
-              onClick={() => setProfileData({ ...profileData, hasDrinks: !profileData.hasDrinks })}
-              className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all border ${
-                profileData.hasDrinks
-                  ? 'bg-cyan-800 text-white border-cyan-900 shadow-xs'
-                  : 'bg-white text-stone-600 border-stone-300'
-              }`}
-            >
-              {profileData.hasDrinks ? 'Ital: BEKAPCSOLVA (ON)' : 'Ital: KIKAPCSOLVA (OFF)'}
-            </button>
+            <div>
+              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                Kínálat összefoglaló (Mit főztek / kínáltok?) *
+              </label>
+              <textarea
+                rows={3}
+                required
+                placeholder="Pl. Bográcsos marhapörkölt, szüretes gulyásleves, rétesek..."
+                value={profileData.offerings}
+                onChange={(e) => setProfileData({ ...profileData, offerings: e.target.value })}
+                className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+              />
+            </div>
           </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-stone-50 p-4 rounded-2xl border border-stone-200">
+            <div>
+              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                Melyik napokon állítotok ki?
+              </label>
+              <select
+                value={profileData.days}
+                onChange={(e) => setProfileData({ ...profileData, days: e.target.value })}
+                className="w-full px-3 py-2 bg-white border border-stone-300 rounded-xl text-xs font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40 cursor-pointer"
+              >
+                <option value="both">Mindkét nap (Szombat és Vasárnap)</option>
+                <option value="saturday">Csak Szombaton</option>
+                <option value="sunday">Csak Vasárnap</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                Telefonszám (Opcionális)
+              </label>
+              <input
+                type="text"
+                placeholder="+36 30 123 4567"
+                value={profileData.phone}
+                onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                className="w-full px-3 py-2 bg-white border border-stone-300 rounded-xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                Email cím (Opcionális)
+              </label>
+              <input
+                type="email"
+                placeholder="csapat@koszeg.hu"
+                value={profileData.email}
+                onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                className="w-full px-3 py-2 bg-white border border-stone-300 rounded-xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                Facebook Link (Opcionális)
+              </label>
+              <input
+                type="url"
+                placeholder="https://facebook.com/csapatnev"
+                value={profileData.facebook_url}
+                onChange={(e) => setProfileData({ ...profileData, facebook_url: e.target.value })}
+                className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                Instagram Link (Opcionális)
+              </label>
+              <input
+                type="url"
+                placeholder="https://instagram.com/csapatnev"
+                value={profileData.instagram_url}
+                onChange={(e) => setProfileData({ ...profileData, instagram_url: e.target.value })}
+                className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
                 Adomány Célja (Kinek / Miért gyűjtünk?)
@@ -222,13 +357,32 @@ export default function ExhibitorDashboard() {
             </div>
           </div>
 
+          <div className="flex items-center justify-between bg-amber-50 p-3.5 rounded-2xl border border-amber-200">
+            <div>
+              <span className="font-extrabold text-amber-950 text-xs block">Ital kapható nálatok a standnál?</span>
+              <span className="text-[11px] text-amber-800 font-medium">Ha bekapcsolod, az árus bekerül az "Italok" kategóriába és a térképre.</span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setProfileData({ ...profileData, hasDrinks: !profileData.hasDrinks })}
+              className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all border ${
+                profileData.hasDrinks
+                  ? 'bg-cyan-800 text-white border-cyan-900 shadow-xs'
+                  : 'bg-white text-stone-600 border-stone-300'
+              }`}
+            >
+              {profileData.hasDrinks ? 'Ital: BEKAPCSOLVA (ON)' : 'Ital: KIKAPCSOLVA (OFF)'}
+            </button>
+          </div>
+
           <div className="flex justify-end">
             <button
               type="submit"
-              className="flex items-center gap-1.5 px-4 py-2 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-xl shadow-xs"
+              className="flex items-center gap-1.5 px-5 py-2.5 bg-stone-900 hover:bg-stone-800 text-white font-extrabold text-xs rounded-xl shadow-xs"
             >
-              <Save className="w-3.5 h-3.5" />
-              <span>Bemutatkozás Mentése</span>
+              <Save className="w-4 h-4 text-amber-400" />
+              <span>Bemutatkozás & Adatok Mentése</span>
             </button>
           </div>
         </form>
@@ -271,6 +425,32 @@ export default function ExhibitorDashboard() {
                 <div>
                   <div className="flex items-start justify-between gap-2">
                     <div>
+                      <div className="flex items-center gap-1.5 flex-wrap mb-1">
+                        <span className="text-[10px] font-bold text-stone-500 bg-stone-100 px-2 py-0.5 rounded-md">
+                          {item.available_day === 'saturday' ? 'Szombat' : item.available_day === 'sunday' ? 'Vasárnap' : 'Mindkét nap'}
+                        </span>
+                        {item.is_gluten_free && (
+                          <span className="text-[9px] font-extrabold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md border border-emerald-200">
+                            Gluténmentes
+                          </span>
+                        )}
+                        {item.is_lactose_free && (
+                          <span className="text-[9px] font-extrabold text-cyan-800 bg-cyan-100 px-2 py-0.5 rounded-md border border-cyan-200">
+                            Laktózmentes
+                          </span>
+                        )}
+                        {item.is_sugar_free && (
+                          <span className="text-[9px] font-extrabold text-purple-800 bg-purple-100 px-2 py-0.5 rounded-md border border-purple-200">
+                            Cukormentes
+                          </span>
+                        )}
+                        {item.is_vegan && (
+                          <span className="text-[9px] font-extrabold text-lime-800 bg-lime-100 px-2 py-0.5 rounded-md border border-lime-200">
+                            Vegán
+                          </span>
+                        )}
+                      </div>
+
                       <h4 className="text-base font-bold text-stone-900">
                         {item.name}
                       </h4>
@@ -376,10 +556,200 @@ export default function ExhibitorDashboard() {
       {/* Stand QR Code & Printable Banner Section */}
       <ExhibitorQRCard exhibitor={activeExhibitor} />
 
+      {/* Super-Admin New Team Registration Modal */}
+      {isTeamModalOpen && (
+        <div className="fixed inset-0 z-50 bg-stone-900/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-white border border-stone-200 rounded-3xl p-6 w-full max-w-lg shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-4">
+            <button
+              onClick={() => setIsTeamModalOpen(false)}
+              className="absolute top-4 right-4 text-stone-400 hover:text-stone-600 p-1"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-2">
+              <span className="p-2 bg-amber-100 rounded-xl text-amber-900">
+                <UserPlus className="w-5 h-5" />
+              </span>
+              <div>
+                <h3 className="text-lg font-extrabold text-stone-900">
+                  Új Csapat Regisztrálása a Vásárra
+                </h3>
+                <p className="text-xs text-stone-500 font-medium">
+                  Add meg a csapat adatait! Az automatikusan generált 4 jegyű PIN kóddal tudnak belépni.
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={handleNewTeamSubmit} className="space-y-4 pt-2">
+              <div>
+                <label className="block text-xs font-extrabold text-stone-800 uppercase tracking-wider mb-1">
+                  Csapat Neve * (Kötelező)
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Pl. Kőszegi Öntelt Szakácsok"
+                  value={teamForm.name}
+                  onChange={(e) => setTeamForm({ ...teamForm, name: e.target.value })}
+                  className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-300 rounded-2xl text-xs font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-extrabold text-stone-800 uppercase tracking-wider mb-1">
+                  Mit főznek / Kínálat * (Kötelező)
+                </label>
+                <textarea
+                  rows={2}
+                  required
+                  placeholder="Pl. Vasi tarhonyás hús, szüretes rétes, házi almalé..."
+                  value={teamForm.offerings}
+                  onChange={(e) => setTeamForm({ ...teamForm, offerings: e.target.value })}
+                  className="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-2xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40 font-medium"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                    Kiállítás Napja
+                  </label>
+                  <select
+                    value={teamForm.days}
+                    onChange={(e) => setTeamForm({ ...teamForm, days: e.target.value })}
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-300 rounded-xl text-xs font-bold text-stone-900 focus:outline-none cursor-pointer"
+                  >
+                    <option value="both">Mindkét nap (Szombat és Vasárnap)</option>
+                    <option value="saturday">Csak Szombat</option>
+                    <option value="sunday">Csak Vasárnap</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                    Helyszín / Stand Száma
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Diáksétány 18."
+                    value={teamForm.location}
+                    onChange={(e) => setTeamForm({ ...teamForm, location: e.target.value })}
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-300 rounded-xl text-xs text-stone-900 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                    Telefonszám (Opcionális)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="+36 30 111 2233"
+                    value={teamForm.phone}
+                    onChange={(e) => setTeamForm({ ...teamForm, phone: e.target.value })}
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-300 rounded-xl text-xs text-stone-900"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                    Email cím (Opcionális)
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="info@csapat.hu"
+                    value={teamForm.email}
+                    onChange={(e) => setTeamForm({ ...teamForm, email: e.target.value })}
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-300 rounded-xl text-xs text-stone-900"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                    Facebook URL (Opcionális)
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://facebook.com/..."
+                    value={teamForm.facebook_url}
+                    onChange={(e) => setTeamForm({ ...teamForm, facebook_url: e.target.value })}
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-300 rounded-xl text-xs text-stone-900"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                    Instagram URL (Opcionális)
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://instagram.com/..."
+                    value={teamForm.instagram_url}
+                    onChange={(e) => setTeamForm({ ...teamForm, instagram_url: e.target.value })}
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-300 rounded-xl text-xs text-stone-900"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3 bg-amber-900 hover:bg-amber-950 text-white font-extrabold text-xs rounded-2xl shadow-xs mt-2"
+              >
+                + Csapat Regisztrálása
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Team Created Success PIN Modal */}
+      {createdTeamPinModal && (
+        <div className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-200 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl space-y-4">
+            <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto text-emerald-800 border border-emerald-300">
+              <CheckCircle className="w-6 h-6" />
+            </div>
+
+            <div>
+              <h3 className="text-lg font-black text-stone-900">
+                Csapat Sikeresen Létrehozva!
+              </h3>
+              <p className="text-xs text-stone-500 font-medium mt-1">
+                {createdTeamPinModal.name} regisztrálva a rendszerbe.
+              </p>
+            </div>
+
+            <div className="bg-amber-50 border border-amber-300 p-4 rounded-2xl">
+              <span className="text-[10px] font-extrabold text-amber-900 uppercase tracking-wider block">
+                BELÉPÉSI PIN KÓD:
+              </span>
+              <span className="text-3xl font-black text-amber-950 tracking-widest block my-1">
+                {createdTeamPinModal.pin}
+              </span>
+              <span className="text-[11px] text-amber-800 font-medium block">
+                Ezzel a 4 jegyű PIN kóddal tud belépni a csapat a Stand Kezelő felületre!
+              </span>
+            </div>
+
+            <button
+              onClick={() => setCreatedTeamPinModal(null)}
+              className="w-full py-2.5 bg-stone-900 text-white font-bold text-xs rounded-xl shadow-xs"
+            >
+              Rendben, bezárás
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Add / Edit Dish Modal */}
       {isDishModalOpen && (
         <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white border border-stone-200 rounded-3xl p-6 w-full max-w-md shadow-2xl relative">
+          <div className="bg-white border border-stone-200 rounded-3xl p-6 w-full max-w-md shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-4">
             <button
               onClick={() => setIsDishModalOpen(false)}
               className="absolute top-4 right-4 text-stone-400 hover:text-stone-600 p-1"
@@ -387,14 +757,14 @@ export default function ExhibitorDashboard() {
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="text-lg font-bold text-stone-900 mb-4">
+            <h3 className="text-lg font-extrabold text-stone-900">
               {editingDish ? 'Étel Szerkesztése' : 'Új Étel Hozzáadása'}
             </h3>
 
             <form onSubmit={handleDishSave} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
-                  Étel Megnevezése
+                  Étel Megnevezése *
                 </label>
                 <input
                   type="text"
@@ -419,17 +789,34 @@ export default function ExhibitorDashboard() {
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
-                  Kezdő Adagszám
-                </label>
-                <input
-                  type="number"
-                  required
-                  value={dishForm.initial_stock}
-                  onChange={(e) => setDishForm({ ...dishForm, initial_stock: e.target.value })}
-                  className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                    Kezdő Adagszám
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    value={dishForm.initial_stock}
+                    onChange={(e) => setDishForm({ ...dishForm, initial_stock: e.target.value })}
+                    className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                    Elérhetőség Napja
+                  </label>
+                  <select
+                    value={dishForm.available_day}
+                    onChange={(e) => setDishForm({ ...dishForm, available_day: e.target.value })}
+                    className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 font-bold focus:outline-none cursor-pointer"
+                  >
+                    <option value="both">Mindkét nap</option>
+                    <option value="saturday">Szombat</option>
+                    <option value="sunday">Vasárnap</option>
+                  </select>
+                </div>
               </div>
 
               <div>
@@ -450,6 +837,55 @@ export default function ExhibitorDashboard() {
                 </select>
               </div>
 
+              {/* Allergen & Dietary Checkboxes */}
+              <div className="bg-amber-50/70 p-3.5 rounded-2xl border border-amber-200/80 space-y-2">
+                <span className="text-xs font-extrabold text-amber-950 uppercase tracking-wider block">
+                  Étrendi Jellemzők / Mentes opciók:
+                </span>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-stone-800">
+                    <input
+                      type="checkbox"
+                      checked={dishForm.is_gluten_free}
+                      onChange={(e) => setDishForm({ ...dishForm, is_gluten_free: e.target.checked })}
+                      className="rounded text-amber-800 focus:ring-amber-500"
+                    />
+                    <span>Gluténmentes</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-stone-800">
+                    <input
+                      type="checkbox"
+                      checked={dishForm.is_lactose_free}
+                      onChange={(e) => setDishForm({ ...dishForm, is_lactose_free: e.target.checked })}
+                      className="rounded text-amber-800 focus:ring-amber-500"
+                    />
+                    <span>Laktózmentes</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-stone-800">
+                    <input
+                      type="checkbox"
+                      checked={dishForm.is_sugar_free}
+                      onChange={(e) => setDishForm({ ...dishForm, is_sugar_free: e.target.checked })}
+                      className="rounded text-amber-800 focus:ring-amber-500"
+                    />
+                    <span>Cukormentes</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-stone-800">
+                    <input
+                      type="checkbox"
+                      checked={dishForm.is_vegan}
+                      onChange={(e) => setDishForm({ ...dishForm, is_vegan: e.target.checked })}
+                      className="rounded text-amber-800 focus:ring-amber-500"
+                    />
+                    <span>Vegán</span>
+                  </label>
+                </div>
+              </div>
+
               <div>
                 <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
                   Címkék (vesszővel elválasztva)
@@ -467,7 +903,7 @@ export default function ExhibitorDashboard() {
                 type="submit"
                 className="w-full py-3 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-2xl shadow-xs mt-2"
               >
-                Mentés
+                Étel Mentése
               </button>
             </form>
           </div>

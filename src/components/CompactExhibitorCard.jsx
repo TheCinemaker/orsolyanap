@@ -1,19 +1,26 @@
 import React from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { MapPin, Utensils, Heart, ChevronRight, ThumbsUp, Map, CupSoda } from 'lucide-react';
+import { MapPin, Utensils, Heart, ChevronRight, ThumbsUp, Map, CupSoda, Calendar } from 'lucide-react';
 
 export default function CompactExhibitorCard({ exhibitor, items, onOpenDetails }) {
   const { favoriteExhibitorIds, toggleFavoriteExhibitor, votedItemIds, voteForItem, focusExhibitorOnMap } = useOrsolya();
   const isFavorite = favoriteExhibitorIds.includes(exhibitor.id);
 
+  const dayLabel = exhibitor.days === 'saturday' ? 'Szombat' : exhibitor.days === 'sunday' ? 'Vasárnap' : 'Mindkét nap';
+
   return (
     <div className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-xs hover:border-amber-600/60 transition-all flex flex-col justify-between space-y-3 relative group">
-      {/* Top Bar: Location Badge, Drinks Badge & Favorite Toggle */}
+      {/* Top Bar: Location Badge, Day Badge, Drinks Badge & Favorite Toggle */}
       <div className="flex items-center justify-between gap-1.5 flex-wrap">
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 flex-wrap">
           <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-900 bg-amber-100/90 px-2.5 py-0.5 rounded-full border border-amber-300/80 inline-flex items-center gap-1">
             <MapPin className="w-2.5 h-2.5 text-amber-700" />
             <span className="truncate">{exhibitor.location.split('(')[0]}</span>
+          </span>
+
+          <span className="text-[10px] font-bold text-stone-600 bg-stone-100 px-2 py-0.5 rounded-full border border-stone-200 inline-flex items-center gap-1">
+            <Calendar className="w-2.5 h-2.5 text-stone-500" />
+            <span>{dayLabel}</span>
           </span>
 
           {exhibitor.hasDrinks && (
@@ -78,7 +85,19 @@ export default function CompactExhibitorCard({ exhibitor, items, onOpenDetails }
                 className="flex items-center justify-between text-xs bg-stone-50 p-2 rounded-xl border border-stone-100 gap-2"
               >
                 <div className="flex-1 min-w-0">
-                  <span className="font-bold text-stone-800 truncate block">{item.name}</span>
+                  <div className="flex items-center gap-1">
+                    <span className="font-bold text-stone-800 truncate block">{item.name}</span>
+                    {item.is_gluten_free && (
+                      <span className="text-[8px] font-extrabold text-emerald-800 bg-emerald-100 px-1 py-0.2 rounded">
+                        GM
+                      </span>
+                    )}
+                    {item.is_lactose_free && (
+                      <span className="text-[8px] font-extrabold text-cyan-800 bg-cyan-100 px-1 py-0.2 rounded">
+                        LM
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <button
