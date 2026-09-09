@@ -3,10 +3,14 @@
 -- Execute this script in your Supabase SQL Editor (https://supabase.com)
 -- =====================================================================
 
--- 1. Create Tables
+-- 1. Reset and Recreate Clean Tables
+DROP TABLE IF EXISTS public.orders CASCADE;
+DROP TABLE IF EXISTS public.votes CASCADE;
+DROP TABLE IF EXISTS public.menu_items CASCADE;
+DROP TABLE IF EXISTS public.exhibitors CASCADE;
 
 -- Exhibitors (Árusok & Csapatok)
-CREATE TABLE IF NOT EXISTS public.exhibitors (
+CREATE TABLE public.exhibitors (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
     location TEXT NOT NULL DEFAULT 'Diáksétány',
@@ -29,7 +33,7 @@ CREATE TABLE IF NOT EXISTS public.exhibitors (
 );
 
 -- Menu Items / Dishes (Ételek & Kínálat)
-CREATE TABLE IF NOT EXISTS public.menu_items (
+CREATE TABLE public.menu_items (
     id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
     exhibitor_id TEXT REFERENCES public.exhibitors(id) ON DELETE CASCADE,
     name TEXT NOT NULL,

@@ -485,7 +485,27 @@ export function OrsolyaProvider({ children }) {
       };
       setMenuItems((prev) => [...prev, newItem]);
       try {
-        await supabase.from('menu_items').insert([newItem]);
+        const dbPayload = {
+          id: newItem.id,
+          exhibitor_id: newItem.exhibitor_id,
+          name: newItem.name,
+          description: newItem.description || '',
+          initial_stock: newItem.initial_stock,
+          stock: newItem.stock,
+          status: newItem.status,
+          votes: 0,
+          category: newItem.category || 'meleg_etel',
+          available_day: newItem.available_day || 'both',
+          is_gluten_free: newItem.is_gluten_free,
+          is_lactose_free: newItem.is_lactose_free,
+          is_sugar_free: newItem.is_sugar_free,
+          is_vegan: newItem.is_vegan,
+          tags: newItem.tags || []
+        };
+        const { error: insErr } = await supabase.from('menu_items').insert([dbPayload]);
+        if (insErr) {
+          console.error('Supabase menu_items insert error:', insErr.message);
+        }
       } catch (e) {
         console.warn('Supabase sync warning:', e);
       }
