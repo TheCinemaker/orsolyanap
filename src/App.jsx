@@ -160,11 +160,11 @@ function MainApp() {
             <div className="space-y-4">
               <div className="space-y-1">
                 <span className="text-[10px] font-extrabold uppercase tracking-widest text-amber-800 bg-amber-100/90 px-2.5 py-0.5 rounded-full border border-amber-200 inline-block">
-                  ORSOLYA-NAPI VÁSÁR • CIVIL ÍZEK UTCÁJA
+                  ORSOLYA-NAPI VÁSÁR • DIÁKSÉTÁNY
                 </span>
 
                 <h1 className="text-3xl sm:text-4xl font-black text-stone-900 tracking-tight">
-                  Mi fő a Diáksétányon?
+                  Civil Ízek Utcája
                 </h1>
               </div>
 

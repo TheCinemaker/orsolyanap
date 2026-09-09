@@ -29,18 +29,21 @@ export function VisitKoszegIcon({ className = "w-7 h-8", color = "#d97706" }) {
   );
 }
 
-export default function VisitKoszegLogo({ onLongPress5s, className = "" }) {
+export default function VisitKoszegLogo({ onClick, onLongPress5s, className = "" }) {
   const [pressProgress, setPressProgress] = useState(0);
   const timerRef = useRef(null);
   const intervalRef = useRef(null);
+  const startTimeRef = useRef(null);
+  const isLongPressTriggeredRef = useRef(false);
 
   const startPress = () => {
     setPressProgress(0);
-    const startTime = Date.now();
+    isLongPressTriggeredRef.current = false;
+    startTimeRef.current = Date.now();
     const duration = 5000; // 5 seconds
 
     intervalRef.current = setInterval(() => {
-      const elapsed = Date.now() - startTime;
+      const elapsed = Date.now() - (startTimeRef.current || Date.now());
       const progress = Math.min(100, (elapsed / duration) * 100);
       setPressProgress(progress);
     }, 50);
@@ -48,27 +51,33 @@ export default function VisitKoszegLogo({ onLongPress5s, className = "" }) {
     timerRef.current = setTimeout(() => {
       clearInterval(intervalRef.current);
       setPressProgress(0);
+      isLongPressTriggeredRef.current = true;
       if (onLongPress5s) {
         onLongPress5s();
       }
     }, duration);
   };
 
-  const cancelPress = () => {
+  const endPress = () => {
+    const elapsed = Date.now() - (startTimeRef.current || Date.now());
     if (timerRef.current) clearTimeout(timerRef.current);
     if (intervalRef.current) clearInterval(intervalRef.current);
     setPressProgress(0);
+
+    if (!isLongPressTriggeredRef.current && elapsed < 4000 && onClick) {
+      onClick();
+    }
   };
 
   return (
     <div
       onMouseDown={startPress}
-      onMouseUp={cancelPress}
-      onMouseLeave={cancelPress}
+      onMouseUp={endPress}
+      onMouseLeave={endPress}
       onTouchStart={startPress}
-      onTouchEnd={cancelPress}
-      className={`inline-flex items-center gap-2 select-none cursor-pointer relative py-1 px-1.5 rounded-xl transition-all ${className}`}
-      title="VisitKőszeg (Tartsd nyomva 5mp-ig az Árus Belépéshez)"
+      onTouchEnd={endPress}
+      className={`inline-flex items-center gap-2 select-none cursor-pointer relative py-1 px-1.5 rounded-xl hover:opacity-85 transition-all ${className}`}
+      title="VisitKőszeg - Vissza a főoldalra"
     >
       {/* 5-second long press progress bar indicator */}
       {pressProgress > 0 && (

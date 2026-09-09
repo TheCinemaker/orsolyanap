@@ -64,7 +64,15 @@ export default function HamburgerMenuDrawer({
       <div className="bg-white w-full max-w-xs sm:max-w-sm h-full shadow-2xl flex flex-col justify-between overflow-y-auto p-5 space-y-6 relative animate-in slide-in-from-left duration-250 border-r border-stone-200">
         {/* Top Header */}
         <div className="flex items-center justify-between border-b border-stone-100 pb-4">
-          <VisitKoszegLogo size="sm" />
+          <VisitKoszegLogo
+            onClick={() => {
+              setMainTab('tents');
+              setSelectedCategory('all');
+              setSelectedZone('all');
+              setActiveView('visitor');
+              onClose();
+            }}
+          />
           <button
             onClick={onClose}
             className="p-1.5 rounded-full text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-all"

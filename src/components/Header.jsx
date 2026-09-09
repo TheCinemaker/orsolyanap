@@ -79,7 +79,16 @@ export default function Header({
             >
               <Menu className="w-5 h-5 text-amber-800" />
             </button>
-            <VisitKoszegLogo onLongPress5s={() => setActiveView('login')} />
+            <VisitKoszegLogo
+              onClick={() => {
+                setActiveView('visitor');
+                setMainTab('tents');
+                setSearchQuery('');
+                setSelectedCategory('all');
+                setSelectedZone('all');
+              }}
+              onLongPress5s={() => setActiveView('login')}
+            />
           </div>
 
           {/* Navigation Tabs (Desktop Apple Segmented Style) */}
