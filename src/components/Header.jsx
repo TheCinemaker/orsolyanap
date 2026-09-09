@@ -301,9 +301,8 @@ export default function Header({
 
       {/* Mobile Bottom Navigation Bar */}
       <MobileBottomNav
-        onOpenInfo={() => setIsInfoOpen(true)}
         onOpenFavorites={() => setIsFavoritesOpen(true)}
-        onOpenScanner={() => setIsScannerOpen(true)}
+        onOpenHamburger={() => setIsHamburgerOpen(true)}
       />
 
       {/* Modals & Drawers */}

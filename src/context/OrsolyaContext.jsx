@@ -34,6 +34,15 @@ export function OrsolyaProvider({ children }) {
     return saved ? JSON.parse(saved) : ['ex-1'];
   });
 
+  // Favorite Dish IDs
+  const [favoriteItemIds, setFavoriteItemIds] = useState(() => {
+    const saved = localStorage.getItem('orsolya_favorite_item_ids');
+    return saved ? JSON.parse(saved) : ['item-101'];
+  });
+
+  // Focused Exhibitor ID on Map
+  const [focusedExhibitorIdOnMap, setFocusedExhibitorIdOnMap] = useState(null);
+
   // Visitor Cart state (Portions reservation)
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -81,49 +90,32 @@ export function OrsolyaProvider({ children }) {
   }, [favoriteExhibitorIds]);
 
   useEffect(() => {
+    localStorage.setItem('orsolya_favorite_item_ids', JSON.stringify(favoriteItemIds));
+  }, [favoriteItemIds]);
+
+  useEffect(() => {
     localStorage.setItem('orsolya_voted_item_ids', JSON.stringify(votedItemIds));
   }, [votedItemIds]);
 
-  // Vote for a dish / item
-  const voteForItem = (itemId) => {
-    if (votedItemIds.includes(itemId)) {
-      showToast('Erre az ételre már leadtad a közönségszavazatodat!', 'error');
-      return false;
-    }
-
-    setVotedItemIds((prev) => [...prev, itemId]);
-    setMenuItems((prevItems) =>
-      prevItems.map((item) => {
-        if (item.id === itemId) {
-          return { ...item, votes: (item.votes || 0) + 1 };
-        }
-        return item;
-      })
-    );
-    showToast('Köszönjük a közönségszavazatot!', 'success');
-    return true;
+  // Focus exhibitor on map
+  const focusExhibitorOnMap = (exhibitorId) => {
+    setFocusedExhibitorIdOnMap(exhibitorId);
+    setActiveView('map');
   };
 
-  useEffect(() => {
-    if (activeExhibitorId) {
-      localStorage.setItem('orsolya_logged_exhibitor_id', activeExhibitorId);
-    } else {
-      localStorage.removeItem('orsolya_logged_exhibitor_id');
-    }
-  }, [activeExhibitorId]);
-
-  // Check URL query parameters for QR code scans (e.g. ?stand=ex-1 or ?qr=ex-1)
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const scannedStandParam = params.get('stand') || params.get('qr');
-    if (scannedStandParam) {
-      const found = exhibitors.find((ex) => ex.id === scannedStandParam || ex.pin === scannedStandParam);
-      if (found) {
-        addFavoriteExhibitor(found.id);
-        showToast(`${found.name} beszkennelve és hozzáadva a Kedvencekhez!`, 'success');
+  // Favorite Dish helper functions
+  const toggleFavoriteItem = (itemId) => {
+    setFavoriteItemIds((prev) => {
+      const isFav = prev.includes(itemId);
+      if (isFav) {
+        showToast('Étel eltávolítva a Kedvencek közül.');
+        return prev.filter((id) => id !== itemId);
+      } else {
+        showToast('Étel elmentve a Kedvencek közé!', 'success');
+        return [...prev, itemId];
       }
-    }
-  }, []);
+    });
+  };
 
   // Favorite Stand helper functions
   const addFavoriteExhibitor = (exhibitorId) => {
@@ -137,9 +129,24 @@ export function OrsolyaProvider({ children }) {
   };
 
   const toggleFavoriteExhibitor = (exhibitorId) => {
-    setFavoriteExhibitorIds((prev) =>
-      prev.includes(exhibitorId) ? prev.filter((id) => id !== exhibitorId) : [...prev, exhibitorId]
+    setFavoriteExhibitorIds((prev) => {
+      const isFav = prev.includes(exhibitorId);
+      if (isFav) {
+        showToast('Stand eltávolítva a Kedvencek közül.');
+        return prev.filter((id) => id !== exhibitorId);
+      } else {
+        showToast('Stand elmentve a Kedvencek közé!', 'success');
+        return [...prev, exhibitorId];
+      }
+    });
+  };
+
+  // Toggle exhibitor hasDrinks
+  const updateExhibitorDrinks = (exhibitorId, hasDrinks) => {
+    setExhibitors((prev) =>
+      prev.map((ex) => (ex.id === exhibitorId ? { ...ex, hasDrinks } : ex))
     );
+    showToast(hasDrinks ? '🥤 Ital elérhetőség bekapcsolva!' : 'Ital elérhetőség kikapcsolva.');
   };
 
   // Login as Exhibitor with PIN
@@ -313,6 +320,11 @@ export function OrsolyaProvider({ children }) {
         favoriteExhibitorIds,
         addFavoriteExhibitor,
         toggleFavoriteExhibitor,
+        favoriteItemIds,
+        toggleFavoriteItem,
+        focusedExhibitorIdOnMap,
+        focusExhibitorOnMap,
+        updateExhibitorDrinks,
         votedItemIds,
         voteForItem,
         placeOrder,

@@ -37,23 +37,43 @@ function MainApp() {
     { id: 'zone-3', label: '71-100. Színpad & Park' }
   ];
 
+  const intentCategories = [
+    { id: 'all', label: 'Összes', icon: '✨' },
+    { id: 'meleg_etel', label: 'Meleg étel', icon: '🍲' },
+    { id: 'sutemeny', label: 'Sütemény', icon: '🍰' },
+    { id: 'retes', label: 'Rétes', icon: '🥧' },
+    { id: 'ital', label: 'Ital', icon: '🥤' },
+    { id: 'kave_tea', label: 'Kávé / tea', icon: '☕' },
+    { id: 'helyi_termek', label: 'Helyi termék', icon: '🧀' }
+  ];
+
   const filteredExhibitors = exhibitors.filter((ex) => {
     const exItems = menuItems.filter((i) => i.exhibitor_id === ex.id);
 
-    // Search query matching
+    // Tolerant Drink search matching ("ital", "üdítő", "bor", "fröccs", etc.)
+    const lowerQuery = searchQuery.trim().toLowerCase();
+    const isDrinkSearch = ['ital', 'üdítő', 'bor', 'sör', 'must', 'forralt bor', 'fröccs'].some((s) =>
+      lowerQuery.includes(s)
+    );
+
     const matchesSearch =
-      ex.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ex.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (ex.story && ex.story.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      !lowerQuery ||
+      ex.name.toLowerCase().includes(lowerQuery) ||
+      ex.location.toLowerCase().includes(lowerQuery) ||
+      (ex.story && ex.story.toLowerCase().includes(lowerQuery)) ||
+      (ex.offerings && ex.offerings.toLowerCase().includes(lowerQuery)) ||
+      (isDrinkSearch && ex.hasDrinks) ||
       exItems.some(
         (i) =>
-          i.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          i.description.toLowerCase().includes(searchQuery.toLowerCase())
+          i.name.toLowerCase().includes(lowerQuery) ||
+          i.description.toLowerCase().includes(lowerQuery) ||
+          (i.tags && i.tags.some((t) => t.toLowerCase().includes(lowerQuery)))
       );
 
-    // Category matching
+    // Category matching (visitor intent)
     const matchesCategory =
       selectedCategory === 'all' ||
+      (selectedCategory === 'ital' && (ex.hasDrinks || ex.category === 'ital')) ||
       ex.category === selectedCategory ||
       exItems.some((i) => i.category === selectedCategory);
 
@@ -63,9 +83,9 @@ function MainApp() {
 
     const matchesZone =
       selectedZone === 'all' ||
-      (selectedZone === 'zone-1' && standNum <= 30) ||
-      (selectedZone === 'zone-2' && standNum > 30 && standNum <= 70) ||
-      (selectedZone === 'zone-3' && standNum > 70);
+      (selectedZone === 'zone-1' && standNum <= 15) ||
+      (selectedZone === 'zone-2' && standNum > 15 && standNum <= 30) ||
+      (selectedZone === 'zone-3' && standNum > 30);
 
     // Filter toggles
     const matchesCooking = !showOnlyCooking || (ex.notice && ex.notice.length > 0);
@@ -77,7 +97,7 @@ function MainApp() {
   const visibleExhibitors = filteredExhibitors.slice(0, visibleCount);
 
   return (
-    <div className="min-h-screen bg-[#fdfbf7] text-stone-900 flex flex-col justify-between font-sans selection:bg-amber-600 selection:text-white pb-20 md:pb-0">
+    <div className="min-h-screen bg-[#fdfbf7] text-stone-900 flex flex-col justify-between font-sans selection:bg-amber-700 selection:text-white pb-20 md:pb-0">
       {/* Toast Notification */}
       {toastMessage && (
         <div
@@ -117,49 +137,67 @@ function MainApp() {
         ) : (
           /* Visitor Main View */
           <div className="max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8 space-y-6 sm:space-y-8">
-            {/* Hero Section */}
-            <div className="bg-white border border-stone-200/90 rounded-3xl p-5 sm:p-8 shadow-xs relative overflow-hidden">
-              <div className="max-w-2xl space-y-3 relative z-10">
-                <span className="text-[10px] font-extrabold tracking-widest text-amber-800 uppercase bg-amber-100/80 px-3 py-1 rounded-full border border-amber-300/60 inline-flex items-center gap-1.5">
-                  <MapPin className="w-3 h-3 text-amber-700" />
-                  <span>ORSOLYA-NAPI VÁSÁR – NATÚRPARK ÍZEI FESZTIVÁL</span>
+            {/* Hero Section: 🔥 MI FŐ? */}
+            <div className="bg-white border border-stone-200/80 rounded-3xl p-6 sm:p-10 shadow-xs space-y-6">
+              <div className="space-y-2">
+                <span className="text-xs font-extrabold uppercase tracking-widest text-amber-800 bg-amber-100 px-3 py-1 rounded-full border border-amber-200 inline-block">
+                  ORSOLYA-NAPI VÁSÁR • CIVIL ÍZEK UTCÁJA
                 </span>
 
-                <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-stone-900 leading-tight">
-                  Civil Ízek Utcája
+                <h1 className="text-3xl sm:text-5xl font-black text-stone-900 tracking-tight flex items-center gap-3">
+                  <span>🔥 MI FŐ?</span>
                 </h1>
 
-                <p className="text-xs sm:text-sm text-stone-600 leading-relaxed font-medium">
-                  A kőszegi Diáksétányon rotyogó civil bográcsok, adományos főzések és vásári standok nyomon követése.
+                <p className="text-xs sm:text-sm text-stone-500 font-medium">
+                  Kőszegi Diáksétány • Keresd meg a legjobb bográcsos ételeket, réteseket és borokat!
                 </p>
+              </div>
 
-                {/* Main View Mode Switcher: 50 Sátor vs 200 Étel Katalógus */}
-                <div className="pt-2">
-                  <div className="inline-flex items-center gap-1 bg-stone-100 p-1.5 rounded-2xl border border-stone-200/90 w-full sm:w-auto">
-                    <button
-                      onClick={() => setMainTab('tents')}
-                      className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 py-2 px-4 rounded-xl text-xs font-extrabold transition-all ${
-                        mainTab === 'tents'
-                          ? 'bg-amber-800 text-white shadow-xs'
-                          : 'text-stone-700 hover:bg-stone-200/60 font-bold'
-                      }`}
-                    >
-                      <Store className="w-4 h-4" />
-                      <span>50 Sátor Nézet</span>
-                    </button>
+              {/* Big Search Input */}
+              <div className="relative max-w-2xl">
+                <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
+                <input
+                  type="text"
+                  placeholder="Mit keresel? (rétes, gulyás, süti, ital...)"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-12 pr-10 py-3.5 bg-stone-50 border border-stone-200 focus:border-amber-600 rounded-2xl text-sm sm:text-base text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-4 focus:ring-amber-500/20 font-semibold transition-all shadow-inner"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-stone-400 hover:text-stone-700"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
 
-                    <button
-                      onClick={() => setMainTab('food')}
-                      className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 py-2 px-4 rounded-xl text-xs font-extrabold transition-all ${
-                        mainTab === 'food'
-                          ? 'bg-amber-800 text-white shadow-xs'
-                          : 'text-stone-700 hover:bg-stone-200/60 font-bold'
-                      }`}
-                    >
-                      <Utensils className="w-4 h-4" />
-                      <span>200 Étel Katalógus</span>
-                    </button>
-                  </div>
+              {/* 6 Large Intent Category Buttons */}
+              <div className="space-y-2 pt-2">
+                <span className="text-[11px] font-extrabold uppercase tracking-wider text-stone-400 block">
+                  Kategóriaválasztó
+                </span>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+                  {intentCategories.map((cat) => {
+                    const isSelected = selectedCategory === cat.id;
+
+                    return (
+                      <button
+                        key={cat.id}
+                        onClick={() => setSelectedCategory(cat.id)}
+                        className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-2xl text-xs sm:text-sm font-extrabold transition-all border shadow-2xs ${
+                          isSelected
+                            ? 'bg-amber-800 text-white border-amber-900 scale-102 shadow-md'
+                            : 'bg-stone-50 hover:bg-stone-100 text-stone-700 border-stone-200 hover:border-stone-300'
+                        }`}
+                      >
+                        <span className="text-base">{cat.icon}</span>
+                        <span>{cat.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>

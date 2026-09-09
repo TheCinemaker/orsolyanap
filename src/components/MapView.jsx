@@ -6,9 +6,10 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 export default function MapView() {
-  const { exhibitors, menuItems, favoriteExhibitorIds, setActiveView, addToCart, showToast } = useOrsolya();
-  const [selectedExhibitorId, setSelectedExhibitorId] = useState(exhibitors[0]?.id || null);
+  const { exhibitors, menuItems, favoriteExhibitorIds, setActiveView, addToCart, showToast, focusedExhibitorIdOnMap } = useOrsolya();
+  const [selectedExhibitorId, setSelectedExhibitorId] = useState(focusedExhibitorIdOnMap || exhibitors[0]?.id || null);
   const [mapMode, setMapMode] = useState('gps'); // 'gps' | 'schematic'
+  const [showOnlyDrinks, setShowOnlyDrinks] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
   const [isLocating, setIsLocating] = useState(false);
 
@@ -16,6 +17,18 @@ export default function MapView() {
   const leafletMapRef = useRef(null);
   const userMarkerRef = useRef(null);
 
+  // If focusedExhibitorIdOnMap changes, focus it
+  useEffect(() => {
+    if (focusedExhibitorIdOnMap) {
+      setSelectedExhibitorId(focusedExhibitorIdOnMap);
+      const found = exhibitors.find((e) => e.id === focusedExhibitorIdOnMap);
+      if (found && found.coordinates && leafletMapRef.current) {
+        leafletMapRef.current.panTo(found.coordinates);
+      }
+    }
+  }, [focusedExhibitorIdOnMap, exhibitors]);
+
+  const filteredExhibitorsOnMap = exhibitors.filter((ex) => !showOnlyDrinks || ex.hasDrinks);
   const selectedExhibitor = exhibitors.find((ex) => ex.id === selectedExhibitorId);
   const selectedItems = menuItems.filter((i) => i.exhibitor_id === selectedExhibitorId);
 
@@ -64,21 +77,19 @@ export default function MapView() {
     });
 
     // Add Exhibitor Markers
-    exhibitors.forEach((ex) => {
+    filteredExhibitorsOnMap.forEach((ex) => {
       if (!ex.coordinates) return;
 
       const isSelected = ex.id === selectedExhibitorId;
       const isFav = favoriteExhibitorIds.includes(ex.id);
-      const items = menuItems.filter((i) => i.exhibitor_id === ex.id);
-      const totalStock = items.reduce((s, i) => s + i.stock, 0);
+      const drinkBadge = ex.hasDrinks ? '🥤' : '';
 
       const pinColor = isSelected ? '#78350f' : isFav ? '#be123c' : '#b45309';
 
       const customHtml = `
         <div class="relative group cursor-pointer transition-transform duration-200 hover:scale-110">
           <div style="background-color: ${pinColor};" class="px-2.5 py-1 rounded-full text-white font-extrabold text-[11px] shadow-lg flex items-center gap-1 border-2 border-white">
-            <span>${ex.name.split(' ')[0]}</span>
-            <span class="bg-white/20 px-1.5 rounded-full text-[10px]">${totalStock}</span>
+            <span>${drinkBadge} ${ex.name.split(' ')[0]}</span>
           </div>
         </div>
       `;
@@ -114,7 +125,7 @@ export default function MapView() {
       });
       userMarkerRef.current = L.marker(userLocation, { icon: userIcon }).addTo(map);
     }
-  }, [mapMode, exhibitors, selectedExhibitorId, favoriteExhibitorIds, menuItems, userLocation]);
+  }, [mapMode, exhibitors, selectedExhibitorId, favoriteExhibitorIds, menuItems, userLocation, showOnlyDrinks]);
 
   // Handle Geolocation tracking
   const handleGetLocation = () => {
@@ -162,22 +173,33 @@ export default function MapView() {
       <div className="bg-white border border-stone-200/90 rounded-3xl p-4 sm:p-6 shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-stone-100 pb-3">
           {/* Mode Switcher */}
-          <div className="flex items-center gap-1 bg-stone-100 p-1 rounded-2xl border border-stone-200 w-full sm:w-auto">
+          <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
             <button
               onClick={() => setMapMode('gps')}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              className={`flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
                 mapMode === 'gps'
-                  ? 'bg-white text-stone-900 shadow-xs'
-                  : 'text-stone-600 hover:text-stone-900'
+                  ? 'bg-amber-800 text-white shadow-xs'
+                  : 'bg-stone-100 text-stone-600 hover:text-stone-900'
               }`}
             >
-              <Compass className="w-3.5 h-3.5 text-amber-700" />
+              <Compass className="w-3.5 h-3.5" />
               <span>GPS Műholdas Térkép</span>
             </button>
 
             <button
+              onClick={() => setShowOnlyDrinks((prev) => !prev)}
+              className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all border ${
+                showOnlyDrinks
+                  ? 'bg-cyan-100 border-cyan-300 text-cyan-900 shadow-xs'
+                  : 'bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100'
+              }`}
+            >
+              <span>🥤 Csak italos árusok</span>
+            </button>
+
+            <button
               onClick={() => setMapMode('schematic')}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              className={`flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
                 mapMode === 'schematic'
                   ? 'bg-white text-stone-900 shadow-xs'
                   : 'text-stone-600 hover:text-stone-900'

@@ -41,7 +41,9 @@ export default function ExhibitorDashboard() {
     story: activeExhibitor.story || '',
     cause: activeExhibitor.cause || '',
     notice: activeExhibitor.notice || '',
-    location: activeExhibitor.location || ''
+    location: activeExhibitor.location || '',
+    offerings: activeExhibitor.offerings || '',
+    hasDrinks: activeExhibitor.hasDrinks || false
   });
 
   // Modal states for dishes
@@ -162,9 +164,37 @@ export default function ExhibitorDashboard() {
               onChange={(e) => setProfileData({ ...profileData, story: e.target.value })}
               className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
             />
+          <div>
+            <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+              Kínálat összefoglaló (Nem kötelező konkrét ételeket felvinni)
+            </label>
+            <input
+              type="text"
+              placeholder="Pl. Sütemények, házi rétesek, pogácsa, forró tea..."
+              value={profileData.offerings}
+              onChange={(e) => setProfileData({ ...profileData, offerings: e.target.value })}
+              className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40 font-semibold"
+            />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex items-center justify-between bg-stone-50 p-3.5 rounded-2xl border border-stone-200">
+            <div>
+              <span className="font-extrabold text-stone-900 text-xs block">🥤 Ital kapható nálatok a standnál?</span>
+              <span className="text-[11px] text-stone-500 font-medium">Ha bekapcsolod, az árus bekerül az "Ital" szűrőbe és a térképes ital-keresőbe.</span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setProfileData({ ...profileData, hasDrinks: !profileData.hasDrinks })}
+              className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all border ${
+                profileData.hasDrinks
+                  ? 'bg-cyan-800 text-white border-cyan-900 shadow-xs'
+                  : 'bg-white text-stone-600 border-stone-300'
+              }`}
+            >
+              {profileData.hasDrinks ? '🥤 Ital: BEKAPCSOLVA (ON)' : 'Ital: KIKAPCSOLVA (OFF)'}
+            </button>
+          </div>
             <div>
               <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
                 Adomány Célja (Kinek / Miért gyűjtünk?)
