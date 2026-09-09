@@ -158,14 +158,14 @@ function MainApp() {
           <div className="max-w-5xl mx-auto px-3 sm:px-4 py-6 space-y-6">
             {/* Top Search & Category Section */}
             <div className="space-y-4">
-              <div>
+              <div className="text-center py-1">
                 <h1 className="text-3xl sm:text-4xl font-black text-stone-900 tracking-tight">
                   Civil Ízek Utcája
                 </h1>
               </div>
 
               {/* Sleek Horizontal Category Pills Bar */}
-              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1">
+              <div className="flex items-center justify-start sm:justify-center gap-1.5 overflow-x-auto scrollbar-none pb-1">
                 {intentCategories.map((cat) => {
                   const isSelected = selectedCategory === cat.id;
                   const IconComp = cat.icon;
