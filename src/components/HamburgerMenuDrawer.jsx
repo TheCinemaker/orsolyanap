@@ -91,7 +91,7 @@ export default function HamburgerMenuDrawer({
             >
               <div className="flex items-center gap-2.5">
                 <Store className="w-4 h-4" />
-                <span>50 Sátor & Stand Kínálata</span>
+                <span>Standok</span>
               </div>
               <ChevronRight className="w-4 h-4 opacity-70" />
             </button>
@@ -106,11 +106,9 @@ export default function HamburgerMenuDrawer({
             >
               <div className="flex items-center gap-2.5">
                 <Utensils className="w-4 h-4" />
-                <span>200 Étel Katalógusa</span>
+                <span>Ételek</span>
               </div>
-              <span className="bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full text-[10px] font-bold">
-                ÚJ
-              </span>
+              <ChevronRight className="w-4 h-4 opacity-70" />
             </button>
 
             <button
@@ -119,7 +117,7 @@ export default function HamburgerMenuDrawer({
             >
               <div className="flex items-center gap-2.5">
                 <Compass className="w-4 h-4 text-amber-700" />
-                <span>Diáksétány GPS Térkép</span>
+                <span>Térkép</span>
               </div>
               <ChevronRight className="w-4 h-4 opacity-50" />
             </button>
@@ -130,7 +128,7 @@ export default function HamburgerMenuDrawer({
             >
               <div className="flex items-center gap-2.5">
                 <Tv className="w-4 h-4 text-amber-700" />
-                <span>Élő TV Kijelző</span>
+                <span>LIVE TV</span>
               </div>
               <ChevronRight className="w-4 h-4 opacity-50" />
             </button>
@@ -146,21 +144,27 @@ export default function HamburgerMenuDrawer({
               onClick={() => handleSelectZone('zone-1')}
               className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-semibold text-stone-700 hover:bg-stone-100 transition-all"
             >
-              <span className="flex items-center gap-2">📍 Stand 1-15. (Várkapu felől)</span>
+              <span className="flex items-center gap-2">
+                <MapPin className="w-3.5 h-3.5 text-amber-700" /> Stand 1-15. (Várkapu felől)
+              </span>
             </button>
 
             <button
               onClick={() => handleSelectZone('zone-2')}
               className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-semibold text-stone-700 hover:bg-stone-100 transition-all"
             >
-              <span className="flex items-center gap-2">📍 Stand 16-30. (Gyöngyös-patak Híd)</span>
+              <span className="flex items-center gap-2">
+                <MapPin className="w-3.5 h-3.5 text-amber-700" /> Stand 16-30. (Gyöngyös-patak Híd)
+              </span>
             </button>
 
             <button
               onClick={() => handleSelectZone('zone-3')}
               className="w-full flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-semibold text-stone-700 hover:bg-stone-100 transition-all"
             >
-              <span className="flex items-center gap-2">📍 Stand 31-50. (Várpark & Színpad)</span>
+              <span className="flex items-center gap-2">
+                <MapPin className="w-3.5 h-3.5 text-amber-700" /> Stand 31-50. (Várpark & Színpad)
+              </span>
             </button>
           </div>
 
