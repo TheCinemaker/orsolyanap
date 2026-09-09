@@ -13,37 +13,16 @@ export function OrsolyaProvider({ children }) {
     return localStorage.getItem('orsolya_logged_exhibitor_id') || null;
   });
 
-  // State: Exhibitors, Menu Items, Orders
-  const [exhibitors, setExhibitors] = useState(() => {
-    const saved = localStorage.getItem('orsolya_exhibitors');
-    if (!saved) return [];
-    const parsed = JSON.parse(saved);
-    return parsed.filter((e) => !['ex-1', 'ex-2', 'ex-3', 'ex-4', 'ex-5', 'ex-6'].includes(e.id));
-  });
-
-  const [menuItems, setMenuItems] = useState(() => {
-    const saved = localStorage.getItem('orsolya_menu_items');
-    if (!saved) return [];
-    const parsed = JSON.parse(saved);
-    return parsed.filter((i) => !['item-101', 'item-102', 'item-103', 'item-201', 'item-202', 'item-301', 'item-401', 'item-501', 'item-601'].includes(i.id));
-  });
-
-  const [orders, setOrders] = useState(() => {
-    const saved = localStorage.getItem('orsolya_orders');
-    return saved ? JSON.parse(saved) : [];
-  });
+  // State: Exhibitors, Menu Items, Orders (Default to empty arrays for clean testing)
+  const [exhibitors, setExhibitors] = useState([]);
+  const [menuItems, setMenuItems] = useState([]);
+  const [orders, setOrders] = useState([]);
 
   // Scanned Favorite Exhibitors
-  const [favoriteExhibitorIds, setFavoriteExhibitorIds] = useState(() => {
-    const saved = localStorage.getItem('orsolya_favorite_exhibitor_ids');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [favoriteExhibitorIds, setFavoriteExhibitorIds] = useState([]);
 
   // Favorite Dish IDs
-  const [favoriteItemIds, setFavoriteItemIds] = useState(() => {
-    const saved = localStorage.getItem('orsolya_favorite_item_ids');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [favoriteItemIds, setFavoriteItemIds] = useState([]);
 
   // Focused Exhibitor ID on Map
   const [focusedExhibitorIdOnMap, setFocusedExhibitorIdOnMap] = useState(null);
@@ -52,16 +31,10 @@ export function OrsolyaProvider({ children }) {
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMyOrdersOpen, setIsMyOrdersOpen] = useState(false);
-  const [myOrderIds, setMyOrderIds] = useState(() => {
-    const saved = localStorage.getItem('orsolya_my_order_ids');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [myOrderIds, setMyOrderIds] = useState([]);
 
   // Public Voting system: voted item IDs persisted in LocalStorage
-  const [votedItemIds, setVotedItemIds] = useState(() => {
-    const saved = localStorage.getItem('orsolya_voted_item_ids');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [votedItemIds, setVotedItemIds] = useState([]);
 
   // Global Visitor Filter States (Day & Dietary Preferences)
   const [selectedDay, setSelectedDay] = useState('all'); // 'all' | 'saturday' | 'sunday'
@@ -77,6 +50,17 @@ export function OrsolyaProvider({ children }) {
     }, 3500);
   };
 
+  // Clear all local storage cache on load for clean production testing
+  useEffect(() => {
+    try {
+      localStorage.removeItem('orsolya_exhibitors');
+      localStorage.removeItem('orsolya_menu_items');
+      localStorage.removeItem('orsolya_orders');
+    } catch (e) {
+      // ignore
+    }
+  }, []);
+
   // ---------------------------------------------------------------------------
   // Supabase Initial Fetch & Real-time Subscriptions
   // ---------------------------------------------------------------------------
@@ -86,7 +70,10 @@ export function OrsolyaProvider({ children }) {
     const fetchSupabaseData = async () => {
       try {
         const { data: exData, error: exErr } = await supabase.from('exhibitors').select('*');
-        if (!exErr && exData) {
+        if (exErr) {
+          console.warn('Supabase exhibitors notice:', exErr.message);
+          setExhibitors([]);
+        } else if (exData) {
           const formattedEx = exData.map((e) => ({
             ...e,
             hasDrinks: e.has_drinks !== undefined ? e.has_drinks : e.hasDrinks
@@ -95,11 +82,16 @@ export function OrsolyaProvider({ children }) {
         }
 
         const { data: itemData, error: itemErr } = await supabase.from('menu_items').select('*');
-        if (!itemErr && itemData) {
+        if (itemErr) {
+          console.warn('Supabase menu_items notice:', itemErr.message);
+          setMenuItems([]);
+        } else if (itemData) {
           setMenuItems(itemData);
         }
       } catch (err) {
-        console.warn('Supabase fetch notice: Using local state', err);
+        console.warn('Supabase fetch notice: Using clean empty state', err);
+        setExhibitors([]);
+        setMenuItems([]);
       }
     };
 
