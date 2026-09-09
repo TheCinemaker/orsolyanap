@@ -86,7 +86,9 @@ export function OrsolyaProvider({ children }) {
           console.warn('Supabase menu_items notice:', itemErr.message);
           setMenuItems([]);
         } else if (itemData) {
-          setMenuItems(itemData);
+          // Filter out legacy restaurant food items (items without exhibitor_id)
+          const validOrsolyaItems = itemData.filter((item) => item.exhibitor_id);
+          setMenuItems(validOrsolyaItems);
         }
       } catch (err) {
         console.warn('Supabase fetch notice: Using clean empty state', err);
@@ -127,7 +129,9 @@ export function OrsolyaProvider({ children }) {
                 prev.map((item) => (item.id === payload.new.id ? { ...item, ...payload.new } : item))
               );
             } else if (payload.eventType === 'INSERT' && payload.new) {
-              setMenuItems((prev) => [...prev, payload.new]);
+              if (payload.new.exhibitor_id) {
+                setMenuItems((prev) => [...prev, payload.new]);
+              }
             } else if (payload.eventType === 'DELETE' && payload.old) {
               setMenuItems((prev) => prev.filter((item) => item.id !== payload.old.id));
             }
