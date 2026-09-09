@@ -168,26 +168,6 @@ function MainApp() {
                 </h1>
               </div>
 
-              {/* Large Clean Search Bar */}
-              <div className="relative">
-                <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
-                <input
-                  type="text"
-                  placeholder="Mit keresel? (rétes, gulyás, süti, ital...)"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-11 pr-10 py-3 bg-white border border-stone-300 focus:border-amber-700 rounded-2xl text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-600/20 font-semibold transition-all shadow-xs"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-stone-400 hover:text-stone-700"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-
               {/* Sleek Horizontal Category Pills Bar */}
               <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1">
                 {intentCategories.map((cat) => {
