@@ -406,7 +406,9 @@ export function OrsolyaProvider({ children }) {
       prev.map((ex) => (ex.id === exhibitorId ? { ...ex, ...updatedData } : ex))
     );
     try {
-      await supabase.from('exhibitors').update({
+      const { error } = await supabase.from('exhibitors').update({
+        name: updatedData.name,
+        category: updatedData.category,
         story: updatedData.story,
         cause: updatedData.cause,
         notice: updatedData.notice,
@@ -417,8 +419,10 @@ export function OrsolyaProvider({ children }) {
         email: updatedData.email,
         facebook_url: updatedData.facebook_url,
         instagram_url: updatedData.instagram_url,
-        days: updatedData.days
+        days: updatedData.days,
+        image: updatedData.image || null
       }).eq('id', exhibitorId);
+      if (error) throw error;
     } catch (e) {
       console.warn('Supabase sync warning:', e);
     }
@@ -490,7 +494,8 @@ export function OrsolyaProvider({ children }) {
           is_gluten_free: formattedItem.is_gluten_free,
           is_lactose_free: formattedItem.is_lactose_free,
           is_sugar_free: formattedItem.is_sugar_free,
-          is_vegan: formattedItem.is_vegan
+          is_vegan: formattedItem.is_vegan,
+          image: formattedItem.image || null
         }).eq('id', itemData.id);
       } catch (e) {
         console.warn('Supabase sync warning:', e);
@@ -523,7 +528,8 @@ export function OrsolyaProvider({ children }) {
           is_lactose_free: newItem.is_lactose_free,
           is_sugar_free: newItem.is_sugar_free,
           is_vegan: newItem.is_vegan,
-          tags: newItem.tags || []
+          tags: newItem.tags || [],
+          image: newItem.image || null
         };
         const { error: insErr } = await supabase.from('menu_items').insert([dbPayload]);
         if (insErr) {
