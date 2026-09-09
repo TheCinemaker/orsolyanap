@@ -116,16 +116,16 @@ function MainApp() {
   const visibleExhibitors = filteredExhibitors.slice(0, visibleCount);
 
   return (
-    <div className="min-h-screen bg-[#fdfbf7] text-stone-900 flex flex-col justify-between font-sans selection:bg-amber-700 selection:text-white pb-20 md:pb-0">
+    <div className="min-h-screen bg-[#fafafa] text-stone-950 flex flex-col justify-between font-sans selection:bg-amber-800 selection:text-white pb-20 md:pb-0">
       {/* Toast Notification */}
       {toastMessage && (
         <div
-          className={`fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 px-4 py-3 rounded-2xl shadow-xl font-semibold text-xs flex items-center gap-2 border animate-in slide-in-from-bottom duration-200 ${
+          className={`fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 px-4 py-3 rounded-2xl shadow-2xl font-extrabold text-xs flex items-center gap-2 border-2 animate-in slide-in-from-bottom duration-200 ${
             toastMessage.type === 'error'
-              ? 'bg-rose-800 text-white border-rose-700'
+              ? 'bg-rose-950 text-white border-rose-700'
               : toastMessage.type === 'success'
-              ? 'bg-emerald-800 text-white border-emerald-700'
-              : 'bg-stone-900 text-white border-stone-800'
+              ? 'bg-emerald-950 text-white border-emerald-600'
+              : 'bg-black text-white border-stone-700'
           }`}
         >
           <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
@@ -156,16 +156,16 @@ function MainApp() {
         ) : (
           /* Visitor Main View */
           <div className="max-w-5xl mx-auto px-3 sm:px-4 py-6 space-y-6">
-            {/* Top Search & Category Section */}
+            {/* Top Title & Category Section */}
             <div className="space-y-4">
               <div className="text-center py-1">
-                <h1 className="text-3xl sm:text-4xl font-black text-stone-900 tracking-tight">
+                <h1 className="text-3xl sm:text-4xl font-black text-black tracking-tight">
                   Civil Ízek Utcája
                 </h1>
               </div>
 
-              {/* Sleek Horizontal Category Pills Bar */}
-              <div className="flex items-center justify-start sm:justify-center gap-1.5 overflow-x-auto scrollbar-none pb-1">
+              {/* High-Contrast Apple Style Horizontal Category Pills Bar */}
+              <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto scrollbar-none pb-1.5">
                 {intentCategories.map((cat) => {
                   const isSelected = selectedCategory === cat.id;
                   const IconComp = cat.icon;
@@ -174,13 +174,13 @@ function MainApp() {
                     <button
                       key={cat.id}
                       onClick={() => setSelectedCategory(cat.id)}
-                      className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all border ${
+                      className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black whitespace-nowrap transition-all border ${
                         isSelected
-                          ? 'bg-amber-800 text-white border-amber-900 shadow-xs'
-                          : 'bg-white text-stone-700 hover:bg-stone-100 border-stone-200'
+                          ? 'bg-stone-950 text-white border-stone-950 shadow-md ring-2 ring-stone-950/20'
+                          : 'bg-white text-stone-900 hover:bg-stone-100 border-stone-300 shadow-2xs font-extrabold'
                       }`}
                     >
-                      <IconComp className={`w-3.5 h-3.5 ${isSelected ? 'text-amber-200' : 'text-amber-800'}`} />
+                      <IconComp className={`w-3.5 h-3.5 ${isSelected ? 'text-amber-400' : 'text-amber-800'}`} />
                       <span>{cat.label}</span>
                     </button>
                   );
@@ -198,46 +198,10 @@ function MainApp() {
               />
             ) : (
               <>
-                {/* Minimal Zone Filter Bar */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 pt-2 border-t border-stone-200/60">
-                  {/* Zone Tabs */}
-                  <div className="flex items-center gap-1 overflow-x-auto scrollbar-none w-full sm:w-auto">
-                    {zones.map((zone) => (
-                      <button
-                        key={zone.id}
-                        onClick={() => {
-                          setSelectedZone(zone.id);
-                          setVisibleCount(12);
-                        }}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-                          selectedZone === zone.id
-                            ? 'bg-stone-900 text-white shadow-xs'
-                            : 'bg-stone-100 text-stone-600 hover:bg-stone-200/70'
-                        }`}
-                      >
-                        {zone.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Favorites Filter */}
-                  <button
-                    onClick={() => setShowOnlyFavorites((prev) => !prev)}
-                    className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition-all flex items-center gap-1.5 ${
-                      showOnlyFavorites
-                        ? 'bg-rose-100 border-rose-300 text-rose-800'
-                        : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-100'
-                    }`}
-                  >
-                    <Heart className={`w-3.5 h-3.5 ${showOnlyFavorites ? 'fill-rose-700 text-rose-700' : 'text-rose-600'}`} />
-                    <span>Kedvenceim ({favoriteExhibitorIds.length})</span>
-                  </button>
-                </div>
-
                 {/* Exhibitors Feed */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-sm font-extrabold text-stone-900 uppercase tracking-wider flex items-center gap-1.5">
+                <div className="space-y-4 pt-2">
+                  <div className="flex items-center justify-between border-b border-stone-200 pb-2">
+                    <h2 className="text-xs font-black text-stone-950 uppercase tracking-widest flex items-center gap-2">
                       <Store className="w-4 h-4 text-amber-800" />
                       <span>Standok a Diáksétányon ({filteredExhibitors.length})</span>
                     </h2>

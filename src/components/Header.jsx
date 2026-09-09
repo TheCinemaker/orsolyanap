@@ -55,16 +55,16 @@ export default function Header({
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-stone-200/80 shadow-xs">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b-2 border-stone-200 shadow-xs">
         {/* Event Banner */}
-        <div className="bg-gradient-to-r from-amber-700 via-amber-800 to-rose-900 text-amber-50 text-[10px] sm:text-[11px] font-semibold px-3 py-1 flex items-center justify-between shadow-inner">
+        <div className="bg-stone-950 text-amber-300 text-[10px] sm:text-[11px] font-black px-3 py-1 flex items-center justify-between border-b border-stone-800">
           <div className="flex items-center gap-1.5 overflow-hidden">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse flex-shrink-0" />
-            <span className="truncate uppercase tracking-wider font-bold">ORSOLYA-NAPI VÁSÁR – NATÚRPARK ÍZEI • CIVIL ÍZEK UTCÁJA</span>
+            <span className="truncate uppercase tracking-wider font-extrabold text-white">ORSOLYA-NAPI VÁSÁR – NATÚRPARK ÍZEI • CIVIL ÍZEK UTCÁJA</span>
           </div>
           <div className="hidden sm:flex items-center gap-3 opacity-90 text-[11px]">
-            <span className="flex items-center gap-1"><Calendar className="w-3 h-3 text-amber-300" /> Natúrpark Ízei</span>
-            <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-amber-300" /> 09:00 - 20:00</span>
+            <span className="flex items-center gap-1"><Calendar className="w-3 h-3 text-amber-400" /> Natúrpark Ízei</span>
+            <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-amber-400" /> 09:00 - 20:00</span>
           </div>
         </div>
 
@@ -74,10 +74,10 @@ export default function Header({
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsHamburgerOpen(true)}
-              className="p-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 transition-all border border-stone-200"
+              className="p-2 rounded-xl bg-stone-900 hover:bg-black text-white transition-all border border-stone-950 shadow-2xs"
               title="Menü megnyitása"
             >
-              <Menu className="w-5 h-5 text-amber-800" />
+              <Menu className="w-5 h-5 text-amber-400" />
             </button>
             <VisitKoszegLogo
               onClick={() => {
@@ -92,7 +92,7 @@ export default function Header({
           </div>
 
           {/* Navigation Tabs (Desktop Apple Segmented Style) */}
-          <div className="hidden md:flex items-center gap-1 bg-stone-100 p-1 rounded-2xl border border-stone-200/80">
+          <div className="hidden md:flex items-center gap-1 bg-stone-100 p-1 rounded-2xl border border-stone-300">
             <button
               onClick={() => {
                 setActiveView('visitor');
@@ -100,11 +100,11 @@ export default function Header({
               }}
               className={`flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs transition-all ${
                 activeView === 'visitor' && mainTab === 'tents'
-                  ? 'bg-white text-stone-900 shadow-sm font-bold'
-                  : 'text-stone-600 hover:text-stone-900 font-medium'
+                  ? 'bg-stone-950 text-white shadow-sm font-black'
+                  : 'text-stone-900 hover:text-black font-extrabold'
               }`}
             >
-              <Store className="w-3.5 h-3.5 text-amber-700" />
+              <Store className="w-3.5 h-3.5 text-amber-400" />
               <span>Standok</span>
             </button>
 
@@ -115,11 +115,11 @@ export default function Header({
               }}
               className={`flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs transition-all ${
                 activeView === 'visitor' && mainTab === 'food'
-                  ? 'bg-white text-stone-900 shadow-sm font-bold'
-                  : 'text-stone-600 hover:text-stone-900 font-medium'
+                  ? 'bg-stone-950 text-white shadow-sm font-black'
+                  : 'text-stone-900 hover:text-black font-extrabold'
               }`}
             >
-              <Utensils className="w-3.5 h-3.5 text-amber-700" />
+              <Utensils className="w-3.5 h-3.5 text-amber-400" />
               <span>Ételek</span>
             </button>
 
@@ -127,11 +127,11 @@ export default function Header({
               onClick={() => setActiveView('map')}
               className={`flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs transition-all ${
                 activeView === 'map'
-                  ? 'bg-white text-stone-900 shadow-sm font-bold'
-                  : 'text-stone-600 hover:text-stone-900 font-medium'
+                  ? 'bg-stone-950 text-white shadow-sm font-black'
+                  : 'text-stone-900 hover:text-black font-extrabold'
               }`}
             >
-              <MapPin className="w-3.5 h-3.5 text-amber-700" />
+              <MapPin className="w-3.5 h-3.5 text-amber-400" />
               <span>Térkép</span>
             </button>
 
@@ -139,20 +139,20 @@ export default function Header({
               onClick={() => setActiveView('tv')}
               className={`flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs transition-all ${
                 activeView === 'tv'
-                  ? 'bg-white text-stone-900 shadow-sm font-bold'
-                  : 'text-stone-600 hover:text-stone-900 font-medium'
+                  ? 'bg-stone-950 text-white shadow-sm font-black'
+                  : 'text-stone-900 hover:text-black font-extrabold'
               }`}
             >
-              <Tv className="w-3.5 h-3.5 text-amber-700" />
+              <Tv className="w-3.5 h-3.5 text-amber-400" />
               <span>LIVE TV</span>
             </button>
 
             {/* Info Button */}
             <button
               onClick={() => setIsInfoOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-800 hover:bg-stone-200/60 transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black text-amber-900 hover:bg-stone-200 transition-all"
             >
-              <Info className="w-3.5 h-3.5 text-amber-700" />
+              <Info className="w-3.5 h-3.5 text-amber-800" />
               <span>Info</span>
             </button>
           </div>
@@ -162,12 +162,12 @@ export default function Header({
             {/* Kedvencek (Beszkennelt Standok) Button */}
             <button
               onClick={() => setIsFavoritesOpen(true)}
-              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold transition-all border border-stone-200"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-white hover:bg-stone-100 text-stone-950 text-xs font-black transition-all border border-stone-300 shadow-2xs"
             >
               <Heart className="w-3.5 h-3.5 text-rose-700 fill-rose-700 flex-shrink-0" />
               <span className="hidden sm:inline">Kedvencek</span>
               {favoriteExhibitorIds.length > 0 && (
-                <span className="bg-rose-700 text-white px-1.5 py-0.5 rounded-full text-[10px] font-bold">
+                <span className="bg-rose-700 text-white px-1.5 py-0.5 rounded-full text-[10px] font-black">
                   {favoriteExhibitorIds.length}
                 </span>
               )}
@@ -176,10 +176,10 @@ export default function Header({
             {/* QR Scan Button */}
             <button
               onClick={() => setIsScannerOpen(true)}
-              className="p-1.5 sm:p-2 rounded-xl bg-amber-800 text-white hover:bg-amber-700 transition-all shadow-xs flex items-center gap-1.5 text-xs font-bold px-2.5 sm:px-3"
+              className="p-1.5 sm:p-2 rounded-xl bg-amber-900 text-white hover:bg-black transition-all shadow-2xs flex items-center gap-1.5 text-xs font-black px-2.5 sm:px-3 border border-amber-950"
               title="QR Kód Beolvasása"
             >
-              <QrCode className="w-4 h-4 text-white flex-shrink-0" />
+              <QrCode className="w-4 h-4 text-amber-300 flex-shrink-0" />
               <span className="hidden sm:inline">QR Olvasó</span>
             </button>
 
@@ -187,9 +187,9 @@ export default function Header({
             {activeExhibitor && (
               <button
                 onClick={() => setActiveView('exhibitor')}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-800 hover:bg-amber-700 text-white text-xs font-bold shadow-sm transition-all"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-stone-900 hover:bg-black text-white text-xs font-black shadow-sm transition-all border border-stone-950"
               >
-                <Store className="w-3.5 h-3.5" />
+                <Store className="w-3.5 h-3.5 text-amber-400" />
                 <span className="max-w-[90px] truncate hidden sm:inline">{activeExhibitor.name}</span>
               </button>
             )}
@@ -198,21 +198,21 @@ export default function Header({
 
         {/* Filter Bar & Instant Live Food Search (Visitor view) */}
         {activeView === 'visitor' && (
-          <div className="border-t border-stone-200/70 px-3 sm:px-4 py-2 bg-stone-50/80">
+          <div className="border-t border-stone-200 px-3 sm:px-4 py-2 bg-stone-100/90">
             <div className="max-w-6xl mx-auto flex items-center justify-between gap-2.5">
               {/* Search Container */}
               <div className="relative w-full sm:w-96">
-                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 font-bold" />
                 <input
                   type="text"
-                  placeholder="Azonnali keresés ételre (pl. gulyás, dödölle, rétes, bor)..."
+                  placeholder="Azonnali keresés ételre (pl. gulyás, rétes, bor)..."
                   value={searchQuery}
                   onFocus={() => setIsSearchFocused(true)}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
                     setIsSearchFocused(true);
                   }}
-                  className="w-full pl-8 pr-8 py-1.5 bg-white border border-amber-300/80 focus:border-amber-500 rounded-xl text-xs text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 shadow-2xs font-medium"
+                  className="w-full pl-9 pr-8 py-2 bg-white border-2 border-stone-400 focus:border-stone-950 rounded-xl text-xs text-stone-950 placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-950/20 shadow-2xs font-bold"
                 />
                 {searchQuery && (
                   <button
