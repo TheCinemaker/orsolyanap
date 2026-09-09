@@ -61,6 +61,17 @@ CREATE TABLE IF NOT EXISTS public.votes (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Live Reels / Stories (Élő Stand Pillanatok)
+CREATE TABLE public.reels (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    exhibitor_id TEXT REFERENCES public.exhibitors(id) ON DELETE CASCADE,
+    exhibitor_name TEXT NOT NULL,
+    caption TEXT NOT NULL,
+    image TEXT NOT NULL,
+    likes INTEGER DEFAULT 0,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Pre-orders / Foglalások
 CREATE TABLE IF NOT EXISTS public.orders (
     id TEXT PRIMARY KEY DEFAULT 'ORD-' || floor(extract(epoch from now())::numeric),
@@ -78,16 +89,19 @@ CREATE INDEX IF NOT EXISTS idx_menu_items_exhibitor ON public.menu_items(exhibit
 CREATE INDEX IF NOT EXISTS idx_menu_items_category ON public.menu_items(category);
 CREATE INDEX IF NOT EXISTS idx_menu_items_allergens ON public.menu_items(is_gluten_free, is_lactose_free, is_sugar_free, is_vegan);
 CREATE INDEX IF NOT EXISTS idx_exhibitors_days ON public.exhibitors(days);
+CREATE INDEX IF NOT EXISTS idx_reels_exhibitor ON public.reels(exhibitor_id);
 
 -- 3. Row Level Security (RLS) & Public Policies (Safe Re-creation)
 ALTER TABLE public.exhibitors ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.menu_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.reels ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.votes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 
 -- Drop existing policies first to prevent 42710 "already exists" errors
 DROP POLICY IF EXISTS "Public exhibitors access" ON public.exhibitors;
 DROP POLICY IF EXISTS "Public menu_items access" ON public.menu_items;
+DROP POLICY IF EXISTS "Public reels access" ON public.reels;
 DROP POLICY IF EXISTS "Public votes read access" ON public.votes;
 DROP POLICY IF EXISTS "Public exhibitors update" ON public.exhibitors;
 DROP POLICY IF EXISTS "Public exhibitors insert" ON public.exhibitors;
@@ -95,12 +109,16 @@ DROP POLICY IF EXISTS "Public exhibitors delete" ON public.exhibitors;
 DROP POLICY IF EXISTS "Public menu_items update" ON public.menu_items;
 DROP POLICY IF EXISTS "Public menu_items insert" ON public.menu_items;
 DROP POLICY IF EXISTS "Public menu_items delete" ON public.menu_items;
+DROP POLICY IF EXISTS "Public reels insert" ON public.reels;
+DROP POLICY IF EXISTS "Public reels update" ON public.reels;
+DROP POLICY IF EXISTS "Public reels delete" ON public.reels;
 DROP POLICY IF EXISTS "Public votes insert" ON public.votes;
 DROP POLICY IF EXISTS "Public orders access" ON public.orders;
 
 -- Re-create Policies
 CREATE POLICY "Public exhibitors access" ON public.exhibitors FOR SELECT USING (true);
 CREATE POLICY "Public menu_items access" ON public.menu_items FOR SELECT USING (true);
+CREATE POLICY "Public reels access" ON public.reels FOR SELECT USING (true);
 CREATE POLICY "Public votes read access" ON public.votes FOR SELECT USING (true);
 CREATE POLICY "Public exhibitors update" ON public.exhibitors FOR UPDATE USING (true);
 CREATE POLICY "Public exhibitors insert" ON public.exhibitors FOR INSERT WITH CHECK (true);
@@ -108,17 +126,20 @@ CREATE POLICY "Public exhibitors delete" ON public.exhibitors FOR DELETE USING (
 CREATE POLICY "Public menu_items update" ON public.menu_items FOR UPDATE USING (true);
 CREATE POLICY "Public menu_items insert" ON public.menu_items FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public menu_items delete" ON public.menu_items FOR DELETE USING (true);
+CREATE POLICY "Public reels insert" ON public.reels FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public reels update" ON public.reels FOR UPDATE USING (true);
+CREATE POLICY "Public reels delete" ON public.reels FOR DELETE USING (true);
 CREATE POLICY "Public votes insert" ON public.votes FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public orders access" ON public.orders FOR ALL USING (true);
 
 -- 4. Enable Supabase Realtime Subscriptions
 BEGIN;
   DROP PUBLICATION IF EXISTS supabase_realtime;
-  CREATE PUBLICATION supabase_realtime FOR TABLE public.exhibitors, public.menu_items;
+  CREATE PUBLICATION supabase_realtime FOR TABLE public.exhibitors, public.menu_items, public.reels;
 COMMIT;
 
 -- 5. ADATBÁZIS TÁBLÁK FULL NULLÁZÁSA (Tiszta üres táblák létrehozása teszteléshez)
-TRUNCATE public.exhibitors, public.menu_items, public.votes, public.orders CASCADE;
+TRUNCATE public.exhibitors, public.menu_items, public.reels, public.votes, public.orders CASCADE;
 
 -- =====================================================================
 -- MINTA TÖMEGES FELTÖLTŐ SCRIPT (Későbbi tömeges adatbetöltéshez)

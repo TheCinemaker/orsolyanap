@@ -10,6 +10,7 @@ export default function ExhibitorAuthPage() {
     exhibitors,
     updateExhibitorPin,
     addExhibitorTeam,
+    convertFileToBase64,
     showToast
   } = useOrsolya();
 
@@ -31,8 +32,22 @@ export default function ExhibitorAuthPage() {
     days: 'both',
     phone: '',
     email: '',
+    image: '',
     story: ''
   });
+
+  const handleImageFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      try {
+        const base64 = await convertFileToBase64(file);
+        setRegForm((prev) => ({ ...prev, image: base64 }));
+        showToast('📸 Csapat fotó feltöltve!', 'success');
+      } catch (err) {
+        showToast('Hiba a kép feldolgozásakor', 'error');
+      }
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -216,6 +231,32 @@ export default function ExhibitorAuthPage() {
             </div>
 
             <form onSubmit={handleRegisterSubmit} className="space-y-4 pt-1">
+              {/* Photo Upload */}
+              <div>
+                <label className="block text-xs font-bold text-stone-800 uppercase tracking-wider mb-1">
+                  Csapat Fotó / Logó (Opcionális)
+                </label>
+                <div className="flex items-center gap-3">
+                  {regForm.image ? (
+                    <img
+                      src={regForm.image}
+                      alt="Preview"
+                      className="w-12 h-12 rounded-xl object-cover border border-stone-300 shadow-xs"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-xl bg-stone-100 border border-stone-300 flex items-center justify-center text-stone-400 font-bold text-xs">
+                      📸
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageFileChange}
+                    className="text-xs text-stone-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-extrabold file:bg-amber-100 file:text-amber-950 hover:file:bg-amber-200 cursor-pointer"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label className="block text-xs font-bold text-stone-800 uppercase tracking-wider mb-1">
                   Csapat / Árus Neve *

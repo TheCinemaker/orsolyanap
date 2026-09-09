@@ -13,10 +13,11 @@ export function OrsolyaProvider({ children }) {
     return localStorage.getItem('orsolya_logged_exhibitor_id') || null;
   });
 
-  // State: Exhibitors, Menu Items, Orders (Default to empty arrays for clean testing)
+  // State: Exhibitors, Menu Items, Orders, Reels (Default to empty arrays for clean testing)
   const [exhibitors, setExhibitors] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [reels, setReels] = useState([]);
 
   // Scanned Favorite Exhibitors
   const [favoriteExhibitorIds, setFavoriteExhibitorIds] = useState([]);
@@ -90,10 +91,16 @@ export function OrsolyaProvider({ children }) {
           const validOrsolyaItems = itemData.filter((item) => item.exhibitor_id);
           setMenuItems(validOrsolyaItems);
         }
+
+        const { data: reelData, error: reelErr } = await supabase.from('reels').select('*').order('created_at', { ascending: false });
+        if (!reelErr && reelData) {
+          setReels(reelData);
+        }
       } catch (err) {
         console.warn('Supabase fetch notice: Using clean empty state', err);
         setExhibitors([]);
         setMenuItems([]);
+        setReels([]);
       }
     };
 
@@ -134,6 +141,19 @@ export function OrsolyaProvider({ children }) {
               }
             } else if (payload.eventType === 'DELETE' && payload.old) {
               setMenuItems((prev) => prev.filter((item) => item.id !== payload.old.id));
+            }
+          }
+        )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'reels' },
+          (payload) => {
+            if (payload.eventType === 'INSERT' && payload.new) {
+              setReels((prev) => [payload.new, ...prev]);
+            } else if (payload.eventType === 'UPDATE' && payload.new) {
+              setReels((prev) => prev.map((r) => (r.id === payload.new.id ? { ...r, ...payload.new } : r)));
+            } else if (payload.eventType === 'DELETE' && payload.old) {
+              setReels((prev) => prev.filter((r) => r.id !== payload.old.id));
             }
           }
         )
@@ -581,12 +601,61 @@ export function OrsolyaProvider({ children }) {
     return newOrder;
   };
 
-  // Update order status (by Exhibitor)
-  const updateOrderStatus = (orderId, newStatus) => {
-    setOrders((prev) =>
-      prev.map((ord) => (ord.id === orderId ? { ...ord, status: newStatus } : ord))
+  // File to Base64 Image Conversion Helper
+  const convertFileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  // Post a new live Reel / Story (by Exhibitor OR Visitor)
+  const postReel = async (caption, image, customName = null, exhibitorId = null) => {
+    if (!caption || !image) {
+      showToast('Kérjük tölts fel egy fotót és írj hozzá rövid leírást!', 'error');
+      return null;
+    }
+
+    const name = customName ? customName.trim() : activeExhibitor ? activeExhibitor.name : 'Vásári Látogató';
+    const exId = exhibitorId || activeExhibitor?.id || null;
+
+    const newReel = {
+      id: `reel-${Date.now()}`,
+      exhibitor_id: exId,
+      exhibitor_name: name,
+      caption: caption.trim(),
+      image: image,
+      likes: 0,
+      created_at: new Date().toISOString()
+    };
+
+    setReels((prev) => [newReel, ...prev]);
+
+    try {
+      await supabase.from('reels').insert([newReel]);
+    } catch (e) {
+      console.warn('Supabase reel insert notice:', e);
+    }
+
+    showToast('📸 Élő pillanat sikeresen közzétéve!', 'success');
+    return newReel;
+  };
+
+  // Like a live Reel / Story
+  const likeReel = async (reelId) => {
+    setReels((prev) =>
+      prev.map((r) => (r.id === reelId ? { ...r, likes: (r.likes || 0) + 1 } : r))
     );
-    showToast(`Foglalás #${orderId} frissítve!`);
+
+    try {
+      const reel = reels.find((r) => r.id === reelId);
+      const newLikes = (reel?.likes || 0) + 1;
+      await supabase.from('reels').update({ likes: newLikes }).eq('id', reelId);
+    } catch (e) {
+      console.warn('Supabase reel like notice:', e);
+    }
   };
 
   const activeExhibitor = exhibitors.find((ex) => ex.id === activeExhibitorId) || null;
@@ -603,6 +672,10 @@ export function OrsolyaProvider({ children }) {
         exhibitors,
         menuItems,
         orders,
+        reels,
+        postReel,
+        likeReel,
+        convertFileToBase64,
         cart,
         addToCart,
         removeFromCart,

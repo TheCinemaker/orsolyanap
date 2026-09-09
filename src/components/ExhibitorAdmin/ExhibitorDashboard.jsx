@@ -38,8 +38,38 @@ export default function ExhibitorDashboard() {
     saveMenuItem,
     deleteMenuItem,
     updateExhibitorProfile,
-    addExhibitorTeam
+    addExhibitorTeam,
+    postReel,
+    convertFileToBase64
   } = useOrsolya();
+
+  // Reel post state
+  const [reelCaption, setReelCaption] = useState('');
+  const [reelImage, setReelImage] = useState('');
+  const [isPostingReel, setIsPostingReel] = useState(false);
+
+  const handleReelFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      try {
+        const base64 = await convertFileToBase64(file);
+        setReelImage(base64);
+      } catch (err) {
+        console.error('File conversion error', err);
+      }
+    }
+  };
+
+  const handleReelSubmit = async (e) => {
+    e.preventDefault();
+    if (!reelCaption.trim() || !reelImage) return;
+
+    setIsPostingReel(true);
+    await postReel(reelCaption, reelImage);
+    setReelCaption('');
+    setReelImage('');
+    setIsPostingReel(false);
+  };
 
   if (!activeExhibitor) return null;
 

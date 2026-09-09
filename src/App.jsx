@@ -12,6 +12,7 @@ import CartDrawer from './components/CartDrawer';
 import MyOrdersModal from './components/MyOrdersModal';
 import MapView from './components/MapView';
 import VisitKoszegLogo from './components/VisitKoszegLogo';
+import LiveReelBar from './components/LiveReelBar';
 import {
   Utensils,
   Info,
@@ -159,6 +160,9 @@ function MainApp() {
         ) : (
           /* Visitor Main View */
           <div className="max-w-5xl mx-auto px-3 sm:px-4 pt-2 pb-4 space-y-4">
+            {/* Live Facebook/Instagram Style Reels Bar */}
+            <LiveReelBar />
+
             {/* Top Title & Category Section */}
             <div className="space-y-2">
               <div className="text-center">
@@ -301,11 +305,31 @@ function MainApp() {
       <MyOrdersModal />
 
       {/* Footer */}
-      <footer className="bg-white border-t border-stone-200/80 py-6 sm:py-8 text-xs text-stone-500 mt-8 sm:mt-12 hidden md:block">
+      <footer className="bg-white border-t border-stone-200/80 py-6 sm:py-8 text-xs text-stone-600 mt-8 sm:mt-12">
         <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-          <VisitKoszegLogo />
-          <div>
-            <span className="font-medium">© 2026 VisitKőszeg.hu • Civil Ízek Utcája • Orsolya-Napi Vásár – Natúrpark Ízei Gasztronómiai Fesztivál</span>
+          <a
+            href="https://visitkoszeg.hu"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:opacity-90 transition-opacity"
+          >
+            <VisitKoszegLogo />
+          </a>
+          <div className="flex flex-col sm:flex-row items-center gap-2">
+            <span className="font-extrabold text-amber-950 bg-amber-100/90 px-3 py-1 rounded-full border border-amber-300 uppercase text-[11px] tracking-wider shadow-2xs">
+              ⚡ POWERED BY{' '}
+              <a
+                href="https://visitkoszeg.hu"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-amber-800 transition-colors"
+              >
+                VISITKOSZEG.HU
+              </a>
+            </span>
+            <span className="font-medium text-stone-500">
+              © 2026 • Civil Ízek Utcája • Orsolya-Napi Vásár
+            </span>
           </div>
         </div>
       </footer>
