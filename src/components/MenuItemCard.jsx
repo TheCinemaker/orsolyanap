@@ -12,31 +12,26 @@ export default function MenuItemCard({ item, exhibitor }) {
   const isCooking = item.status === 'cooking';
 
   return (
-    <div className="bg-white border border-stone-200/90 rounded-2xl p-4 sm:p-4.5 transition-all hover:border-amber-600/40 hover:shadow-md flex flex-col justify-between group space-y-3">
+    <div className={`border rounded-2xl p-4 sm:p-4.5 transition-all flex flex-col justify-between group space-y-3 ${isSoldOut ? "bg-stone-200 border-stone-300 opacity-80 grayscale" : "bg-white border-stone-200/90 hover:border-amber-600/40 hover:shadow-md"}`}>
       <div>
         {/* Top Badges */}
         <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2">
           {/* Status Badge */}
           {isSoldOut ? (
-            <span className="bg-rose-700 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-rose-800 uppercase tracking-wider">
+            <span className="bg-rose-700 text-white text-xs font-black px-2.5 py-1 rounded-full flex items-center gap-1 border border-rose-800 uppercase tracking-wider">
               <AlertCircle className="w-3 h-3 text-white" />
               <span>Elfogyott</span>
             </span>
           ) : isCooking ? (
-            <span className="bg-amber-100 text-amber-900 text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-amber-300">
+            <span className="bg-amber-100 text-amber-900 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 border border-amber-300">
               <Clock className="w-3 h-3 text-amber-700 animate-spin" />
               <span>Fő / Készül</span>
-            </span>
-          ) : (
-            <span className="bg-emerald-50 text-emerald-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-emerald-200">
-              <CheckCircle2 className="w-3 h-3 text-emerald-700" />
-              <span>Kóstolható</span>
             </span>
           )}
 
           {/* Top Voted Emblem Badge */}
           {isTopVoted && (
-            <span className="bg-amber-100 text-amber-900 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-amber-300">
+            <span className="bg-amber-100 text-amber-900 text-xs font-extrabold px-2.5 py-1 rounded-full flex items-center gap-1 border border-amber-300">
               <Trophy className="w-3 h-3 text-amber-700" />
               <span>Közönségkedvenc</span>
             </span>
@@ -61,7 +56,7 @@ export default function MenuItemCard({ item, exhibitor }) {
             {item.tags.map((tag, idx) => (
               <span
                 key={idx}
-                className="bg-stone-100 text-stone-600 text-[10px] font-semibold px-2 py-0.5 rounded-md"
+                className="bg-stone-100 text-stone-600 text-xs font-semibold px-2.5 py-1 rounded-lg"
               >
                 #{tag}
               </span>
