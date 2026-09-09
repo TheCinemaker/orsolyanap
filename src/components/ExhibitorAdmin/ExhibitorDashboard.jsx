@@ -52,7 +52,7 @@ export default function ExhibitorDashboard() {
     const file = e.target.files?.[0];
     if (file) {
       try {
-        const base64 = await convertFileToBase64(file);
+        const base64 = await convertFileToBase64(file, 'reels');
         setReelImage(base64);
       } catch (err) {
         console.error('File conversion error', err);
@@ -293,7 +293,7 @@ export default function ExhibitorDashboard() {
                   <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
                     const file = e.target.files?.[0];
                     if (file) {
-                      try { setProfileData({ ...profileData, image: await convertFileToBase64(file) }); }
+                      try { setProfileData({ ...profileData, image: await convertFileToBase64(file, 'exhibitors') }); }
                       catch (err) { console.error('Profile image conversion error', err); }
                     }
                   }} />
@@ -980,7 +980,7 @@ export default function ExhibitorDashboard() {
                     <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        try { setDishForm({ ...dishForm, image: await convertFileToBase64(file) }); }
+                        try { setDishForm({ ...dishForm, image: await convertFileToBase64(file, 'dishes') }); }
                         catch (err) { console.error('Dish image conversion error', err); }
                       }
                     }} />
