@@ -154,7 +154,7 @@ export default function LiveReelBar() {
                   isExhibitorPost ? 'bg-amber-900 border-amber-400' : 'bg-emerald-900 border-emerald-400'
                 }`}>
                   {exhibitor?.image ? (
-                    <img src={exhibitor.image} alt="" className="w-full h-full rounded-full object-cover" />
+                    <img src={exhibitor.image} alt="" className="w-full h-full rounded-full object-contain bg-stone-950" />
                   ) : (
                     <span>{reel.exhibitor_name?.substring(0, 2).toUpperCase() || 'LÁ'}</span>
                   )}
@@ -216,8 +216,8 @@ export default function LiveReelBar() {
                   Fotó Kiválasztása / Készítése *
                 </label>
                 {imageInput ? (
-                  <div className="relative aspect-4/3 rounded-2xl overflow-hidden border border-stone-300 bg-stone-900">
-                    <img src={imageInput} alt="Preview" className="w-full h-full object-cover" />
+                  <div className="relative aspect-4/3 rounded-2xl overflow-hidden border border-stone-300 bg-stone-950 flex items-center justify-center">
+                    <img src={imageInput} alt="Preview" className="w-full h-full object-contain" />
                     <button
                       type="button"
                       onClick={() => setImageInput('')}

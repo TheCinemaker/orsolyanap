@@ -34,13 +34,13 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
 
         {/* Large Photo */}
         {exhibitor.image && (
-          <div className="h-48 sm:h-56 -mx-5 -mt-5 sm:-mx-6 sm:-mt-6 overflow-hidden relative">
+          <div className="w-full aspect-video -mx-5 -mt-5 sm:-mx-6 sm:-mt-6 overflow-hidden relative bg-stone-950 flex items-center justify-center">
             <img
               src={exhibitor.image}
               alt={exhibitor.name}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
             <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between flex-wrap gap-1.5">
               <span className="text-xs font-extrabold uppercase tracking-wider text-amber-200 bg-amber-900/80 backdrop-blur-md px-3 py-1 rounded-full border border-amber-500/40 inline-flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5 text-amber-300" />

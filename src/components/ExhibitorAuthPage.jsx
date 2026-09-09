@@ -241,7 +241,7 @@ export default function ExhibitorAuthPage() {
                     <img
                       src={regForm.image}
                       alt="Preview"
-                      className="w-12 h-12 rounded-xl object-cover border border-stone-300 shadow-xs"
+                      className="w-12 h-12 rounded-xl object-contain border border-stone-300 shadow-xs"
                     />
                   ) : (
                     <div className="w-12 h-12 rounded-xl bg-stone-100 border border-stone-300 flex items-center justify-center text-stone-400 font-bold text-xs">

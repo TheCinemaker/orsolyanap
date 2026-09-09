@@ -45,8 +45,8 @@ export default function MenuItemCard({ item, exhibitor }) {
 
         {/* Item Image */}
         {item.image && (
-          <div className="w-full h-40 sm:h-48 rounded-xl overflow-hidden mb-3 border border-stone-100">
-            <img src={item.image} alt={item.name} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+          <div className="w-full aspect-video rounded-xl overflow-hidden mb-3 border border-stone-200 bg-stone-950 flex items-center justify-center">
+            <img src={item.image} alt={item.name} className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105" />
           </div>
         )}
 

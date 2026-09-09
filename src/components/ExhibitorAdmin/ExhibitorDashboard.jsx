@@ -287,7 +287,7 @@ export default function ExhibitorDashboard() {
             <div>
               <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Szervezet / stand képe <span className="normal-case font-medium text-stone-400">(opcionális)</span></label>
               <div className="flex items-center gap-3">
-                {profileData.image && <img src={profileData.image} alt="" className="w-14 h-14 rounded-xl object-cover border border-stone-200" />}
+                {profileData.image && <img src={profileData.image} alt="" className="w-14 h-14 rounded-xl object-contain bg-stone-950 border border-stone-200" />}
                 <label className="flex-1 cursor-pointer px-3 py-2.5 bg-stone-50 border border-dashed border-stone-300 rounded-2xl text-sm font-semibold text-stone-700 hover:bg-stone-100">
                   Kép kiválasztása
                   <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
@@ -974,8 +974,8 @@ export default function ExhibitorDashboard() {
               <div>
                 <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Étel fotó <span className="normal-case font-medium text-stone-400">(opcionális)</span></label>
                 <div className="flex items-center gap-3">
-                  {dishForm.image && <img src={dishForm.image} alt="" className="w-20 h-16 rounded-xl object-cover border border-stone-200" />}
-                  <label className="flex-1 cursor-pointer px-3 py-3 bg-stone-50 border border-dashed border-stone-300 rounded-2xl text-sm font-semibold text-stone-700 hover:bg-stone-100">
+                  {dishForm.image && <img src={dishForm.image} alt="" className="w-20 h-16 rounded-xl object-contain bg-stone-950 border border-stone-200" />}
+                  <label className="flex-1 cursor-pointer px-3 py-2.5 bg-stone-50 border border-dashed border-stone-300 rounded-2xl text-sm font-semibold text-stone-700 hover:bg-stone-100">
                     Fotó kiválasztása
                     <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
                       const file = e.target.files?.[0];
