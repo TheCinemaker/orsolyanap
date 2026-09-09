@@ -618,14 +618,32 @@ export function OrsolyaProvider({ children }) {
     showToast(`Foglalás #${orderId} frissítve!`);
   };
 
-  // File to Base64 Image Conversion Helper
-  const convertFileToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
-    });
+  // Upload an image to Supabase Storage and return its public URL.
+  const convertFileToBase64 = async (file, folder = 'uploads') => {
+    if (!file) throw new Error('Nincs kiválasztott fájl.');
+    if (!file.type?.startsWith('image/')) throw new Error('Csak képfájl tölthető fel.');
+    if (file.size > 5 * 1024 * 1024) throw new Error('A kép legfeljebb 5 MB lehet.');
+
+    const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+    const safeExtension = ['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(extension) ? extension : 'jpg';
+    const filePath = `${folder}/${crypto.randomUUID()}.${safeExtension}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('orsolya-images')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        contentType: file.type,
+        upsert: false
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase.storage
+      .from('orsolya-images')
+      .getPublicUrl(filePath);
+
+    if (!data?.publicUrl) throw new Error('A feltöltött kép URL-je nem érhető el.');
+    return data.publicUrl;
   };
 
   // Post a new live Reel / Story (by Exhibitor OR Visitor)
