@@ -43,6 +43,12 @@ export function OrsolyaProvider({ children }) {
     return saved ? JSON.parse(saved) : ['ORD-1001'];
   });
 
+  // Public Voting system: voted item IDs persisted in LocalStorage
+  const [votedItemIds, setVotedItemIds] = useState(() => {
+    const saved = localStorage.getItem('orsolya_voted_item_ids');
+    return saved ? JSON.parse(saved) : [];
+  });
+
   // Toast message
   const [toastMessage, setToastMessage] = useState(null);
 
@@ -73,6 +79,30 @@ export function OrsolyaProvider({ children }) {
   useEffect(() => {
     localStorage.setItem('orsolya_favorite_exhibitor_ids', JSON.stringify(favoriteExhibitorIds));
   }, [favoriteExhibitorIds]);
+
+  useEffect(() => {
+    localStorage.setItem('orsolya_voted_item_ids', JSON.stringify(votedItemIds));
+  }, [votedItemIds]);
+
+  // Vote for a dish / item
+  const voteForItem = (itemId) => {
+    if (votedItemIds.includes(itemId)) {
+      showToast('Erre az ételre már leadtad a közönségszavazatodat!', 'error');
+      return false;
+    }
+
+    setVotedItemIds((prev) => [...prev, itemId]);
+    setMenuItems((prevItems) =>
+      prevItems.map((item) => {
+        if (item.id === itemId) {
+          return { ...item, votes: (item.votes || 0) + 1 };
+        }
+        return item;
+      })
+    );
+    showToast('Köszönjük a közönségszavazatot!', 'success');
+    return true;
+  };
 
   useEffect(() => {
     if (activeExhibitorId) {
@@ -283,6 +313,8 @@ export function OrsolyaProvider({ children }) {
         favoriteExhibitorIds,
         addFavoriteExhibitor,
         toggleFavoriteExhibitor,
+        votedItemIds,
+        voteForItem,
         placeOrder,
         updateItemStock,
         updateItemStatus,

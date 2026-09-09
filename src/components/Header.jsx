@@ -5,26 +5,53 @@ import FavoritesModal from './FavoritesModal';
 import QRScannerModal from './QRScannerModal';
 import MobileBottomNav from './MobileBottomNav';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { Utensils, MapPin, Store, Heart, Search, X, Info, QrCode, Calendar, Clock } from 'lucide-react';
+import { Utensils, MapPin, Store, Heart, Search, X, Info, QrCode, Calendar, Clock, Menu, ThumbsUp, Flame, CheckCircle2 } from 'lucide-react';
+import HamburgerMenuDrawer from './HamburgerMenuDrawer';
 
-export default function Header({ searchQuery, setSearchQuery, selectedCategory, setSelectedCategory }) {
+export default function Header({
+  searchQuery,
+  setSearchQuery,
+  selectedCategory,
+  setSelectedCategory,
+  mainTab,
+  setMainTab,
+  selectedZone,
+  setSelectedZone
+}) {
   const {
     activeView,
     setActiveView,
     activeExhibitor,
-    favoriteExhibitorIds
+    favoriteExhibitorIds,
+    menuItems,
+    exhibitors,
+    votedItemIds,
+    voteForItem
   } = useOrsolya();
 
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
-  const categories = [
-    { id: 'all', label: 'Összes kínálat' },
-    { id: 'bogracs', label: 'Bogrács & Meleg étel' },
-    { id: 'ital', label: 'Borok & Must' },
-    { id: 'desszert', label: 'Rétes & Sütemény' }
-  ];
+  // Instant matching dishes calculation
+  const searchTrim = searchQuery.trim().toLowerCase();
+  const instantMatchingItems = searchTrim
+    ? menuItems.filter((item) => {
+        const exhibitor = exhibitors.find((ex) => ex.id === item.exhibitor_id);
+        const exName = exhibitor ? exhibitor.name.toLowerCase() : '';
+        const exLoc = exhibitor ? exhibitor.location.toLowerCase() : '';
+
+        return (
+          item.name.toLowerCase().includes(searchTrim) ||
+          item.description.toLowerCase().includes(searchTrim) ||
+          (item.tags && item.tags.some((t) => t.toLowerCase().includes(searchTrim))) ||
+          exName.includes(searchTrim) ||
+          exLoc.includes(searchTrim)
+        );
+      })
+    : [];
 
   return (
     <>
@@ -33,7 +60,7 @@ export default function Header({ searchQuery, setSearchQuery, selectedCategory, 
         <div className="bg-gradient-to-r from-amber-700 via-amber-800 to-rose-900 text-amber-50 text-[10px] sm:text-[11px] font-semibold px-3 py-1 flex items-center justify-between shadow-inner">
           <div className="flex items-center gap-1.5 overflow-hidden">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse flex-shrink-0" />
-            <span className="truncate uppercase tracking-wider font-bold">KŐSZEGI ORSOLYA-NAPI VÁSÁR • DIÁKSÉTÁNY</span>
+            <span className="truncate uppercase tracking-wider font-bold">ORSOLYA-NAPI VÁSÁR – NATÚRPARK ÍZEI • CIVIL ÍZEK UTCÁJA</span>
           </div>
           <div className="hidden sm:flex items-center gap-3 opacity-90 text-[11px]">
             <span className="flex items-center gap-1"><Calendar className="w-3 h-3 text-amber-300" /> Natúrpark Ízei</span>
@@ -43,21 +70,48 @@ export default function Header({ searchQuery, setSearchQuery, selectedCategory, 
 
         {/* Main Navbar */}
         <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 flex items-center justify-between gap-2">
-          {/* Logo with 5-second long press to trigger Exhibitor Login */}
-          <VisitKoszegLogo onLongPress5s={() => setActiveView('login')} />
+          {/* Left Group: Hamburger Button & Logo */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsHamburgerOpen(true)}
+              className="p-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 transition-all border border-stone-200"
+              title="Menü megnyitása"
+            >
+              <Menu className="w-5 h-5 text-amber-800" />
+            </button>
+            <VisitKoszegLogo onLongPress5s={() => setActiveView('login')} />
+          </div>
 
           {/* Navigation Tabs (Desktop Apple Segmented Style) */}
           <div className="hidden md:flex items-center gap-1 bg-stone-100 p-1 rounded-2xl border border-stone-200/80">
             <button
-              onClick={() => setActiveView('visitor')}
+              onClick={() => {
+                setActiveView('visitor');
+                setMainTab('tents');
+              }}
               className={`flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs transition-all ${
-                activeView === 'visitor'
+                activeView === 'visitor' && mainTab === 'tents'
+                  ? 'bg-white text-stone-900 shadow-sm font-bold'
+                  : 'text-stone-600 hover:text-stone-900 font-medium'
+              }`}
+            >
+              <Store className="w-3.5 h-3.5 text-amber-700" />
+              <span>50 Sátor Nézet</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setActiveView('visitor');
+                setMainTab('food');
+              }}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs transition-all ${
+                activeView === 'visitor' && mainTab === 'food'
                   ? 'bg-white text-stone-900 shadow-sm font-bold'
                   : 'text-stone-600 hover:text-stone-900 font-medium'
               }`}
             >
               <Utensils className="w-3.5 h-3.5 text-amber-700" />
-              <span>Árusok & Ételek</span>
+              <span>200 Étel Katalógus</span>
             </button>
 
             <button
@@ -121,45 +175,124 @@ export default function Header({ searchQuery, setSearchQuery, selectedCategory, 
           </div>
         </div>
 
-        {/* Filter Bar (Visitor view) */}
+        {/* Filter Bar & Instant Live Food Search (Visitor view) */}
         {activeView === 'visitor' && (
           <div className="border-t border-stone-200/70 px-3 sm:px-4 py-2 bg-stone-50/80">
-            <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5">
-              {/* Search */}
-              <div className="relative w-full sm:w-64">
+            <div className="max-w-6xl mx-auto flex items-center justify-between gap-2.5">
+              {/* Search Container */}
+              <div className="relative w-full sm:w-96">
                 <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
                 <input
                   type="text"
-                  placeholder="Keresés étel, árus, bogrács..."
+                  placeholder="Azonnali keresés ételre (pl. gulyás, dödölle, rétes, bor)..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-8 pr-4 py-1.5 bg-white border border-stone-200 rounded-xl text-xs text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                  onFocus={() => setIsSearchFocused(true)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setIsSearchFocused(true);
+                  }}
+                  className="w-full pl-8 pr-8 py-1.5 bg-white border border-amber-300/80 focus:border-amber-500 rounded-xl text-xs text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 shadow-2xs font-medium"
                 />
                 {searchQuery && (
                   <button
-                    onClick={() => setSearchQuery('')}
+                    onClick={() => {
+                      setSearchQuery('');
+                      setIsSearchFocused(false);
+                    }}
                     className="absolute right-2 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
                 )}
-              </div>
 
-              {/* Categories */}
-              <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 scrollbar-none">
-                {categories.map((cat) => (
-                  <button
-                    key={cat.id}
-                    onClick={() => setSelectedCategory(cat.id)}
-                    className={`whitespace-nowrap px-3 py-1 rounded-xl text-xs transition-all ${
-                      selectedCategory === cat.id
-                        ? 'bg-amber-800 text-white font-bold shadow-xs'
-                        : 'bg-white text-stone-700 hover:bg-stone-100 border border-stone-200/80 font-medium'
-                    }`}
-                  >
-                    {cat.label}
-                  </button>
-                ))}
+                {/* Instant Search Dropdown Popover */}
+                {searchTrim.length > 0 && isSearchFocused && (
+                  <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-stone-200 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150">
+                    <div className="bg-amber-900 text-amber-5 px-3 py-1.5 text-[11px] font-bold flex items-center justify-between">
+                      <span className="flex items-center gap-1">
+                        <Utensils className="w-3 h-3 text-amber-300" />
+                        <span>Azonnali találatok ("{searchQuery}")</span>
+                      </span>
+                      <span className="text-[10px] bg-amber-800 text-amber-100 px-2 py-0.5 rounded-full font-bold">
+                        {instantMatchingItems.length} étel
+                      </span>
+                    </div>
+
+                    {instantMatchingItems.length === 0 ? (
+                      <div className="p-4 text-center text-xs text-stone-500 font-medium">
+                        Nincs a keresésnek megfelelő étel a vásárban.
+                      </div>
+                    ) : (
+                      <div className="max-h-80 overflow-y-auto divide-y divide-stone-100">
+                        {instantMatchingItems.map((item) => {
+                          const exhibitor = exhibitors.find((ex) => ex.id === item.exhibitor_id);
+                          const isVoted = votedItemIds.includes(item.id);
+
+                          return (
+                            <div
+                              key={item.id}
+                              className="p-3 hover:bg-amber-50/60 transition-all flex items-center justify-between gap-3 group cursor-pointer"
+                              onClick={() => {
+                                setSearchQuery(item.name);
+                                setIsSearchFocused(false);
+                                setMainTab('food');
+                              }}
+                            >
+                              <div className="space-y-1 min-w-0 flex-1">
+                                <div className="flex items-center gap-1.5">
+                                  <h4 className="font-extrabold text-stone-900 text-xs sm:text-sm group-hover:text-amber-800 transition-colors truncate">
+                                    {item.name}
+                                  </h4>
+                                </div>
+
+                                {item.description && (
+                                  <p className="text-[11px] text-stone-500 truncate leading-tight">
+                                    {item.description}
+                                  </p>
+                                )}
+
+                                {exhibitor && (
+                                  <div className="flex items-center gap-1 text-[10px] text-amber-800 font-bold">
+                                    <MapPin className="w-2.5 h-2.5 text-amber-700 flex-shrink-0" />
+                                    <span className="truncate">{exhibitor.name} • {exhibitor.location}</span>
+                                  </div>
+                                )}
+                              </div>
+
+                              {/* Vote action right inside dropdown */}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  voteForItem(item.id);
+                                }}
+                                className={`flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-extrabold transition-all border ${
+                                  isVoted
+                                    ? 'bg-emerald-800 text-white border-emerald-800'
+                                    : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-300'
+                                }`}
+                              >
+                                <ThumbsUp className={`w-3 h-3 ${isVoted ? 'fill-white' : 'text-amber-800'}`} />
+                                <span>{isVoted ? `(Szavazva)` : `(${item.votes || 0})`}</span>
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    <div className="bg-stone-50 p-2 border-t border-stone-100 text-center">
+                      <button
+                        onClick={() => {
+                          setIsSearchFocused(false);
+                          setMainTab('food');
+                        }}
+                        className="text-[11px] text-amber-800 hover:text-amber-900 font-extrabold flex items-center justify-center gap-1 mx-auto"
+                      >
+                        <span>Összes találat megtekintése a Katalógusban →</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -173,7 +306,19 @@ export default function Header({ searchQuery, setSearchQuery, selectedCategory, 
         onOpenScanner={() => setIsScannerOpen(true)}
       />
 
-      {/* Modals */}
+      {/* Modals & Drawers */}
+      <HamburgerMenuDrawer
+        isOpen={isHamburgerOpen}
+        onClose={() => setIsHamburgerOpen(false)}
+        mainTab={mainTab}
+        setMainTab={setMainTab}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        selectedZone={selectedZone}
+        setSelectedZone={setSelectedZone}
+        setIsInfoOpen={setIsInfoOpen}
+        setIsFavoritesOpen={setIsFavoritesOpen}
+      />
       <OrsolyaInfoModal isOpen={isInfoOpen} onClose={() => setIsInfoOpen(false)} />
       <FavoritesModal
         isOpen={isFavoritesOpen}

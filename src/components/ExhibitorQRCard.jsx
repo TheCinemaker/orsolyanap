@@ -92,7 +92,7 @@ export default function ExhibitorQRCard({ exhibitor }) {
         <div>
           <span className="text-[11px] font-black uppercase tracking-widest text-amber-900 bg-amber-100 px-3 py-1 rounded-full border border-amber-300 inline-flex items-center gap-1.5">
             <MapPin className="w-3.5 h-3.5 text-amber-800" />
-            <span>KŐSZEGI ŐSZ ÍZEI • DIÁKSÉTÁNY</span>
+            <span>CIVIL ÍZEK UTCÁJA • DIÁKSÉTÁNY</span>
           </span>
 
           <h2 className="text-2xl sm:text-3xl font-black text-stone-900 mt-3 leading-tight">

@@ -4,18 +4,21 @@ import Header from './components/Header';
 import ExhibitorCard from './components/ExhibitorCard';
 import CompactExhibitorCard from './components/CompactExhibitorCard';
 import ExhibitorDetailModal from './components/ExhibitorDetailModal';
+import InlineQRScanner from './components/InlineQRScanner';
+import FoodCatalogView from './components/FoodCatalogView';
 import ExhibitorDashboard from './components/ExhibitorAdmin/ExhibitorDashboard';
 import ExhibitorAuthPage from './components/ExhibitorAuthPage';
 import CartDrawer from './components/CartDrawer';
 import MyOrdersModal from './components/MyOrdersModal';
 import MapView from './components/MapView';
 import VisitKoszegLogo from './components/VisitKoszegLogo';
-import { Utensils, Info, CheckCircle2, MapPin, LayoutGrid, List, Flame, Heart, ChevronDown } from 'lucide-react';
+import { Utensils, Info, CheckCircle2, MapPin, LayoutGrid, List, Flame, Heart, ChevronDown, Store } from 'lucide-react';
 import './App.css';
 
 function MainApp() {
   const { activeView, exhibitors, menuItems, favoriteExhibitorIds, toastMessage } = useOrsolya();
 
+  const [mainTab, setMainTab] = useState('tents'); // 'tents' | 'food'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedZone, setSelectedZone] = useState('all'); // 'all' | 'zone-1' | 'zone-2' | 'zone-3'
@@ -97,6 +100,10 @@ function MainApp() {
         setSearchQuery={setSearchQuery}
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
+        mainTab={mainTab}
+        setMainTab={setMainTab}
+        selectedZone={selectedZone}
+        setSelectedZone={setSelectedZone}
       />
 
       {/* Main View Switcher */}
@@ -115,21 +122,60 @@ function MainApp() {
               <div className="max-w-2xl space-y-3 relative z-10">
                 <span className="text-[10px] font-extrabold tracking-widest text-amber-800 uppercase bg-amber-100/80 px-3 py-1 rounded-full border border-amber-300/60 inline-flex items-center gap-1.5">
                   <MapPin className="w-3 h-3 text-amber-700" />
-                  <span>KŐSZEG DIÁKSÉTÁNY • ORSOLYA-NAPI VÁSÁR</span>
+                  <span>ORSOLYA-NAPI VÁSÁR – NATÚRPARK ÍZEI FESZTIVÁL</span>
                 </span>
 
                 <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-stone-900 leading-tight">
-                  Kőszegi Ősz Ízei
+                  Civil Ízek Utcája
                 </h1>
 
                 <p className="text-xs sm:text-sm text-stone-600 leading-relaxed font-medium">
-                  100+ vásári stand a Diáksétányon! Használd a zónaszűrőket és a kompakt nézetet a gyors kereséshez.
+                  A kőszegi Diáksétányon rotyogó civil bográcsok, adományos főzések és vásári standok nyomon követése.
                 </p>
+
+                {/* Main View Mode Switcher: 50 Sátor vs 200 Étel Katalógus */}
+                <div className="pt-2">
+                  <div className="inline-flex items-center gap-1 bg-stone-100 p-1.5 rounded-2xl border border-stone-200/90 w-full sm:w-auto">
+                    <button
+                      onClick={() => setMainTab('tents')}
+                      className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 py-2 px-4 rounded-xl text-xs font-extrabold transition-all ${
+                        mainTab === 'tents'
+                          ? 'bg-amber-800 text-white shadow-xs'
+                          : 'text-stone-700 hover:bg-stone-200/60 font-bold'
+                      }`}
+                    >
+                      <Store className="w-4 h-4" />
+                      <span>50 Sátor Nézet</span>
+                    </button>
+
+                    <button
+                      onClick={() => setMainTab('food')}
+                      className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 py-2 px-4 rounded-xl text-xs font-extrabold transition-all ${
+                        mainTab === 'food'
+                          ? 'bg-amber-800 text-white shadow-xs'
+                          : 'text-stone-700 hover:bg-stone-200/60 font-bold'
+                      }`}
+                    >
+                      <Utensils className="w-4 h-4" />
+                      <span>200 Étel Katalógus</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Filters Bar for 100+ Exhibitors */}
-            <div className="bg-white border border-stone-200/90 rounded-3xl p-4 sm:p-5 shadow-xs space-y-4">
+            {/* Main Content Area */}
+            {mainTab === 'food' ? (
+              <FoodCatalogView
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
+              />
+            ) : (
+              <>
+                {/* Filters Bar for 100+ Exhibitors */}
+                <div className="bg-white border border-stone-200/90 rounded-3xl p-4 sm:p-5 shadow-xs space-y-4">
               {/* Top Control Bar: View Mode Switcher & Zone Selector */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-stone-100 pb-3">
                 {/* Zone Select Tabs */}
@@ -281,9 +327,11 @@ function MainApp() {
                 </div>
               )}
             </div>
-          </div>
+          </>
         )}
-      </main>
+      </div>
+    )}
+  </main>
 
       {/* Detail Modal */}
       {selectedDetailExhibitor && (
@@ -302,7 +350,7 @@ function MainApp() {
         <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <VisitKoszegLogo />
           <div>
-            <span className="font-medium">© 2026 VisitKőszeg.hu • Orsolya-Napi Vásár • Kőszeg Diáksétány</span>
+            <span className="font-medium">© 2026 VisitKőszeg.hu • Civil Ízek Utcája • Orsolya-Napi Vásár – Natúrpark Ízei Gasztronómiai Fesztivál</span>
           </div>
         </div>
       </footer>

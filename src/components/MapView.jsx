@@ -148,13 +148,13 @@ export default function MapView() {
       <div className="text-center max-w-xl mx-auto space-y-2">
         <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-800 bg-amber-100/80 px-3 py-1 rounded-full border border-amber-300/60 inline-flex items-center gap-1.5">
           <MapPin className="w-3 h-3 text-amber-700" />
-          <span>KŐSZEG DIÁKSÉTÁNY • GPS TÉRKÉP</span>
+          <span>CIVIL ÍZEK UTCÁJA • GPS TÉRKÉP</span>
         </span>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
-          Interaktív Vásári Térkép
+          Civil Ízek Utcája Interaktív Térkép
         </h1>
         <p className="text-xs sm:text-sm text-stone-600 font-medium">
-          A fesztivál pontos 4-sarok GPS lehatárolása a Gyöngyös-patak mentén.
+          A Natúrpark Ízei Gasztronómiai Fesztivál diáksétányi szakaszának GPS lehatárolása a Gyöngyös-patak mentén.
         </p>
       </div>
 

@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { MapPin, Utensils, Heart, Info, Plus, CheckCircle2, ChevronRight } from 'lucide-react';
+import { MapPin, Utensils, Heart, ChevronRight, ThumbsUp, CheckCircle2 } from 'lucide-react';
 
 export default function CompactExhibitorCard({ exhibitor, items, onOpenDetails }) {
-  const { favoriteExhibitorIds, toggleFavoriteExhibitor, addToCart } = useOrsolya();
+  const { favoriteExhibitorIds, toggleFavoriteExhibitor, votedItemIds, voteForItem } = useOrsolya();
   const isFavorite = favoriteExhibitorIds.includes(exhibitor.id);
 
-  const totalStock = items.reduce((s, i) => s + i.stock, 0);
-
   return (
-    <div className="bg-white border border-stone-200/90 rounded-2xl p-3 sm:p-4 shadow-xs hover:border-amber-500/60 transition-all flex flex-col justify-between space-y-3 relative group">
+    <div className="bg-white border border-stone-200/90 rounded-2xl p-3.5 sm:p-4 shadow-xs hover:border-amber-500/60 transition-all flex flex-col justify-between space-y-3 relative group">
       {/* Top Bar: Location Badge & Favorite Toggle */}
       <div className="flex items-center justify-between gap-1.5">
         <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-800 bg-amber-100/80 px-2.5 py-0.5 rounded-full border border-amber-300/60 inline-flex items-center gap-1">
@@ -31,7 +29,7 @@ export default function CompactExhibitorCard({ exhibitor, items, onOpenDetails }
         </button>
       </div>
 
-      {/* Title & Category */}
+      {/* Title & Story */}
       <div onClick={() => onOpenDetails(exhibitor)} className="cursor-pointer space-y-1">
         <h3 className="font-extrabold text-stone-900 text-sm sm:text-base leading-snug group-hover:text-amber-800 transition-colors line-clamp-1">
           {exhibitor.name}
@@ -45,28 +43,36 @@ export default function CompactExhibitorCard({ exhibitor, items, onOpenDetails }
 
       {/* Dishes preview (Up to 2 items) */}
       <div className="space-y-1.5 pt-2 border-t border-stone-100">
-        {items.slice(0, 2).map((item) => (
-          <div
-            key={item.id}
-            className="flex items-center justify-between text-xs bg-stone-50 p-2 rounded-xl border border-stone-100"
-          >
-            <div className="flex-1 min-w-0 pr-2">
-              <span className="font-bold text-stone-800 truncate block">{item.name}</span>
-              <span className="text-[10px] text-amber-800 font-semibold">Adományos ({item.stock} adag)</span>
-            </div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                addToCart(item, exhibitor);
-              }}
-              disabled={item.stock <= 0}
-              className="px-2 py-1 bg-amber-800 text-white rounded-lg font-bold text-[10px] hover:bg-amber-700 transition-all disabled:opacity-40 flex items-center gap-0.5 flex-shrink-0"
+        {items.slice(0, 2).map((item) => {
+          const isVoted = votedItemIds.includes(item.id);
+
+          return (
+            <div
+              key={item.id}
+              className="flex items-center justify-between text-xs bg-stone-50 p-2 rounded-xl border border-stone-100 gap-2"
             >
-              <Plus className="w-3 h-3" />
-              <span>Kóstoló</span>
-            </button>
-          </div>
-        ))}
+              <div className="flex-1 min-w-0">
+                <span className="font-bold text-stone-800 truncate block">{item.name}</span>
+                <span className="text-[10px] text-amber-800 font-semibold">Adományos kóstolás</span>
+              </div>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  voteForItem(item.id);
+                }}
+                className={`px-2 py-1 rounded-lg font-extrabold text-[10px] transition-all flex items-center gap-1 border flex-shrink-0 ${
+                  isVoted
+                    ? 'bg-emerald-800 text-white border-emerald-800'
+                    : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-300'
+                }`}
+              >
+                <ThumbsUp className={`w-3 h-3 ${isVoted ? 'fill-white' : 'text-amber-800'}`} />
+                <span>{item.votes || 0}</span>
+              </button>
+            </div>
+          );
+        })}
       </div>
 
       {/* Bottom Action Footer */}

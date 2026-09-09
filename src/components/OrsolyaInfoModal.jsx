@@ -24,10 +24,10 @@ export default function OrsolyaInfoModal({ isOpen, onClose }) {
               VÁSÁRI TÖRTÉNELEM & TRADÍCIÓ
             </span>
             <h2 className="text-2xl font-bold text-stone-900 mt-2">
-              A Kőszegi Orsolya-Napi Vásár Története
+              Orsolya-Napi Vásár – Natúrpark Ízei Gasztronómiai Fesztivál
             </h2>
             <p className="text-xs text-stone-500 font-medium">
-              Évszázados kereskedelmi hagyományoktól a Natúrpark Ízei fesztiválig.
+              Civil Ízek Utcája a Diáksétányon • Évszázados kereskedelmi hagyományoktól a modern gasztrofesztiválig.
             </p>
           </div>
         </div>
