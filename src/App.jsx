@@ -66,6 +66,9 @@ function MainApp() {
     { id: 'helyi_termek', label: 'Helyi termék', icon: Package }
   ];
 
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const activeCategoryObj = intentCategories.find((cat) => cat.id === selectedCategory) || intentCategories[0];
+
   const filteredExhibitors = exhibitors.filter((ex) => {
     const exItems = menuItems.filter((i) => i.exhibitor_id === ex.id);
 
@@ -164,27 +167,64 @@ function MainApp() {
                 </h1>
               </div>
 
-              {/* High-Contrast Apple Style Horizontal Category Pills Bar */}
-              <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto scrollbar-none pb-1.5">
-                {intentCategories.map((cat) => {
-                  const isSelected = selectedCategory === cat.id;
-                  const IconComp = cat.icon;
-
-                  return (
-                    <button
-                      key={cat.id}
-                      onClick={() => setSelectedCategory(cat.id)}
-                      className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black whitespace-nowrap transition-all border ${
-                        isSelected
-                          ? 'bg-stone-950 text-white border-stone-950 shadow-md ring-2 ring-stone-950/20'
-                          : 'bg-white text-stone-900 hover:bg-stone-100 border-stone-300 shadow-2xs font-extrabold'
+              {/* High-Contrast Apple-Style Centered Category Dropdown */}
+              <div className="flex justify-center pt-1">
+                <div className="relative inline-block text-left w-full sm:w-80">
+                  <button
+                    onClick={() => setIsCategoryDropdownOpen((prev) => !prev)}
+                    className="w-full flex items-center justify-between gap-3 px-4 py-3 bg-white border-2 border-stone-900 rounded-2xl text-sm font-black text-stone-950 shadow-md hover:bg-stone-50 transition-all focus:outline-none focus:ring-2 focus:ring-stone-950 cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3 truncate">
+                      {activeCategoryObj && (
+                        <activeCategoryObj.icon className="w-4 h-4 text-amber-700 flex-shrink-0" />
+                      )}
+                      <span className="truncate">{activeCategoryObj?.label || 'Kategória választás'}</span>
+                    </div>
+                    <ChevronDown
+                      className={`w-4 h-4 text-stone-900 flex-shrink-0 transition-transform duration-200 ${
+                        isCategoryDropdownOpen ? 'rotate-180' : ''
                       }`}
-                    >
-                      <IconComp className={`w-3.5 h-3.5 ${isSelected ? 'text-amber-400' : 'text-amber-800'}`} />
-                      <span>{cat.label}</span>
-                    </button>
-                  );
-                })}
+                    />
+                  </button>
+
+                  {/* Popover Dropdown Menu */}
+                  {isCategoryDropdownOpen && (
+                    <>
+                      {/* Backdrop for click outside */}
+                      <div
+                        className="fixed inset-0 z-30"
+                        onClick={() => setIsCategoryDropdownOpen(false)}
+                      />
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border-2 border-stone-950 rounded-2xl shadow-2xl z-40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 p-1.5 space-y-1">
+                        {intentCategories.map((cat) => {
+                          const isSelected = selectedCategory === cat.id;
+                          const IconComp = cat.icon;
+
+                          return (
+                            <button
+                              key={cat.id}
+                              onClick={() => {
+                                setSelectedCategory(cat.id);
+                                setIsCategoryDropdownOpen(false);
+                              }}
+                              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                                isSelected
+                                  ? 'bg-stone-950 text-white shadow-xs'
+                                  : 'text-stone-900 hover:bg-stone-100'
+                              }`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <IconComp className={`w-4 h-4 ${isSelected ? 'text-amber-400' : 'text-amber-800'}`} />
+                                <span>{cat.label}</span>
+                              </div>
+                              {isSelected && <CheckCircle2 className="w-4 h-4 text-amber-400" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
 
