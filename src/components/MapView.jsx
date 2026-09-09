@@ -170,13 +170,13 @@ export default function MapView() {
       </div>
 
       {/* Map Control Bar */}
-      <div className="bg-white border border-stone-200/90 rounded-3xl p-4 sm:p-6 shadow-xs space-y-4">
+      <div className="bg-white border border-stone-200/90 rounded-md p-4 sm:p-6 shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-stone-100 pb-3">
           {/* Mode Switcher */}
           <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
             <button
               onClick={() => setMapMode('gps')}
-              className={`flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              className={`flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-bold transition-all ${
                 mapMode === 'gps'
                   ? 'bg-amber-800 text-white shadow-xs'
                   : 'bg-stone-100 text-stone-600 hover:text-stone-900'
@@ -188,7 +188,7 @@ export default function MapView() {
 
             <button
               onClick={() => setShowOnlyDrinks((prev) => !prev)}
-              className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all border ${
+              className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-extrabold transition-all border ${
                 showOnlyDrinks
                   ? 'bg-cyan-100 border-cyan-300 text-cyan-900 shadow-xs'
                   : 'bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100'
@@ -200,7 +200,7 @@ export default function MapView() {
 
             <button
               onClick={() => setMapMode('schematic')}
-              className={`flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              className={`flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-bold transition-all ${
                 mapMode === 'schematic'
                   ? 'bg-white text-stone-900 shadow-xs'
                   : 'text-stone-600 hover:text-stone-900'
@@ -216,7 +216,7 @@ export default function MapView() {
             <button
               onClick={handleGetLocation}
               disabled={isLocating}
-              className="w-full sm:w-auto px-4 py-2 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-50"
+              className="w-full sm:w-auto px-4 py-2 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-md shadow-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-50"
             >
               <Navigation className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} />
               <span>{isLocating ? 'Helymeghatározás...' : 'Hol vagyok a fesztiválon?'}</span>
@@ -226,11 +226,11 @@ export default function MapView() {
 
         {/* GPS Leaflet View */}
         {mapMode === 'gps' ? (
-          <div className="relative rounded-2xl overflow-hidden border border-stone-200 shadow-inner min-h-[380px] sm:min-h-[440px] z-10">
+          <div className="relative rounded-md overflow-hidden border border-stone-200 shadow-inner min-h-[380px] sm:min-h-[440px] z-10">
             <div ref={mapContainerRef} className="w-full h-[380px] sm:h-[440px] bg-stone-100" />
             
             {/* Corner Legend Badge */}
-            <div className="absolute bottom-3 left-3 z-[1000] bg-white/95 backdrop-blur-md px-3 py-2 rounded-2xl border border-stone-200 shadow-md text-[11px] space-y-1">
+            <div className="absolute bottom-3 left-3 z-[1000] bg-white/95 backdrop-blur-md px-3 py-2 rounded-md border border-stone-200 shadow-md text-[11px] space-y-1">
               <span className="font-extrabold text-stone-900 block flex items-center gap-1">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-700 inline-block border border-amber-900"></span>
                 Diáksétány Fesztiválterület
@@ -240,7 +240,7 @@ export default function MapView() {
           </div>
         ) : (
           /* Schematic Path View */
-          <div className="relative bg-stone-50 border border-stone-200/90 rounded-2xl p-6 min-h-[300px] flex flex-col justify-between overflow-hidden">
+          <div className="relative bg-stone-50 border border-stone-200/90 rounded-md p-6 min-h-[300px] flex flex-col justify-between overflow-hidden">
             {/* Stream */}
             <div className="absolute top-1/2 left-0 right-0 h-10 -translate-y-1/2 bg-sky-100/90 border-y border-sky-300/70 flex items-center justify-around text-sky-800 text-[11px] font-bold tracking-widest pointer-events-none select-none">
               <span className="flex items-center gap-1"><Waves className="w-3.5 h-3.5 text-sky-700" /> Gyöngyös-patak</span>
@@ -250,11 +250,11 @@ export default function MapView() {
 
             {/* Landmarks */}
             <div className="flex justify-between items-center relative z-10 text-xs font-bold text-stone-700">
-              <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-stone-200 shadow-xs">
+              <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-md border border-stone-200 shadow-xs">
                 <Castle className="w-4 h-4 text-amber-700" />
                 <span>Jurisics Vár</span>
               </div>
-              <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-stone-200 shadow-xs">
+              <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-md border border-stone-200 shadow-xs">
                 <Trees className="w-4 h-4 text-emerald-700" />
                 <span>Várpark & Színpad</span>
               </div>
@@ -272,7 +272,7 @@ export default function MapView() {
                   <button
                     key={ex.id}
                     onClick={() => setSelectedExhibitorId(ex.id)}
-                    className={`flex-shrink-0 flex flex-col items-center gap-1.5 p-3 rounded-2xl border transition-all relative ${
+                    className={`flex-shrink-0 flex flex-col items-center gap-1.5 p-3 rounded-md border transition-all relative ${
                       isSelected
                         ? 'bg-amber-800 text-white border-amber-800 shadow-md scale-105'
                         : 'bg-white text-stone-900 border-stone-200 hover:border-amber-600'
@@ -295,7 +295,7 @@ export default function MapView() {
 
         {/* Selected Exhibitor Preview Box */}
         {selectedExhibitor && (
-          <div className="bg-stone-50 border border-stone-200/80 rounded-2xl p-4 sm:p-5 space-y-4">
+          <div className="bg-stone-50 border border-stone-200/80 rounded-md p-4 sm:p-5 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-200/60 pb-3">
               <div>
                 <div className="flex items-center gap-2">
@@ -320,7 +320,7 @@ export default function MapView() {
 
               <button
                 onClick={() => setActiveView('visitor')}
-                className="px-4 py-2 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs self-start sm:self-center flex items-center gap-1 whitespace-nowrap"
+                className="px-4 py-2 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-md shadow-xs self-start sm:self-center flex items-center gap-1 whitespace-nowrap"
               >
                 <span>Ételek listázása</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -336,7 +336,7 @@ export default function MapView() {
                 {selectedItems.map((item) => (
                   <div
                     key={item.id}
-                    className="bg-white border border-stone-200 p-3 rounded-xl flex items-center justify-between text-xs"
+                    className="bg-white border border-stone-200 p-3 rounded-md flex items-center justify-between text-xs"
                   >
                     <div>
                       <span className="font-bold text-stone-900 block">{item.name}</span>

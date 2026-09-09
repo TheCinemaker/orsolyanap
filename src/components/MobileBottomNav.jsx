@@ -12,7 +12,7 @@ export default function MobileBottomNav({ onOpenFavorites, onOpenHamburger }) {
         {/* Ételek */}
         <button
           onClick={() => setActiveView('visitor')}
-          className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
+          className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-md transition-all ${
             activeView === 'visitor'
               ? 'text-amber-900 font-extrabold'
               : 'text-stone-500 font-medium hover:text-stone-900'
@@ -25,7 +25,7 @@ export default function MobileBottomNav({ onOpenFavorites, onOpenHamburger }) {
         {/* Térkép */}
         <button
           onClick={() => setActiveView('map')}
-          className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
+          className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-md transition-all ${
             activeView === 'map'
               ? 'text-amber-900 font-extrabold'
               : 'text-stone-500 font-medium hover:text-stone-900'
@@ -38,7 +38,7 @@ export default function MobileBottomNav({ onOpenFavorites, onOpenHamburger }) {
         {/* Kedvencek */}
         <button
           onClick={onOpenFavorites}
-          className="flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all text-stone-500 hover:text-stone-900 font-medium relative"
+          className="flex flex-col items-center gap-0.5 py-1 px-3 rounded-md transition-all text-stone-500 hover:text-stone-900 font-medium relative"
         >
           <div className="relative">
             <Heart className="w-5 h-5 text-rose-700 fill-rose-700" />
@@ -54,7 +54,7 @@ export default function MobileBottomNav({ onOpenFavorites, onOpenHamburger }) {
         {/* Menü (Hamburger) */}
         <button
           onClick={onOpenHamburger}
-          className="flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all text-stone-500 hover:text-stone-900 font-medium"
+          className="flex flex-col items-center gap-0.5 py-1 px-3 rounded-md transition-all text-stone-500 hover:text-stone-900 font-medium"
         >
           <Menu className="w-5 h-5 text-amber-800" />
           <span className="text-[10px]">Menü</span>

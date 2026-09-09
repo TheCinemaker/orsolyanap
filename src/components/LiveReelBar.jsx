@@ -109,7 +109,7 @@ export default function LiveReelBar() {
             setNameInput(activeExhibitor ? activeExhibitor.name : '');
             setIsAddModalOpen(true);
           }}
-          className="flex-shrink-0 w-28 sm:w-32 h-44 sm:h-48 rounded-2xl bg-gradient-to-b from-amber-900 via-amber-950 to-stone-900 text-white relative overflow-hidden cursor-pointer group shadow-xs hover:shadow-md transition-all border-2 border-amber-600/40 snap-start flex flex-col justify-between p-2.5"
+          className="flex-shrink-0 w-28 sm:w-32 h-44 sm:h-48 rounded-md bg-gradient-to-b from-amber-900 via-amber-950 to-stone-900 text-white relative overflow-hidden cursor-pointer group shadow-xs hover:shadow-md transition-all border-2 border-amber-600/40 snap-start flex flex-col justify-between p-2.5"
         >
           <div className="w-9 h-9 rounded-full bg-amber-500 text-stone-950 flex items-center justify-center font-black shadow-lg group-hover:scale-110 transition-transform">
             <Plus className="w-5 h-5 stroke-[3]" />
@@ -136,7 +136,7 @@ export default function LiveReelBar() {
             <div
               key={reel.id}
               onClick={() => setActiveStoryModal(reel)}
-              className="flex-shrink-0 w-28 sm:w-32 h-44 sm:h-48 rounded-2xl relative overflow-hidden cursor-pointer group shadow-xs hover:shadow-md transition-all snap-start border border-stone-300 bg-stone-900"
+              className="flex-shrink-0 w-28 sm:w-32 h-44 sm:h-48 rounded-md relative overflow-hidden cursor-pointer group shadow-xs hover:shadow-md transition-all snap-start border border-stone-300 bg-stone-900"
             >
               {/* Background Photo */}
               <img
@@ -187,7 +187,7 @@ export default function LiveReelBar() {
       {/* ---------------------------------------------------------------- */}
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
-          <div className="bg-white border border-stone-200 rounded-3xl p-6 w-full max-w-md shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white border border-stone-200 rounded-md p-6 w-full max-w-md shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setIsAddModalOpen(false)}
               className="absolute top-4 right-4 text-stone-400 hover:text-stone-600 p-1"
@@ -196,7 +196,7 @@ export default function LiveReelBar() {
             </button>
 
             <div className="flex items-center gap-2.5">
-              <span className="p-2.5 bg-amber-100 text-amber-900 rounded-2xl border border-amber-300">
+              <span className="p-2.5 bg-amber-100 text-amber-900 rounded-md border border-amber-300">
                 <Camera className="w-5 h-5 text-amber-800" />
               </span>
               <div>
@@ -216,7 +216,7 @@ export default function LiveReelBar() {
                   Fotó Kiválasztása / Készítése *
                 </label>
                 {imageInput ? (
-                  <div className="relative aspect-4/3 rounded-2xl overflow-hidden border border-stone-300 bg-stone-950 flex items-center justify-center">
+                  <div className="relative aspect-4/3 rounded-md overflow-hidden border border-stone-300 bg-stone-950 flex items-center justify-center">
                     <img src={imageInput} alt="Preview" className="w-full h-full object-contain" />
                     <button
                       type="button"
@@ -227,7 +227,7 @@ export default function LiveReelBar() {
                     </button>
                   </div>
                 ) : (
-                  <div className="border-2 border-dashed border-stone-300 hover:border-amber-600 rounded-2xl p-6 text-center cursor-pointer bg-stone-50 hover:bg-amber-50/50 transition-colors">
+                  <div className="border-2 border-dashed border-stone-300 hover:border-amber-600 rounded-md p-6 text-center cursor-pointer bg-stone-50 hover:bg-amber-50/50 transition-colors">
                     <input
                       type="file"
                       accept="image/*"
@@ -256,7 +256,7 @@ export default function LiveReelBar() {
                   placeholder="pl. Péter / Kőszegi Látogató"
                   value={nameInput}
                   onChange={(e) => setNameInput(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                  className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-300 rounded-md text-xs font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
                 />
               </div>
 
@@ -269,7 +269,7 @@ export default function LiveReelBar() {
                   <select
                     value={selectedExhibitorId}
                     onChange={(e) => setSelectedExhibitorId(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40 cursor-pointer"
+                    className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-300 rounded-md text-xs font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40 cursor-pointer"
                   >
                     <option value="">Általános vásári hangulat</option>
                     {exhibitors.map((ex) => (
@@ -292,7 +292,7 @@ export default function LiveReelBar() {
                   placeholder="pl. Isteni finom a gulyásleves! Szuper a hangulat!"
                   value={captionInput}
                   onChange={(e) => setCaptionInput(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-300 rounded-xl text-xs font-extrabold text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                  className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-300 rounded-md text-xs font-extrabold text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
                 />
               </div>
 
@@ -300,14 +300,14 @@ export default function LiveReelBar() {
                 <button
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs rounded-xl"
+                  className="px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs rounded-md"
                 >
                   Mégse
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2 bg-amber-900 hover:bg-amber-950 text-white font-black text-xs rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer"
+                  className="px-5 py-2 bg-amber-900 hover:bg-amber-950 text-white font-black text-xs rounded-md shadow-xs flex items-center gap-1.5 cursor-pointer"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>Posztolás az Élő Feedbe</span>
@@ -328,7 +328,7 @@ export default function LiveReelBar() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-stone-900 text-white rounded-3xl max-w-sm w-full overflow-hidden shadow-2xl relative border border-stone-800 flex flex-col justify-between h-[80vh] max-h-[650px]"
+            className="bg-stone-900 text-white rounded-md max-w-sm w-full overflow-hidden shadow-2xl relative border border-stone-800 flex flex-col justify-between h-[80vh] max-h-[650px]"
           >
             {/* Top Bar Header */}
             <div className="p-4 bg-gradient-to-b from-stone-950/80 to-transparent z-10 flex items-center justify-between">
@@ -376,7 +376,7 @@ export default function LiveReelBar() {
                     setLikedReelIds((prev) => [...prev, activeStoryModal.id]);
                     likeReel(activeStoryModal.id);
                   }}
-                  className="flex items-center gap-1.5 px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white font-black text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white font-black text-xs rounded-md shadow-xs transition-colors cursor-pointer"
                 >
                   <Heart className={`w-4 h-4 ${likedReelIds.includes(activeStoryModal.id) ? "fill-white" : ""}`} />
                   <span>{activeStoryModal.likes || 0} Kedvelés</span>
@@ -388,7 +388,7 @@ export default function LiveReelBar() {
                       focusExhibitorOnMap(activeStoryModal.exhibitor_id);
                       setActiveStoryModal(null);
                     }}
-                    className="flex items-center gap-1.5 px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-stone-950 font-black text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
+                    className="flex items-center gap-1.5 px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-stone-950 font-black text-xs rounded-md shadow-xs transition-colors cursor-pointer"
                   >
                     <MapPin className="w-4 h-4" />
                     <span>Stand a térképen</span>

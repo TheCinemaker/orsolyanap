@@ -202,7 +202,7 @@ export default function ExhibitorDashboard() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
       {/* Top Header Bar */}
-      <div className="bg-white border border-stone-200/90 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white border border-stone-200/90 rounded-md p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[10px] font-extrabold tracking-wider text-emerald-800 uppercase bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-200">
@@ -227,7 +227,7 @@ export default function ExhibitorDashboard() {
         <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={openNewDishModal}
-            className="flex items-center gap-1.5 px-3.5 py-2.5 bg-amber-800 hover:bg-amber-700 text-white font-extrabold text-xs rounded-2xl shadow-xs transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-2.5 bg-amber-800 hover:bg-amber-700 text-white font-extrabold text-xs rounded-md shadow-xs transition-all"
           >
             <PlusCircle className="w-4 h-4" />
             <span>+ Étel Hozzáadása</span>
@@ -235,7 +235,7 @@ export default function ExhibitorDashboard() {
 
           <button
             onClick={logoutExhibitor}
-            className="flex items-center gap-1.5 px-3 py-2.5 bg-stone-100 text-stone-700 hover:bg-stone-200 text-xs font-semibold rounded-2xl transition-all border border-stone-200"
+            className="flex items-center gap-1.5 px-3 py-2.5 bg-stone-100 text-stone-700 hover:bg-stone-200 text-xs font-semibold rounded-md transition-all border border-stone-200"
           >
             <LogOut className="w-4 h-4 text-rose-700" />
             <span className="hidden sm:inline">Kijelentkezés</span>
@@ -244,7 +244,7 @@ export default function ExhibitorDashboard() {
       </div>
 
       {/* Profile & Story Editor Form */}
-      <div className="bg-white border border-stone-200/90 rounded-3xl p-6 shadow-sm space-y-4">
+      <div className="bg-white border border-stone-200/90 rounded-md p-6 shadow-sm space-y-4">
         <h3 className="text-sm font-bold text-stone-900 flex items-center gap-2">
           <Heart className="w-4 h-4 text-rose-700" />
           <span>Stand Bemutatkozás, Elérhetőségek & Kiállítási Napok</span>
@@ -256,13 +256,13 @@ export default function ExhibitorDashboard() {
               <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Szervezet / csapat neve *</label>
               <input type="text" required value={profileData.name}
                 onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-2xl text-sm font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40" />
+                className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-md text-sm font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40" />
             </div>
             <div>
               <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Stand helye *</label>
               <input type="text" required value={profileData.location}
                 onChange={(e) => setProfileData({ ...profileData, location: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-2xl text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40" />
+                className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-md text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40" />
             </div>
           </div>
 
@@ -270,7 +270,7 @@ export default function ExhibitorDashboard() {
             <div>
               <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Szervezet kategóriája</label>
               <select value={profileData.category} onChange={(e) => setProfileData({ ...profileData, category: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-2xl text-sm font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+                className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-md text-sm font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
                 <option value="gasztro">Gasztro / Főzőcsapat</option>
                 <option value="civil">Civil szervezet</option>
                 <option value="egyesület">Egyesület</option>
@@ -282,8 +282,8 @@ export default function ExhibitorDashboard() {
             <div>
               <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Szervezet / stand képe <span className="normal-case font-medium text-stone-400">(opcionális)</span></label>
               <div className="flex items-center gap-3">
-                {profileData.image && <img src={profileData.image} alt="" className="w-14 h-14 rounded-xl object-contain bg-stone-950 border border-stone-200" />}
-                <label className="flex-1 cursor-pointer px-3 py-2.5 bg-stone-50 border border-dashed border-stone-300 rounded-2xl text-sm font-semibold text-stone-700 hover:bg-stone-100">
+                {profileData.image && <img src={profileData.image} alt="" className="w-14 h-14 rounded-md object-contain bg-stone-950 border border-stone-200" />}
+                <label className="flex-1 cursor-pointer px-3 py-2.5 bg-stone-50 border border-dashed border-stone-300 rounded-md text-sm font-semibold text-stone-700 hover:bg-stone-100">
                   Kép kiválasztása
                   <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
                     const file = e.target.files?.[0];
@@ -306,7 +306,7 @@ export default function ExhibitorDashboard() {
                 placeholder="Pl. Kőszegi hagyományőrző társaság vagyunk. Dédszüleink receptje alapján főzünk..."
                 value={profileData.story}
                 onChange={(e) => setProfileData({ ...profileData, story: e.target.value })}
-                className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
               />
             </div>
 
@@ -320,12 +320,12 @@ export default function ExhibitorDashboard() {
                 placeholder="Pl. Bográcsos marhapörkölt, szüretes gulyásleves, rétesek..."
                 value={profileData.offerings}
                 onChange={(e) => setProfileData({ ...profileData, offerings: e.target.value })}
-                className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500/40"
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-stone-50 p-4 rounded-2xl border border-stone-200">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-stone-50 p-4 rounded-md border border-stone-200">
             <div>
               <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
                 Melyik napokon állítotok ki?
@@ -333,7 +333,7 @@ export default function ExhibitorDashboard() {
               <select
                 value={profileData.days}
                 onChange={(e) => setProfileData({ ...profileData, days: e.target.value })}
-                className="w-full px-3 py-2 bg-white border border-stone-300 rounded-xl text-xs font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40 cursor-pointer"
+                className="w-full px-3 py-2 bg-white border border-stone-300 rounded-md text-xs font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40 cursor-pointer"
               >
                 <option value="both">Mindkét nap (Szombat és Vasárnap)</option>
                 <option value="saturday">Csak Szombaton</option>
@@ -350,7 +350,7 @@ export default function ExhibitorDashboard() {
                 placeholder="+36 30 123 4567"
                 value={profileData.phone}
                 onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
-                className="w-full px-3 py-2 bg-white border border-stone-300 rounded-xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                className="w-full px-3 py-2 bg-white border border-stone-300 rounded-md text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
               />
             </div>
 
@@ -363,7 +363,7 @@ export default function ExhibitorDashboard() {
                 placeholder="csapat@koszeg.hu"
                 value={profileData.email}
                 onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
-                className="w-full px-3 py-2 bg-white border border-stone-300 rounded-xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                className="w-full px-3 py-2 bg-white border border-stone-300 rounded-md text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
               />
             </div>
           </div>
@@ -378,7 +378,7 @@ export default function ExhibitorDashboard() {
                 placeholder="https://facebook.com/csapatnev"
                 value={profileData.facebook_url}
                 onChange={(e) => setProfileData({ ...profileData, facebook_url: e.target.value })}
-                className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
               />
             </div>
 
@@ -391,7 +391,7 @@ export default function ExhibitorDashboard() {
                 placeholder="https://instagram.com/csapatnev"
                 value={profileData.instagram_url}
                 onChange={(e) => setProfileData({ ...profileData, instagram_url: e.target.value })}
-                className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
               />
             </div>
           </div>
@@ -406,7 +406,7 @@ export default function ExhibitorDashboard() {
                 placeholder="Pl. A kőszegi gyermekmentők javára"
                 value={profileData.cause}
                 onChange={(e) => setProfileData({ ...profileData, cause: e.target.value })}
-                className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
               />
             </div>
 
@@ -419,12 +419,12 @@ export default function ExhibitorDashboard() {
                 placeholder="Pl. A marhapörkölt frissen rotyog, várható elkészülés 12:45!"
                 value={profileData.notice}
                 onChange={(e) => setProfileData({ ...profileData, notice: e.target.value })}
-                className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
               />
             </div>
           </div>
 
-          <div className="flex items-center justify-between bg-amber-50 p-3.5 rounded-2xl border border-amber-200">
+          <div className="flex items-center justify-between bg-amber-50 p-3.5 rounded-md border border-amber-200">
             <div>
               <span className="font-extrabold text-amber-950 text-xs block">Ital kapható nálatok a standnál?</span>
               <span className="text-[11px] text-amber-800 font-medium">Ha bekapcsolod, az árus bekerül az "Italok" kategóriába és a térképre.</span>
@@ -433,7 +433,7 @@ export default function ExhibitorDashboard() {
             <button
               type="button"
               onClick={() => setProfileData({ ...profileData, hasDrinks: !profileData.hasDrinks })}
-              className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all border ${
+              className={`px-4 py-2 rounded-md text-xs font-extrabold transition-all border ${
                 profileData.hasDrinks
                   ? 'bg-cyan-800 text-white border-cyan-900 shadow-xs'
                   : 'bg-white text-stone-600 border-stone-300'
@@ -446,7 +446,7 @@ export default function ExhibitorDashboard() {
           <div className="flex justify-end">
             <button
               type="submit"
-              className="flex items-center gap-1.5 px-5 py-2.5 bg-stone-900 hover:bg-stone-800 text-white font-extrabold text-xs rounded-xl shadow-xs"
+              className="flex items-center gap-1.5 px-5 py-2.5 bg-stone-900 hover:bg-stone-800 text-white font-extrabold text-xs rounded-md shadow-xs"
             >
               <Save className="w-4 h-4 text-amber-400" />
               <span>Bemutatkozás & Adatok Mentése</span>
@@ -473,11 +473,11 @@ export default function ExhibitorDashboard() {
         </div>
 
         {exhibitorItems.length === 0 ? (
-          <div className="bg-white border border-stone-200 rounded-3xl p-8 text-center text-stone-500">
+          <div className="bg-white border border-stone-200 rounded-md p-8 text-center text-stone-500">
             <p className="text-xs font-medium">Még nem vettél fel ételt a standodhoz.</p>
             <button
               onClick={openNewDishModal}
-              className="mt-3 px-4 py-2 bg-amber-800 text-white font-bold text-xs rounded-xl"
+              className="mt-3 px-4 py-2 bg-amber-800 text-white font-bold text-xs rounded-md"
             >
               + Új étel hozzáadása
             </button>
@@ -487,7 +487,7 @@ export default function ExhibitorDashboard() {
             {exhibitorItems.map((item) => (
               <div
                 key={item.id}
-                className="bg-white border border-stone-200/90 rounded-3xl p-5 shadow-xs space-y-4 flex flex-col justify-between"
+                className="bg-white border border-stone-200/90 rounded-md p-5 shadow-xs space-y-4 flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-start justify-between gap-2">
@@ -548,7 +548,7 @@ export default function ExhibitorDashboard() {
                   <div className="flex items-center gap-1.5 mt-3">
                     <button
                       onClick={() => updateItemStatus(item.id, 'ready', 0)}
-                      className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all ${
+                      className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all ${
                         item.status === 'ready'
                           ? 'bg-emerald-700 text-white'
                           : 'bg-stone-100 text-stone-600'
@@ -559,7 +559,7 @@ export default function ExhibitorDashboard() {
 
                     <button
                       onClick={() => updateItemStatus(item.id, 'cooking', 15)}
-                      className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all ${
+                      className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all ${
                         item.status === 'cooking'
                           ? 'bg-amber-800 text-white'
                           : 'bg-stone-100 text-stone-600'
@@ -570,7 +570,7 @@ export default function ExhibitorDashboard() {
 
                     <button
                       onClick={() => updateItemStatus(item.id, 'sold_out', 0)}
-                      className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all ${
+                      className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all ${
                         item.status === 'sold_out' || item.stock === 0
                           ? 'bg-rose-700 text-white'
                           : 'bg-stone-100 text-stone-600'
@@ -592,7 +592,7 @@ export default function ExhibitorDashboard() {
       {/* Super-Admin New Team Registration Modal */}
       {isTeamModalOpen && (
         <div className="fixed inset-0 z-50 bg-stone-900/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
-          <div className="bg-white border border-stone-200 rounded-3xl p-6 w-full max-w-lg shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-4">
+          <div className="bg-white border border-stone-200 rounded-md p-6 w-full max-w-lg shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-4">
             <button
               onClick={() => setIsTeamModalOpen(false)}
               className="absolute top-4 right-4 text-stone-400 hover:text-stone-600 p-1"
@@ -601,7 +601,7 @@ export default function ExhibitorDashboard() {
             </button>
 
             <div className="flex items-center gap-2">
-              <span className="p-2 bg-amber-100 rounded-xl text-amber-900">
+              <span className="p-2 bg-amber-100 rounded-md text-amber-900">
                 <UserPlus className="w-5 h-5" />
               </span>
               <div>
@@ -625,7 +625,7 @@ export default function ExhibitorDashboard() {
                   placeholder="Pl. Kőszegi Öntelt Szakácsok"
                   value={teamForm.name}
                   onChange={(e) => setTeamForm({ ...teamForm, name: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-300 rounded-2xl text-xs font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                  className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-300 rounded-md text-xs font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
                 />
               </div>
 
@@ -639,7 +639,7 @@ export default function ExhibitorDashboard() {
                   placeholder="Pl. Vasi tarhonyás hús, szüretes rétes, házi almalé..."
                   value={teamForm.offerings}
                   onChange={(e) => setTeamForm({ ...teamForm, offerings: e.target.value })}
-                  className="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-2xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40 font-medium"
+                  className="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-md text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40 font-medium"
                 />
               </div>
 
@@ -651,7 +651,7 @@ export default function ExhibitorDashboard() {
                   <select
                     value={teamForm.days}
                     onChange={(e) => setTeamForm({ ...teamForm, days: e.target.value })}
-                    className="w-full px-3 py-2 bg-stone-50 border border-stone-300 rounded-xl text-xs font-bold text-stone-900 focus:outline-none cursor-pointer"
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-300 rounded-md text-xs font-bold text-stone-900 focus:outline-none cursor-pointer"
                   >
                     <option value="both">Mindkét nap (Szombat és Vasárnap)</option>
                     <option value="saturday">Csak Szombat</option>
@@ -668,7 +668,7 @@ export default function ExhibitorDashboard() {
                     placeholder="Diáksétány 18."
                     value={teamForm.location}
                     onChange={(e) => setTeamForm({ ...teamForm, location: e.target.value })}
-                    className="w-full px-3 py-2 bg-stone-50 border border-stone-300 rounded-xl text-xs text-stone-900 focus:outline-none"
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-300 rounded-md text-xs text-stone-900 focus:outline-none"
                   />
                 </div>
               </div>
@@ -683,7 +683,7 @@ export default function ExhibitorDashboard() {
                     placeholder="+36 30 111 2233"
                     value={teamForm.phone}
                     onChange={(e) => setTeamForm({ ...teamForm, phone: e.target.value })}
-                    className="w-full px-3 py-2 bg-stone-50 border border-stone-300 rounded-xl text-xs text-stone-900"
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-300 rounded-md text-xs text-stone-900"
                   />
                 </div>
 
@@ -696,7 +696,7 @@ export default function ExhibitorDashboard() {
                     placeholder="info@csapat.hu"
                     value={teamForm.email}
                     onChange={(e) => setTeamForm({ ...teamForm, email: e.target.value })}
-                    className="w-full px-3 py-2 bg-stone-50 border border-stone-300 rounded-xl text-xs text-stone-900"
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-300 rounded-md text-xs text-stone-900"
                   />
                 </div>
               </div>
@@ -711,7 +711,7 @@ export default function ExhibitorDashboard() {
                     placeholder="https://facebook.com/..."
                     value={teamForm.facebook_url}
                     onChange={(e) => setTeamForm({ ...teamForm, facebook_url: e.target.value })}
-                    className="w-full px-3 py-2 bg-stone-50 border border-stone-300 rounded-xl text-xs text-stone-900"
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-300 rounded-md text-xs text-stone-900"
                   />
                 </div>
 
@@ -724,14 +724,14 @@ export default function ExhibitorDashboard() {
                     placeholder="https://instagram.com/..."
                     value={teamForm.instagram_url}
                     onChange={(e) => setTeamForm({ ...teamForm, instagram_url: e.target.value })}
-                    className="w-full px-3 py-2 bg-stone-50 border border-stone-300 rounded-xl text-xs text-stone-900"
+                    className="w-full px-3 py-2 bg-stone-50 border border-stone-300 rounded-md text-xs text-stone-900"
                   />
                 </div>
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3 bg-amber-900 hover:bg-amber-950 text-white font-extrabold text-xs rounded-2xl shadow-xs mt-2"
+                className="w-full py-3 bg-amber-900 hover:bg-amber-950 text-white font-extrabold text-xs rounded-md shadow-xs mt-2"
               >
                 + Csapat Regisztrálása
               </button>
@@ -743,7 +743,7 @@ export default function ExhibitorDashboard() {
       {/* Team Created Success PIN Modal */}
       {createdTeamPinModal && (
         <div className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white border border-stone-200 rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl space-y-4">
+          <div className="bg-white border border-stone-200 rounded-md p-6 w-full max-w-sm text-center shadow-2xl space-y-4">
             <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mx-auto text-emerald-800 border border-emerald-300">
               <CheckCircle className="w-6 h-6" />
             </div>
@@ -757,7 +757,7 @@ export default function ExhibitorDashboard() {
               </p>
             </div>
 
-            <div className="bg-amber-50 border border-amber-300 p-4 rounded-2xl">
+            <div className="bg-amber-50 border border-amber-300 p-4 rounded-md">
               <span className="text-[10px] font-extrabold text-amber-900 uppercase tracking-wider block">
                 BELÉPÉSI PIN KÓD:
               </span>
@@ -771,7 +771,7 @@ export default function ExhibitorDashboard() {
 
             <button
               onClick={() => setCreatedTeamPinModal(null)}
-              className="w-full py-2.5 bg-stone-900 text-white font-bold text-xs rounded-xl shadow-xs"
+              className="w-full py-2.5 bg-stone-900 text-white font-bold text-xs rounded-md shadow-xs"
             >
               Rendben, bezárás
             </button>
@@ -782,7 +782,7 @@ export default function ExhibitorDashboard() {
       {/* Add / Edit Dish Modal */}
       {isDishModalOpen && (
         <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white border border-stone-200 rounded-3xl p-6 w-full max-w-md shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-4">
+          <div className="bg-white border border-stone-200 rounded-md p-6 w-full max-w-md shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-4">
             <button
               onClick={() => setIsDishModalOpen(false)}
               className="absolute top-4 right-4 text-stone-400 hover:text-stone-600 p-1"
@@ -805,7 +805,7 @@ export default function ExhibitorDashboard() {
                   placeholder="Pl. Bográcsos Marhapörkölt"
                   value={dishForm.name}
                   onChange={(e) => setDishForm({ ...dishForm, name: e.target.value })}
-                  className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                  className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
                 />
               </div>
 
@@ -818,7 +818,7 @@ export default function ExhibitorDashboard() {
                   placeholder="Pl. Szabad tűzön főzött marhapörkölt házi tarhonyával..."
                   value={dishForm.description}
                   onChange={(e) => setDishForm({ ...dishForm, description: e.target.value })}
-                  className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                  className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
                 />
               </div>
 
@@ -830,7 +830,7 @@ export default function ExhibitorDashboard() {
                   <select
                     value={dishForm.available_day}
                     onChange={(e) => setDishForm({ ...dishForm, available_day: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 font-bold focus:outline-none cursor-pointer"
+                    className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 font-bold focus:outline-none cursor-pointer"
                   >
                     <option value="both">Mindkét nap</option>
                     <option value="saturday">Szombat</option>
@@ -846,7 +846,7 @@ export default function ExhibitorDashboard() {
                 <select
                   value={dishForm.category}
                   onChange={(e) => setDishForm({ ...dishForm, category: e.target.value })}
-                  className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 font-bold focus:outline-none focus:ring-2 focus:ring-amber-500/40 cursor-pointer"
+                  className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 font-bold focus:outline-none focus:ring-2 focus:ring-amber-500/40 cursor-pointer"
                 >
                   <option value="meleg_etel">Meleg ételek</option>
                   <option value="hideg_etel">Hideg ételek</option>
@@ -858,7 +858,7 @@ export default function ExhibitorDashboard() {
               </div>
 
               {/* Allergen & Dietary Checkboxes */}
-              <div className="bg-amber-50/70 p-3.5 rounded-2xl border border-amber-200/80 space-y-2">
+              <div className="bg-amber-50/70 p-3.5 rounded-md border border-amber-200/80 space-y-2">
                 <span className="text-xs font-extrabold text-amber-950 uppercase tracking-wider block">
                   Étrendi Jellemzők / Mentes opciók:
                 </span>
@@ -915,15 +915,15 @@ export default function ExhibitorDashboard() {
                   placeholder="Pl. Bográcsos, Kőszegi Recept"
                   value={dishForm.tags}
                   onChange={(e) => setDishForm({ ...dishForm, tags: e.target.value })}
-                  className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                  className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Étel fotó <span className="normal-case font-medium text-stone-400">(opcionális)</span></label>
                 <div className="flex items-center gap-3">
-                  {dishForm.image && <img src={dishForm.image} alt="" className="w-20 h-16 rounded-xl object-contain bg-stone-950 border border-stone-200" />}
-                  <label className="flex-1 cursor-pointer px-3 py-2.5 bg-stone-50 border border-dashed border-stone-300 rounded-2xl text-sm font-semibold text-stone-700 hover:bg-stone-100">
+                  {dishForm.image && <img src={dishForm.image} alt="" className="w-20 h-16 rounded-md object-contain bg-stone-950 border border-stone-200" />}
+                  <label className="flex-1 cursor-pointer px-3 py-2.5 bg-stone-50 border border-dashed border-stone-300 rounded-md text-sm font-semibold text-stone-700 hover:bg-stone-100">
                     Fotó kiválasztása
                     <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
                       const file = e.target.files?.[0];
@@ -938,7 +938,7 @@ export default function ExhibitorDashboard() {
 
               <button
                 type="submit"
-                className="w-full py-3 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-2xl shadow-xs mt-2"
+                className="w-full py-3 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-md shadow-xs mt-2"
               >
                 Étel Mentése
               </button>

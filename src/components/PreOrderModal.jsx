@@ -29,7 +29,7 @@ export default function PreOrderModal({ exhibitor, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 bg-zinc-950/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 w-full max-w-lg shadow-2xl relative">
+      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-md p-6 w-full max-w-lg shadow-2xl relative">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-600 p-1"
@@ -50,7 +50,7 @@ export default function PreOrderModal({ exhibitor, onClose }) {
             </div>
 
             {/* Reserved Items */}
-            <div className="bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/60 rounded-2xl p-4 mb-5 space-y-2">
+            <div className="bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/60 rounded-md p-4 mb-5 space-y-2">
               <h4 className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-2">
                 Foglalt ételek adagszáma:
               </h4>
@@ -74,7 +74,7 @@ export default function PreOrderModal({ exhibitor, onClose }) {
                   required
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl text-xs text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500"
+                  className="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-md text-xs text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500"
                 />
               </div>
 
@@ -89,7 +89,7 @@ export default function PreOrderModal({ exhibitor, onClose }) {
                   required
                   value={userPhone}
                   onChange={(e) => setUserPhone(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl text-xs text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500"
+                  className="w-full px-3.5 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-md text-xs text-zinc-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-amber-500"
                 />
               </div>
 
@@ -104,7 +104,7 @@ export default function PreOrderModal({ exhibitor, onClose }) {
                       type="button"
                       key={slot}
                       onClick={() => setPickupTime(slot)}
-                      className={`py-2 text-xs font-medium rounded-xl border transition-all ${
+                      className={`py-2 text-xs font-medium rounded-md border transition-all ${
                         pickupTime === slot
                           ? 'bg-amber-600 text-white border-amber-600 font-semibold'
                           : 'bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700'
@@ -118,7 +118,7 @@ export default function PreOrderModal({ exhibitor, onClose }) {
 
               <button
                 type="submit"
-                className="w-full py-3 bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 mt-2"
+                className="w-full py-3 bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs rounded-md shadow-sm transition-all flex items-center justify-center gap-2 mt-2"
               >
                 <Utensils className="w-4 h-4" />
                 <span>Kóstoló Foglalás Véglegesítése</span>
@@ -138,7 +138,7 @@ export default function PreOrderModal({ exhibitor, onClose }) {
               </p>
             </div>
 
-            <div className="bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/60 rounded-2xl p-4 text-left space-y-1.5 text-xs">
+            <div className="bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/60 rounded-md p-4 text-left space-y-1.5 text-xs">
               <div className="flex justify-between items-center border-b border-zinc-200/60 dark:border-zinc-700/60 pb-2">
                 <span className="text-zinc-500">Foglalás azonosító:</span>
                 <span className="font-mono font-bold text-amber-600">#{completedOrder.id}</span>
@@ -158,7 +158,7 @@ export default function PreOrderModal({ exhibitor, onClose }) {
                 onClose();
                 setIsMyOrdersOpen(true);
               }}
-              className="w-full py-3 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-semibold text-xs rounded-2xl"
+              className="w-full py-3 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-semibold text-xs rounded-md"
             >
               Foglalásaim Megtekintése
             </button>

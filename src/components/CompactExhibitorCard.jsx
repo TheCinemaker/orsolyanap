@@ -9,7 +9,7 @@ export default function CompactExhibitorCard({ exhibitor, items, onOpenDetails }
   const dayLabel = exhibitor.days === 'saturday' ? 'Szombat' : exhibitor.days === 'sunday' ? 'Vasárnap' : 'Mindkét nap';
 
   return (
-    <div className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-xs hover:border-amber-600/60 transition-all flex flex-col justify-between space-y-3 relative group">
+    <div className="bg-white border border-stone-200/90 rounded-md p-4 shadow-xs hover:border-amber-600/60 transition-all flex flex-col justify-between space-y-3 relative group">
       {/* Top Bar: Location Badge, Day Badge, Drinks Badge & Favorite Toggle */}
       <div className="flex items-center justify-between gap-1.5 flex-wrap">
         <div className="flex items-center gap-1.5 flex-wrap">
@@ -48,7 +48,7 @@ export default function CompactExhibitorCard({ exhibitor, items, onOpenDetails }
       {/* Image & Title */}
       <div onClick={() => onOpenDetails(exhibitor)} className="cursor-pointer space-y-2">
         {exhibitor.image && (
-          <div className="w-full aspect-video rounded-xl overflow-hidden relative border border-stone-200 bg-stone-950 flex items-center justify-center">
+          <div className="w-full aspect-video rounded-md overflow-hidden relative border border-stone-200 bg-stone-950 flex items-center justify-center">
             <img
               src={exhibitor.image}
               alt={exhibitor.name}
@@ -82,7 +82,7 @@ export default function CompactExhibitorCard({ exhibitor, items, onOpenDetails }
             return (
               <div
                 key={item.id}
-                className={`flex items-center justify-between text-xs p-2 rounded-xl border gap-2 transition-all ${
+                className={`flex items-center justify-between text-xs p-2 rounded-md border gap-2 transition-all ${
                   item.status === 'sold_out' ? 'bg-stone-200 border-stone-300 opacity-80 grayscale' : 'bg-stone-50 border-stone-100'
                 }`}
               >
@@ -126,7 +126,7 @@ export default function CompactExhibitorCard({ exhibitor, items, onOpenDetails }
       <div className="grid grid-cols-2 gap-2 pt-1">
         <button
           onClick={() => focusExhibitorOnMap(exhibitor.id)}
-          className="py-1.5 px-2 text-center text-xs font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 rounded-xl transition-all flex items-center justify-center gap-1 border border-amber-300/80"
+          className="py-1.5 px-2 text-center text-xs font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 rounded-md transition-all flex items-center justify-center gap-1 border border-amber-300/80"
         >
           <Map className="w-3.5 h-3.5 text-amber-800" />
           <span>Térkép</span>
@@ -134,7 +134,7 @@ export default function CompactExhibitorCard({ exhibitor, items, onOpenDetails }
 
         <button
           onClick={() => onOpenDetails(exhibitor)}
-          className="py-1.5 px-2 text-center text-xs font-bold text-stone-700 bg-stone-100 hover:bg-stone-200/80 rounded-xl transition-all flex items-center justify-center gap-1"
+          className="py-1.5 px-2 text-center text-xs font-bold text-stone-700 bg-stone-100 hover:bg-stone-200/80 rounded-md transition-all flex items-center justify-center gap-1"
         >
           <span>Részletek</span>
           <ChevronRight className="w-3.5 h-3.5" />

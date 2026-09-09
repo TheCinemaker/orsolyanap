@@ -51,7 +51,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
   return (
     <div className="space-y-6">
       {/* Header Bar */}
-      <div className="bg-white border border-stone-200/90 rounded-3xl p-4 sm:p-5 shadow-xs space-y-4">
+      <div className="bg-white border border-stone-200/90 rounded-md p-4 sm:p-5 shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-200">
@@ -64,10 +64,10 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
           </div>
 
           {/* Day Switcher Toggle */}
-          <div className="flex items-center bg-stone-100 p-1 rounded-2xl border border-stone-200 self-stretch sm:self-auto">
+          <div className="flex items-center bg-stone-100 p-1 rounded-md border border-stone-200 self-stretch sm:self-auto">
             <button
               onClick={() => setSelectedDay('all')}
-              className={`flex-1 sm:flex-none px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all ${
+              className={`flex-1 sm:flex-none px-3 py-1.5 rounded-md text-xs font-extrabold transition-all ${
                 selectedDay === 'all'
                   ? 'bg-amber-900 text-white shadow-xs'
                   : 'text-stone-600 hover:text-stone-900'
@@ -77,7 +77,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
             </button>
             <button
               onClick={() => setSelectedDay('saturday')}
-              className={`flex-1 sm:flex-none px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all ${
+              className={`flex-1 sm:flex-none px-3 py-1.5 rounded-md text-xs font-extrabold transition-all ${
                 selectedDay === 'saturday'
                   ? 'bg-amber-900 text-white shadow-xs'
                   : 'text-stone-600 hover:text-stone-900'
@@ -87,7 +87,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
             </button>
             <button
               onClick={() => setSelectedDay('sunday')}
-              className={`flex-1 sm:flex-none px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all ${
+              className={`flex-1 sm:flex-none px-3 py-1.5 rounded-md text-xs font-extrabold transition-all ${
                 selectedDay === 'sunday'
                   ? 'bg-amber-900 text-white shadow-xs'
                   : 'text-stone-600 hover:text-stone-900'
@@ -106,7 +106,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
 
           <button
             onClick={() => setSelectedDietary('all')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all flex-shrink-0 border ${
+            className={`px-3 py-1.5 rounded-md text-xs font-extrabold transition-all flex-shrink-0 border ${
               selectedDietary === 'all'
                 ? 'bg-stone-900 text-white border-stone-900'
                 : 'bg-stone-50 text-stone-600 border-stone-200 hover:bg-stone-100'
@@ -117,7 +117,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
 
           <button
             onClick={() => setSelectedDietary('gluten_free')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all flex-shrink-0 border ${
+            className={`px-3 py-1.5 rounded-md text-xs font-extrabold transition-all flex-shrink-0 border ${
               selectedDietary === 'gluten_free'
                 ? 'bg-emerald-800 text-white border-emerald-900 shadow-xs'
                 : 'bg-emerald-50 text-emerald-900 border-emerald-200 hover:bg-emerald-100'
@@ -128,7 +128,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
 
           <button
             onClick={() => setSelectedDietary('lactose_free')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all flex-shrink-0 border ${
+            className={`px-3 py-1.5 rounded-md text-xs font-extrabold transition-all flex-shrink-0 border ${
               selectedDietary === 'lactose_free'
                 ? 'bg-cyan-800 text-white border-cyan-900 shadow-xs'
                 : 'bg-cyan-50 text-cyan-900 border-cyan-200 hover:bg-cyan-100'
@@ -139,7 +139,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
 
           <button
             onClick={() => setSelectedDietary('sugar_free')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all flex-shrink-0 border ${
+            className={`px-3 py-1.5 rounded-md text-xs font-extrabold transition-all flex-shrink-0 border ${
               selectedDietary === 'sugar_free'
                 ? 'bg-purple-800 text-white border-purple-900 shadow-xs'
                 : 'bg-purple-50 text-purple-900 border-purple-200 hover:bg-purple-100'
@@ -150,7 +150,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
 
           <button
             onClick={() => setSelectedDietary('vegan')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all flex-shrink-0 border ${
+            className={`px-3 py-1.5 rounded-md text-xs font-extrabold transition-all flex-shrink-0 border ${
               selectedDietary === 'vegan'
                 ? 'bg-lime-800 text-white border-lime-900 shadow-xs'
                 : 'bg-lime-50 text-lime-900 border-lime-200 hover:bg-lime-100'
@@ -163,7 +163,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
 
       {/* Dishes Grid */}
       {filteredItems.length === 0 ? (
-        <div className="bg-white border border-stone-200 rounded-3xl p-8 text-center text-stone-400 space-y-2">
+        <div className="bg-white border border-stone-200 rounded-md p-8 text-center text-stone-400 space-y-2">
           <Info className="w-8 h-8 mx-auto opacity-40 text-amber-800" />
           <p className="text-sm font-bold text-stone-700">Nincs a szűrésnek megfelelő étel.</p>
           <button
@@ -172,7 +172,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
               setSelectedDay('all');
               if (setSearchQuery) setSearchQuery('');
             }}
-            className="px-4 py-2 bg-amber-800 text-white text-xs font-bold rounded-xl mt-2"
+            className="px-4 py-2 bg-amber-800 text-white text-xs font-bold rounded-md mt-2"
           >
             Szűrők alaphelyzetbe állítása
           </button>
@@ -187,7 +187,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
             return (
               <div
                 key={item.id}
-                className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-xs hover:border-amber-500/60 transition-all flex flex-col justify-between space-y-3 relative group"
+                className="bg-white border border-stone-200/90 rounded-md p-4 shadow-xs hover:border-amber-500/60 transition-all flex flex-col justify-between space-y-3 relative group"
               >
                 {/* Stand Info Badge & Top Voted */}
                 {exhibitor && (
@@ -207,7 +207,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
 
                 {/* Item Image */}
                 {item.image && (
-                  <div className="w-full aspect-video rounded-xl overflow-hidden mt-2 mb-2 border border-stone-200 bg-stone-950 flex items-center justify-center">
+                  <div className="w-full aspect-video rounded-md overflow-hidden mt-2 mb-2 border border-stone-200 bg-stone-950 flex items-center justify-center">
                     <img src={item.image} alt={item.name} className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105" />
                   </div>
                 )}
@@ -279,7 +279,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
                 <div className="pt-2.5 border-t border-stone-100 flex items-center justify-end gap-2">
                   <button
                     onClick={() => voteForItem(item.id)}
-                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all border shadow-2xs ${
+                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-md text-xs font-extrabold transition-all border shadow-2xs ${
                       isVoted
                         ? 'bg-emerald-800 text-white border-emerald-800'
                         : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-300/80'

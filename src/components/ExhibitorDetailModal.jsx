@@ -23,7 +23,7 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-150">
-      <div className="bg-white border border-stone-200 rounded-t-3xl sm:rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 shadow-2xl space-y-5 relative animate-in slide-in-from-bottom duration-200">
+      <div className="bg-white border border-stone-200 rounded-t-3xl sm:rounded-md max-w-lg w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 shadow-2xl space-y-5 relative animate-in slide-in-from-bottom duration-200">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -73,7 +73,7 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
           <div className="flex items-center gap-2">
             <button
               onClick={() => toggleFavoriteExhibitor(exhibitor.id)}
-              className={`flex-1 py-2 px-3 rounded-2xl text-xs font-extrabold transition-all border flex items-center justify-center gap-1.5 shadow-2xs ${
+              className={`flex-1 py-2 px-3 rounded-md text-xs font-extrabold transition-all border flex items-center justify-center gap-1.5 shadow-2xs ${
                 isFavorite
                   ? 'bg-rose-100 text-rose-800 border-rose-300'
                   : 'bg-stone-50 hover:bg-stone-100 text-stone-700 border-stone-200'
@@ -88,7 +88,7 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
                 onClose();
                 focusExhibitorOnMap(exhibitor.id);
               }}
-              className="flex-1 py-2 px-3 bg-amber-800 hover:bg-amber-700 text-white rounded-2xl text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 shadow-xs"
+              className="flex-1 py-2 px-3 bg-amber-800 hover:bg-amber-700 text-white rounded-md text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 shadow-xs"
             >
               <Map className="w-4 h-4" />
               <span>Mutasd a térképen</span>
@@ -98,11 +98,11 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
 
         {/* Social Links & Contact Details */}
         {(exhibitor.phone || exhibitor.email || exhibitor.facebook_url || exhibitor.instagram_url) && (
-          <div className="flex items-center gap-2 flex-wrap bg-stone-50 p-3 rounded-2xl border border-stone-200/80 text-xs">
+          <div className="flex items-center gap-2 flex-wrap bg-stone-50 p-3 rounded-md border border-stone-200/80 text-xs">
             {exhibitor.phone && (
               <a
                 href={`tel:${exhibitor.phone}`}
-                className="flex items-center gap-1 text-stone-700 font-bold hover:text-amber-800 bg-white px-2.5 py-1 rounded-xl border border-stone-200"
+                className="flex items-center gap-1 text-stone-700 font-bold hover:text-amber-800 bg-white px-2.5 py-1 rounded-md border border-stone-200"
               >
                 <Phone className="w-3.5 h-3.5 text-stone-500" />
                 <span>{exhibitor.phone}</span>
@@ -112,7 +112,7 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
             {exhibitor.email && (
               <a
                 href={`mailto:${exhibitor.email}`}
-                className="flex items-center gap-1 text-stone-700 font-bold hover:text-amber-800 bg-white px-2.5 py-1 rounded-xl border border-stone-200"
+                className="flex items-center gap-1 text-stone-700 font-bold hover:text-amber-800 bg-white px-2.5 py-1 rounded-md border border-stone-200"
               >
                 <Mail className="w-3.5 h-3.5 text-stone-500" />
                 <span>Email</span>
@@ -124,7 +124,7 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
                 href={exhibitor.facebook_url}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center gap-1 text-blue-800 font-bold bg-blue-50 px-2.5 py-1 rounded-xl border border-blue-200 hover:bg-blue-100"
+                className="flex items-center gap-1 text-blue-800 font-bold bg-blue-50 px-2.5 py-1 rounded-md border border-blue-200 hover:bg-blue-100"
               >
                 <Share2 className="w-3.5 h-3.5 text-blue-700" />
                 <span>Facebook</span>
@@ -136,7 +136,7 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
                 href={exhibitor.instagram_url}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center gap-1 text-pink-800 font-bold bg-pink-50 px-2.5 py-1 rounded-xl border border-pink-200 hover:bg-pink-100"
+                className="flex items-center gap-1 text-pink-800 font-bold bg-pink-50 px-2.5 py-1 rounded-md border border-pink-200 hover:bg-pink-100"
               >
                 <Share2 className="w-3.5 h-3.5 text-pink-700" />
                 <span>Instagram</span>
@@ -147,7 +147,7 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
 
         {/* Offerings Summary (Kínálat) */}
         {exhibitor.offerings && (
-          <div className="bg-amber-50 border border-amber-200 p-4 rounded-2xl space-y-1">
+          <div className="bg-amber-50 border border-amber-200 p-4 rounded-md space-y-1">
             <span className="text-xs font-black text-amber-900 uppercase tracking-wider flex items-center gap-1">
               <Utensils className="w-3.5 h-3.5 text-amber-800" />
               <span>Mit kínál az árus:</span>
@@ -160,7 +160,7 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
 
         {/* Story & Cause (Hide empty fields) */}
         {(exhibitor.story || exhibitor.cause) && (
-          <div className="space-y-3 bg-stone-50 p-4 rounded-2xl border border-stone-200/80 text-xs">
+          <div className="space-y-3 bg-stone-50 p-4 rounded-md border border-stone-200/80 text-xs">
             {exhibitor.story && (
               <div>
                 <span className="font-bold text-stone-900 block mb-0.5">Bemutatkozás:</span>
@@ -193,13 +193,13 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
                 return (
                   <div
                     key={item.id}
-                    className={`border p-3.5 rounded-2xl flex items-center justify-between gap-3 shadow-2xs transition-all ${
+                    className={`border p-3.5 rounded-md flex items-center justify-between gap-3 shadow-2xs transition-all ${
                       item.status === 'sold_out' ? 'border-stone-300 bg-stone-100 opacity-80 grayscale' : 'bg-white border-stone-200'
                     }`}
                   >
                     {/* Item Image */}
                     {item.image && (
-                      <div className="w-24 sm:w-32 aspect-video flex-shrink-0 rounded-xl overflow-hidden bg-stone-950 flex items-center justify-center border border-stone-200">
+                      <div className="w-24 sm:w-32 aspect-video flex-shrink-0 rounded-md overflow-hidden bg-stone-950 flex items-center justify-center border border-stone-200">
                         <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
                       </div>
                     )}
@@ -237,7 +237,7 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
                     <div className="flex items-center gap-1 flex-shrink-0">
                       <button
                         onClick={() => toggleFavoriteItem(item.id)}
-                        className={`p-1.5 rounded-xl border transition-all ${
+                        className={`p-1.5 rounded-md border transition-all ${
                           isFavItem
                             ? 'bg-rose-100 border-rose-300 text-rose-700'
                             : 'bg-stone-50 border-stone-200 text-stone-400 hover:text-rose-600'
@@ -249,7 +249,7 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
 
                       <button
                         onClick={() => voteForItem(item.id)}
-                        className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-extrabold transition-all border ${
+                        className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-extrabold transition-all border ${
                           isVoted
                             ? 'bg-emerald-800 text-white border-emerald-800'
                             : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-300'

@@ -20,7 +20,7 @@ export default function FavoritesModal({ isOpen, onClose, onOpenScanner }) {
 
   return (
     <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-150">
-      <div className="bg-white border border-stone-200 rounded-3xl p-5 sm:p-6 w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl relative">
+      <div className="bg-white border border-stone-200 rounded-md p-5 sm:p-6 w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl relative">
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-stone-100">
           <div>
@@ -47,7 +47,7 @@ export default function FavoritesModal({ isOpen, onClose, onOpenScanner }) {
               onClose();
               onOpenScanner();
             }}
-            className="w-full py-2.5 bg-amber-800 hover:bg-amber-700 text-white font-extrabold text-xs rounded-2xl shadow-xs flex items-center justify-center gap-2 transition-all"
+            className="w-full py-2.5 bg-amber-800 hover:bg-amber-700 text-white font-extrabold text-xs rounded-md shadow-xs flex items-center justify-center gap-2 transition-all"
           >
             <QrCode className="w-4 h-4 text-white" />
             <span>Stand QR Kód Beolvasása Kamerával</span>
@@ -77,7 +77,7 @@ export default function FavoritesModal({ isOpen, onClose, onOpenScanner }) {
                   return (
                     <div
                       key={item.id}
-                      className="bg-stone-50 border border-stone-200/80 rounded-2xl p-3 flex items-center justify-between gap-3 shadow-2xs"
+                      className="bg-stone-50 border border-stone-200/80 rounded-md p-3 flex items-center justify-between gap-3 shadow-2xs"
                     >
                       <div className="min-w-0 flex-1 space-y-0.5">
                         <h4 className="text-xs sm:text-sm font-extrabold text-stone-900 truncate">
@@ -98,7 +98,7 @@ export default function FavoritesModal({ isOpen, onClose, onOpenScanner }) {
                               onClose();
                               focusExhibitorOnMap(exhibitor.id);
                             }}
-                            className="p-2 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-xl text-xs font-bold transition-all flex items-center gap-1"
+                            className="p-2 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-md text-xs font-bold transition-all flex items-center gap-1"
                             title="Mutasd a térképen"
                           >
                             <Map className="w-3.5 h-3.5" />
@@ -107,7 +107,7 @@ export default function FavoritesModal({ isOpen, onClose, onOpenScanner }) {
 
                         <button
                           onClick={() => toggleFavoriteItem(item.id)}
-                          className="p-2 text-rose-600 hover:text-stone-400 rounded-xl"
+                          className="p-2 text-rose-600 hover:text-stone-400 rounded-md"
                           title="Eltávolítás"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -138,7 +138,7 @@ export default function FavoritesModal({ isOpen, onClose, onOpenScanner }) {
                 {favoriteExhibitors.map((ex) => (
                   <div
                     key={ex.id}
-                    className="bg-stone-50 border border-stone-200/80 rounded-2xl p-3 flex items-center justify-between gap-3 shadow-2xs"
+                    className="bg-stone-50 border border-stone-200/80 rounded-md p-3 flex items-center justify-between gap-3 shadow-2xs"
                   >
                     <div className="min-w-0 flex-1 space-y-0.5">
                       <h4 className="text-xs sm:text-sm font-extrabold text-stone-900 truncate">
@@ -156,7 +156,7 @@ export default function FavoritesModal({ isOpen, onClose, onOpenScanner }) {
                           onClose();
                           focusExhibitorOnMap(ex.id);
                         }}
-                        className="p-2 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-xl text-xs font-bold transition-all flex items-center gap-1"
+                        className="p-2 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-md text-xs font-bold transition-all flex items-center gap-1"
                         title="Mutasd a térképen"
                       >
                         <Map className="w-3.5 h-3.5" />
@@ -164,7 +164,7 @@ export default function FavoritesModal({ isOpen, onClose, onOpenScanner }) {
 
                       <button
                         onClick={() => toggleFavoriteExhibitor(ex.id)}
-                        className="p-2 text-rose-600 hover:text-stone-400 rounded-xl"
+                        className="p-2 text-rose-600 hover:text-stone-400 rounded-md"
                         title="Eltávolítás"
                       >
                         <Trash2 className="w-4 h-4" />

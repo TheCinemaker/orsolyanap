@@ -47,7 +47,7 @@ export default function CartDrawer() {
               groupedCart.map(({ exhibitor, items }) => (
                 <div
                   key={exhibitor.id}
-                  className="bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/60 rounded-2xl p-4 space-y-3"
+                  className="bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-200 dark:border-zinc-700/60 rounded-md p-4 space-y-3"
                 >
                   <div className="flex items-center justify-between pb-2 border-b border-zinc-200/60 dark:border-zinc-700/60">
                     <div>
@@ -63,7 +63,7 @@ export default function CartDrawer() {
                           {item.name}
                         </span>
 
-                        <div className="flex items-center gap-1.5 bg-white dark:bg-zinc-800 px-2 py-1 rounded-xl border border-zinc-200 dark:border-zinc-700">
+                        <div className="flex items-center gap-1.5 bg-white dark:bg-zinc-800 px-2 py-1 rounded-md border border-zinc-200 dark:border-zinc-700">
                           <button
                             onClick={() => addToCart(item, -1)}
                             className="text-zinc-400 hover:text-zinc-700 p-0.5"
@@ -97,7 +97,7 @@ export default function CartDrawer() {
                       setSelectedExhibitorForCheckout(exhibitor);
                       setIsCartOpen(false);
                     }}
-                    className="w-full mt-2 py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs rounded-xl shadow-sm flex items-center justify-center gap-2"
+                    className="w-full mt-2 py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs rounded-md shadow-sm flex items-center justify-center gap-2"
                   >
                     <span>Foglalás Véglegesítése</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -111,7 +111,7 @@ export default function CartDrawer() {
             <div className="p-4 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900">
               <button
                 onClick={clearCart}
-                className="w-full py-2 border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-white text-xs font-semibold rounded-xl"
+                className="w-full py-2 border border-zinc-200 dark:border-zinc-800 text-zinc-500 hover:text-zinc-900 dark:hover:text-white text-xs font-semibold rounded-md"
               >
                 Kosár ürítése
               </button>

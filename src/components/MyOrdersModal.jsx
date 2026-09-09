@@ -46,7 +46,7 @@ export default function MyOrdersModal() {
 
   return (
     <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white border border-stone-200 rounded-3xl p-6 w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl relative">
+      <div className="bg-white border border-stone-200 rounded-md p-6 w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl relative">
         <div className="flex items-center justify-between pb-4 border-b border-stone-100">
           <div>
             <h2 className="text-lg font-bold text-stone-900 flex items-center gap-2">
@@ -78,7 +78,7 @@ export default function MyOrdersModal() {
               return (
                 <div
                   key={order.id}
-                  className="bg-stone-50 border border-stone-200/80 rounded-2xl p-4 space-y-3"
+                  className="bg-stone-50 border border-stone-200/80 rounded-md p-4 space-y-3"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
@@ -99,7 +99,7 @@ export default function MyOrdersModal() {
                     <div>{getStatusBadge(order.status)}</div>
                   </div>
 
-                  <div className="bg-white p-3 rounded-xl space-y-1 text-xs text-stone-700 border border-stone-200/60">
+                  <div className="bg-white p-3 rounded-md space-y-1 text-xs text-stone-700 border border-stone-200/60">
                     {order.items.map((it, idx) => (
                       <div key={idx} className="flex justify-between">
                         <span>{it.name}</span>

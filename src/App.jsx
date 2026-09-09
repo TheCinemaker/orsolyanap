@@ -125,7 +125,7 @@ function MainApp() {
       {/* Toast Notification */}
       {toastMessage && (
         <div
-          className={`fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 px-4 py-3 rounded-2xl shadow-xl font-extrabold text-xs flex items-center gap-2 border animate-in slide-in-from-bottom duration-200 ${
+          className={`fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 px-4 py-3 rounded-md shadow-xl font-extrabold text-xs flex items-center gap-2 border animate-in slide-in-from-bottom duration-200 ${
             toastMessage.type === 'error'
               ? 'bg-rose-900 text-white border-rose-800'
               : toastMessage.type === 'success'
@@ -179,7 +179,7 @@ function MainApp() {
                 <div className="relative inline-block text-left w-full sm:w-64">
                   <button
                     onClick={() => setIsCategoryDropdownOpen((prev) => !prev)}
-                    className="w-full flex items-center justify-between gap-3 px-4 py-3 bg-white border-2 border-amber-900/80 rounded-2xl text-sm font-extrabold text-amber-950 shadow-xs hover:bg-amber-50/60 transition-all focus:outline-none focus:ring-2 focus:ring-amber-800 cursor-pointer"
+                    className="w-full flex items-center justify-between gap-3 px-4 py-3 bg-white border-2 border-amber-900/80 rounded-md text-sm font-extrabold text-amber-950 shadow-xs hover:bg-amber-50/60 transition-all focus:outline-none focus:ring-2 focus:ring-amber-800 cursor-pointer"
                   >
                     <div className="flex items-center gap-3 truncate">
                       {activeCategoryObj && (
@@ -202,7 +202,7 @@ function MainApp() {
                         className="fixed inset-0 z-30"
                         onClick={() => setIsCategoryDropdownOpen(false)}
                       />
-                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border-2 border-amber-900 rounded-2xl shadow-2xl z-40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 p-1.5 space-y-1">
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border-2 border-amber-900 rounded-md shadow-2xl z-40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 p-1.5 space-y-1">
                         {intentCategories.map((cat) => {
                           const isSelected = selectedCategory === cat.id;
                           const IconComp = cat.icon;
@@ -214,7 +214,7 @@ function MainApp() {
                                 setSelectedCategory(cat.id);
                                 setIsCategoryDropdownOpen(false);
                               }}
-                              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-md text-xs font-black transition-all cursor-pointer ${
                                 isSelected
                                   ? 'bg-amber-900 text-white shadow-xs'
                                   : 'text-stone-800 hover:bg-amber-100/60'
@@ -255,7 +255,7 @@ function MainApp() {
                   </div>
 
                   {filteredExhibitors.length === 0 ? (
-                    <div className="bg-white border border-stone-200 rounded-3xl p-8 sm:p-12 text-center text-stone-400">
+                    <div className="bg-white border border-stone-200 rounded-md p-8 sm:p-12 text-center text-stone-400">
                       <Info className="w-8 h-8 mx-auto mb-2 opacity-40" />
                       <p className="text-sm font-bold text-stone-700">Nincs a keresésnek megfelelő stand.</p>
                     </div>
@@ -281,7 +281,7 @@ function MainApp() {
                     <div className="text-center pt-4">
                       <button
                         onClick={() => setVisibleCount((prev) => prev + 12)}
-                        className="px-6 py-3 bg-white hover:bg-stone-50 border border-stone-300 text-stone-800 font-extrabold text-xs rounded-2xl shadow-xs transition-all flex items-center gap-2 mx-auto"
+                        className="px-6 py-3 bg-white hover:bg-stone-50 border border-stone-300 text-stone-800 font-extrabold text-xs rounded-md shadow-xs transition-all flex items-center gap-2 mx-auto"
                       >
                         <span>További standok betöltése ({visibleCount} / {filteredExhibitors.length})</span>
                         <ChevronDown className="w-4 h-4 text-amber-700" />

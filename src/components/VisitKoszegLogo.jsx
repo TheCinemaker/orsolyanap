@@ -76,7 +76,7 @@ export default function VisitKoszegLogo({ onClick, onLongPress5s, className = ""
       onMouseLeave={endPress}
       onTouchStart={startPress}
       onTouchEnd={endPress}
-      className={`inline-flex items-center gap-2 select-none cursor-pointer relative py-1 px-1.5 rounded-xl hover:opacity-85 transition-all ${className}`}
+      className={`inline-flex items-center gap-2 select-none cursor-pointer relative py-1 px-1.5 rounded-md hover:opacity-85 transition-all ${className}`}
       title="VisitKőszeg - Vissza a főoldalra"
     >
       {/* 5-second long press progress bar indicator */}

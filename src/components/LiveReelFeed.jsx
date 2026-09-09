@@ -26,7 +26,7 @@ export default function LiveReelFeed() {
   return (
     <div className="space-y-6">
       {/* Top Banner Header */}
-      <div className="bg-gradient-to-r from-amber-950 via-amber-900 to-stone-900 rounded-3xl p-5 sm:p-6 text-white shadow-md relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="bg-gradient-to-r from-amber-950 via-amber-900 to-stone-900 rounded-md p-5 sm:p-6 text-white shadow-md relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="space-y-1.5 max-w-xl z-10">
           <span className="text-[10px] font-black uppercase tracking-widest text-amber-200 bg-amber-900/80 px-3 py-1 rounded-full border border-amber-700/60 inline-flex items-center gap-1.5">
             <Camera className="w-3.5 h-3.5 text-amber-300" />
@@ -42,7 +42,7 @@ export default function LiveReelFeed() {
 
         <button
           onClick={() => setActiveView('login')}
-          className="z-10 px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-stone-950 font-black text-xs rounded-2xl shadow-xs transition-all flex items-center gap-2 flex-shrink-0 cursor-pointer"
+          className="z-10 px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-stone-950 font-black text-xs rounded-md shadow-xs transition-all flex items-center gap-2 flex-shrink-0 cursor-pointer"
         >
           <Camera className="w-4 h-4" />
           <span>Árus Posztolása</span>
@@ -51,8 +51,8 @@ export default function LiveReelFeed() {
 
       {/* Reels Feed Grid */}
       {uniqueReels.length === 0 ? (
-        <div className="bg-white border border-stone-200/90 rounded-3xl p-10 text-center space-y-3">
-          <div className="w-14 h-14 mx-auto bg-amber-100 text-amber-900 rounded-2xl flex items-center justify-center border border-amber-300">
+        <div className="bg-white border border-stone-200/90 rounded-md p-10 text-center space-y-3">
+          <div className="w-14 h-14 mx-auto bg-amber-100 text-amber-900 rounded-md flex items-center justify-center border border-amber-300">
             <Camera className="w-7 h-7 text-amber-800" />
           </div>
           <h3 className="text-base font-extrabold text-stone-900">
@@ -70,12 +70,12 @@ export default function LiveReelFeed() {
             return (
               <div
                 key={reel.id}
-                className="bg-white border border-stone-200/90 rounded-3xl overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between group"
+                className="bg-white border border-stone-200/90 rounded-md overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between group"
               >
                 {/* Header info */}
                 <div className="p-3.5 border-b border-stone-100 flex items-center justify-between gap-2 bg-stone-50/60">
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-950 font-extrabold text-xs flex items-center justify-center border border-amber-300 flex-shrink-0 overflow-hidden">
+                    <div className="w-9 h-9 rounded-md bg-amber-100 text-amber-950 font-extrabold text-xs flex items-center justify-center border border-amber-300 flex-shrink-0 overflow-hidden">
                       {exhibitor?.image ? (
                         <img src={exhibitor.image} alt="" className="w-full h-full object-cover" />
                       ) : (
@@ -118,7 +118,7 @@ export default function LiveReelFeed() {
                 <div className="p-3 bg-white flex items-center justify-between gap-2 border-t border-stone-100">
                   <button
                     onClick={() => likeReel(reel.id)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-900 font-extrabold text-xs rounded-xl border border-rose-200 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-900 font-extrabold text-xs rounded-md border border-rose-200 transition-colors"
                   >
                     <Heart className="w-4 h-4 fill-rose-600 text-rose-600" />
                     <span>{reel.likes || 0} Kedvelés</span>
@@ -127,7 +127,7 @@ export default function LiveReelFeed() {
                   {exhibitor && (
                     <button
                       onClick={() => focusExhibitorOnMap(exhibitor.id)}
-                      className="flex items-center gap-1 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-950 font-bold text-xs rounded-xl border border-amber-200 transition-colors"
+                      className="flex items-center gap-1 px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-950 font-bold text-xs rounded-md border border-amber-200 transition-colors"
                     >
                       <MapPin className="w-3.5 h-3.5 text-amber-800" />
                       <span>Stand Térkép</span>
@@ -148,7 +148,7 @@ export default function LiveReelFeed() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl space-y-0"
+            className="bg-white rounded-md max-w-2xl w-full overflow-hidden shadow-2xl space-y-0"
           >
             <div className="relative max-h-[70vh] bg-black flex items-center justify-center">
               <img
@@ -172,14 +172,14 @@ export default function LiveReelFeed() {
               <div className="pt-2 flex items-center justify-between border-t border-stone-100">
                 <button
                   onClick={() => likeReel(selectedPhoto.id)}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-rose-50 text-rose-900 font-extrabold text-xs rounded-xl border border-rose-200"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-rose-50 text-rose-900 font-extrabold text-xs rounded-md border border-rose-200"
                 >
                   <Heart className="w-4 h-4 fill-rose-600 text-rose-600" />
                   <span>{selectedPhoto.likes || 0} Kedvelés</span>
                 </button>
                 <button
                   onClick={() => setSelectedPhoto(null)}
-                  className="px-4 py-2 bg-stone-900 text-white font-bold text-xs rounded-xl"
+                  className="px-4 py-2 bg-stone-900 text-white font-bold text-xs rounded-md"
                 >
                   Bezárás
                 </button>

@@ -12,7 +12,7 @@ export default function MenuItemCard({ item, exhibitor }) {
   const isCooking = item.status === 'cooking';
 
   return (
-    <div className={`border rounded-2xl p-4 sm:p-4.5 transition-all flex flex-col justify-between group space-y-3 ${isSoldOut ? "bg-stone-200 border-stone-300 opacity-80 grayscale" : isCooking ? "bg-white border-amber-200 hover:border-amber-400 hover:shadow-md" : "bg-white border-emerald-200 hover:border-emerald-400 hover:shadow-lg"}`}>
+    <div className={`border rounded-md p-4 sm:p-4.5 transition-all flex flex-col justify-between group space-y-3 ${isSoldOut ? "bg-stone-200 border-stone-300 opacity-80 grayscale" : isCooking ? "bg-white border-amber-200 hover:border-amber-400 hover:shadow-md" : "bg-white border-emerald-200 hover:border-emerald-400 hover:shadow-lg"}`}>
       <div>
         {/* Top Badges */}
         <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2">
@@ -45,7 +45,7 @@ export default function MenuItemCard({ item, exhibitor }) {
 
         {/* Item Image */}
         {item.image && (
-          <div className="w-full aspect-video rounded-xl overflow-hidden mb-3 border border-stone-200 bg-stone-950 flex items-center justify-center">
+          <div className="w-full aspect-video rounded-md overflow-hidden mb-3 border border-stone-200 bg-stone-950 flex items-center justify-center">
             <img src={item.image} alt={item.name} className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105" />
           </div>
         )}
@@ -82,7 +82,7 @@ export default function MenuItemCard({ item, exhibitor }) {
         {/* Public Vote Button */}
         <button
           onClick={() => voteForItem(item.id)}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all border shadow-2xs ${
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-extrabold transition-all border shadow-2xs ${
             isVoted
               ? 'bg-emerald-800 text-white border-emerald-800'
               : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-300/80'

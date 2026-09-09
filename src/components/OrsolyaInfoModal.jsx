@@ -7,11 +7,11 @@ export default function OrsolyaInfoModal({ isOpen, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white border border-stone-200/90 rounded-3xl p-6 sm:p-8 w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-2xl relative space-y-6">
+      <div className="bg-white border border-stone-200/90 rounded-md p-6 sm:p-8 w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-2xl relative space-y-6">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 text-stone-400 hover:text-stone-700 p-1 rounded-xl transition-colors"
+          className="absolute top-5 right-5 text-stone-400 hover:text-stone-700 p-1 rounded-md transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
@@ -35,7 +35,7 @@ export default function OrsolyaInfoModal({ isOpen, onClose }) {
         {/* Story Content Blocks */}
         <div className="space-y-4 text-xs text-stone-700 leading-relaxed">
           {/* Card 1: Miért Orsolya-nap */}
-          <div className="bg-stone-50 border border-stone-200/80 rounded-2xl p-4 space-y-2">
+          <div className="bg-stone-50 border border-stone-200/80 rounded-md p-4 space-y-2">
             <div className="flex items-center gap-2 font-bold text-sm text-stone-900">
               <Landmark className="w-4 h-4 text-amber-800" />
               <h3>Miért pont Orsolya-nap? (A történelmi nagyvásár)</h3>
@@ -49,7 +49,7 @@ export default function OrsolyaInfoModal({ isOpen, onClose }) {
           </div>
 
           {/* Card 2: Mióta mai formájában? */}
-          <div className="bg-stone-50 border border-stone-200/80 rounded-2xl p-4 space-y-2">
+          <div className="bg-stone-50 border border-stone-200/80 rounded-md p-4 space-y-2">
             <div className="flex items-center gap-2 font-bold text-sm text-stone-900">
               <Calendar className="w-4 h-4 text-amber-800" />
               <h3>Újjáéledés 2002-ben: "Natúrpark Ízei"</h3>
@@ -63,7 +63,7 @@ export default function OrsolyaInfoModal({ isOpen, onClose }) {
           </div>
 
           {/* Card 3: Mi a vásár lényege ma? */}
-          <div className="bg-stone-50 border border-stone-200/80 rounded-2xl p-4 space-y-2">
+          <div className="bg-stone-50 border border-stone-200/80 rounded-md p-4 space-y-2">
             <div className="flex items-center gap-2 font-bold text-sm text-stone-900">
               <Sparkles className="w-4 h-4 text-amber-800" />
               <h3>Mi a vásár lényege ma?</h3>
@@ -86,7 +86,7 @@ export default function OrsolyaInfoModal({ isOpen, onClose }) {
         <div className="pt-2 border-t border-stone-100 flex justify-end">
           <button
             onClick={onClose}
-            className="px-5 py-2 bg-stone-900 text-white font-bold text-xs rounded-xl hover:bg-stone-800"
+            className="px-5 py-2 bg-stone-900 text-white font-bold text-xs rounded-md hover:bg-stone-800"
           >
             Bezárás
           </button>

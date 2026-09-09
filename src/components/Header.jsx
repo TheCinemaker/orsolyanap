@@ -74,7 +74,7 @@ export default function Header({
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsHamburgerOpen(true)}
-              className="p-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 transition-all border border-amber-300/80"
+              className="p-2 rounded-md bg-amber-100 hover:bg-amber-200 text-amber-900 transition-all border border-amber-300/80"
               title="Menü megnyitása"
             >
               <Menu className="w-5 h-5 text-amber-900" />
@@ -92,13 +92,13 @@ export default function Header({
           </div>
 
           {/* Navigation Tabs (Desktop Apple Segmented Style) */}
-          <div className="hidden md:flex items-center gap-1 bg-stone-100 p-1 rounded-2xl border border-stone-200/80">
+          <div className="hidden md:flex items-center gap-1 bg-stone-100 p-1 rounded-md border border-stone-200/80">
             <button
               onClick={() => {
                 setActiveView('visitor');
                 setMainTab('tents');
               }}
-              className={`flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs transition-all ${
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-xs transition-all ${
                 activeView === 'visitor' && mainTab === 'tents'
                   ? 'bg-amber-900 text-white shadow-sm font-extrabold'
                   : 'text-stone-700 hover:text-stone-900 font-semibold'
@@ -113,7 +113,7 @@ export default function Header({
                 setActiveView('visitor');
                 setMainTab('food');
               }}
-              className={`flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs transition-all ${
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-xs transition-all ${
                 activeView === 'visitor' && mainTab === 'food'
                   ? 'bg-amber-900 text-white shadow-sm font-extrabold'
                   : 'text-stone-700 hover:text-stone-900 font-semibold'
@@ -125,7 +125,7 @@ export default function Header({
 
             <button
               onClick={() => setActiveView('map')}
-              className={`flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs transition-all ${
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-xs transition-all ${
                 activeView === 'map'
                   ? 'bg-amber-900 text-white shadow-sm font-extrabold'
                   : 'text-stone-700 hover:text-stone-900 font-semibold'
@@ -140,7 +140,7 @@ export default function Header({
             {/* Info Button */}
             <button
               onClick={() => setIsInfoOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-amber-900 hover:bg-stone-200/70 transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-bold text-amber-900 hover:bg-stone-200/70 transition-all"
             >
               <Info className="w-3.5 h-3.5 text-amber-800" />
               <span>Info</span>
@@ -152,7 +152,7 @@ export default function Header({
             {/* Kedvencek (Beszkennelt Standok) Button */}
             <button
               onClick={() => setIsFavoritesOpen(true)}
-              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold transition-all border border-stone-200"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold transition-all border border-stone-200"
             >
               <Heart className="w-3.5 h-3.5 text-rose-700 fill-rose-700 flex-shrink-0" />
               <span className="hidden sm:inline">Kedvencek</span>
@@ -166,7 +166,7 @@ export default function Header({
             {/* QR Scan Button */}
             <button
               onClick={() => setIsScannerOpen(true)}
-              className="p-1.5 sm:p-2 rounded-xl bg-amber-800 text-white hover:bg-amber-700 transition-all shadow-xs flex items-center gap-1.5 text-xs font-bold px-2.5 sm:px-3"
+              className="p-1.5 sm:p-2 rounded-md bg-amber-800 text-white hover:bg-amber-700 transition-all shadow-xs flex items-center gap-1.5 text-xs font-bold px-2.5 sm:px-3"
               title="QR Kód Beolvasása"
             >
               <QrCode className="w-4 h-4 text-white flex-shrink-0" />
@@ -177,7 +177,7 @@ export default function Header({
             {activeExhibitor && (
               <button
                 onClick={() => setActiveView('exhibitor')}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-800 hover:bg-amber-700 text-white text-xs font-bold shadow-sm transition-all"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-amber-800 hover:bg-amber-700 text-white text-xs font-bold shadow-sm transition-all"
               >
                 <Store className="w-3.5 h-3.5" />
                 <span className="max-w-[90px] truncate hidden sm:inline">{activeExhibitor.name}</span>
@@ -202,7 +202,7 @@ export default function Header({
                     setSearchQuery(e.target.value);
                     setIsSearchFocused(true);
                   }}
-                  className="w-full pl-8 pr-8 py-1.5 bg-white border border-amber-300/80 focus:border-amber-500 rounded-xl text-xs text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 shadow-2xs font-medium"
+                  className="w-full pl-8 pr-8 py-1.5 bg-white border border-amber-300/80 focus:border-amber-500 rounded-md text-xs text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500/30 shadow-2xs font-medium"
                 />
                 {searchQuery && (
                   <button
@@ -218,7 +218,7 @@ export default function Header({
 
                 {/* Instant Search Dropdown Popover */}
                 {searchTrim.length > 0 && isSearchFocused && (
-                  <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-stone-200 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150">
+                  <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-stone-200 rounded-md shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150">
                     <div className="bg-amber-900 text-amber-5 px-3 py-1.5 text-[11px] font-bold flex items-center justify-between">
                       <span className="flex items-center gap-1">
                         <Utensils className="w-3 h-3 text-amber-300" />
@@ -276,7 +276,7 @@ export default function Header({
                                   e.stopPropagation();
                                   voteForItem(item.id);
                                 }}
-                                className={`flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-extrabold transition-all border ${
+                                className={`flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-extrabold transition-all border ${
                                   isVoted
                                     ? 'bg-emerald-800 text-white border-emerald-800'
                                     : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-300'

@@ -58,11 +58,11 @@ export default function InlineQRScanner() {
   };
 
   return (
-    <div className="bg-white border border-stone-200/90 rounded-3xl p-4 sm:p-5 shadow-xs space-y-4">
+    <div className="bg-white border border-stone-200/90 rounded-md p-4 sm:p-5 shadow-xs space-y-4">
       {/* Header Bar */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="p-2 bg-amber-100 text-amber-800 rounded-2xl border border-amber-300/60">
+          <div className="p-2 bg-amber-100 text-amber-800 rounded-md border border-amber-300/60">
             <Camera className="w-4 h-4 text-amber-800" />
           </div>
           <div>
@@ -80,7 +80,7 @@ export default function InlineQRScanner() {
 
         <button
           onClick={() => setIsCameraActive((prev) => !prev)}
-          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 border ${
+          className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all flex items-center gap-1 border ${
             isCameraActive
               ? 'bg-stone-100 text-stone-700 border-stone-200 hover:bg-stone-200'
               : 'bg-amber-800 text-white border-amber-800 shadow-xs'
@@ -102,16 +102,16 @@ export default function InlineQRScanner() {
 
       {/* Main Scanner Body */}
       {isCameraActive && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center bg-stone-50 p-4 rounded-2xl border border-stone-200/80">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center bg-stone-50 p-4 rounded-md border border-stone-200/80">
           {/* Live Camera Feed Container */}
-          <div className="relative rounded-2xl overflow-hidden border-2 border-amber-600/40 bg-black min-h-[220px] flex items-center justify-center">
+          <div className="relative rounded-md overflow-hidden border-2 border-amber-600/40 bg-black min-h-[220px] flex items-center justify-center">
             <div id="inline-qr-reader" className="w-full text-white font-mono text-xs" />
           </div>
 
           {/* Right Status / Feedback Panel */}
           <div className="space-y-3">
             {lastScannedStand ? (
-              <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-2xl text-center space-y-2 animate-in zoom-in-95 duration-150">
+              <div className="bg-emerald-50 border border-emerald-200 p-4 rounded-md text-center space-y-2 animate-in zoom-in-95 duration-150">
                 <CheckCircle2 className="w-8 h-8 text-emerald-700 mx-auto" />
                 <span className="text-[10px] font-extrabold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full border border-emerald-300 uppercase">
                   SIKERES SZKENNELÉS
@@ -148,7 +148,7 @@ export default function InlineQRScanner() {
                   <button
                     key={ex.id}
                     onClick={() => handleDemoScan(ex)}
-                    className="px-2.5 py-1 bg-white hover:bg-stone-100 border border-stone-200 rounded-xl text-[11px] font-bold text-stone-800 shadow-2xs transition-all"
+                    className="px-2.5 py-1 bg-white hover:bg-stone-100 border border-stone-200 rounded-md text-[11px] font-bold text-stone-800 shadow-2xs transition-all"
                   >
                     + Szkennelés: {ex.name.split(' ')[0]}
                   </button>

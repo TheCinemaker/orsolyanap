@@ -65,7 +65,7 @@ export default function QRScannerModal({ isOpen, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-white border border-stone-200 rounded-3xl p-6 w-full max-w-md shadow-2xl relative space-y-4">
+      <div className="bg-white border border-stone-200 rounded-md p-6 w-full max-w-md shadow-2xl relative space-y-4">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -89,7 +89,7 @@ export default function QRScannerModal({ isOpen, onClose }) {
             </div>
 
             {/* Camera Viewport */}
-            <div className="bg-stone-50 border border-stone-200 rounded-2xl p-2 overflow-hidden min-h-[260px]">
+            <div className="bg-stone-50 border border-stone-200 rounded-md p-2 overflow-hidden min-h-[260px]">
               <div id="qr-reader" className="w-full text-xs" />
             </div>
 
@@ -131,20 +131,20 @@ export default function QRScannerModal({ isOpen, onClose }) {
               </p>
             </div>
 
-            <p className="text-xs text-stone-600 bg-stone-50 p-3 rounded-2xl border border-stone-200">
+            <p className="text-xs text-stone-600 bg-stone-50 p-3 rounded-md border border-stone-200">
               A stand elmentve a <strong>Kedvenceid</strong> közé a telefonodon! Bármikor megtalálod a térképen.
             </p>
 
             <div className="flex gap-2 pt-2">
               <button
                 onClick={() => setScannedStand(null)}
-                className="w-full py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold text-xs rounded-xl"
+                className="w-full py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold text-xs rounded-md"
               >
                 Új QR Kód
               </button>
               <button
                 onClick={onClose}
-                className="w-full py-2.5 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-xl"
+                className="w-full py-2.5 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-md"
               >
                 Kész
               </button>
