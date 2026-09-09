@@ -5,6 +5,7 @@ import { Camera, Heart, MapPin, Store, Sparkles, Clock, Flame, Image as ImageIco
 export default function LiveReelFeed() {
   const { reels, exhibitors, likeReel, focusExhibitorOnMap, setActiveView } = useOrsolya();
   const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const uniqueReels = Array.from(new Map(reels.map((reel) => [String(reel.id), reel])).values());
 
   const formatTimeAgo = (isoString) => {
     if (!isoString) return 'Éppen most';
@@ -45,7 +46,7 @@ export default function LiveReelFeed() {
       </div>
 
       {/* Reels Feed Grid */}
-      {reels.length === 0 ? (
+      {uniqueReels.length === 0 ? (
         <div className="bg-white border border-stone-200/90 rounded-3xl p-10 text-center space-y-3">
           <div className="w-14 h-14 mx-auto bg-amber-100 text-amber-900 rounded-2xl flex items-center justify-center border border-amber-300">
             <Camera className="w-7 h-7 text-amber-800" />
@@ -59,7 +60,7 @@ export default function LiveReelFeed() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {reels.map((reel) => {
+          {uniqueReels.map((reel) => {
             const exhibitor = exhibitors.find((e) => e.id === reel.exhibitor_id);
 
             return (
