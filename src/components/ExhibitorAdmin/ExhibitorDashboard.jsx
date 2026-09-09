@@ -87,7 +87,10 @@ export default function ExhibitorDashboard() {
     phone: activeExhibitor.phone || '',
     email: activeExhibitor.email || '',
     facebook_url: activeExhibitor.facebook_url || '',
-    instagram_url: activeExhibitor.instagram_url || ''
+    instagram_url: activeExhibitor.instagram_url || '',
+    name: activeExhibitor.name || '',
+    category: activeExhibitor.category || 'gasztro',
+    image: activeExhibitor.image || ''
   });
 
   // Modal states for Super-Admin New Team Creation
@@ -176,7 +179,8 @@ export default function ExhibitorDashboard() {
       is_gluten_free: !!dish.is_gluten_free,
       is_lactose_free: !!dish.is_lactose_free,
       is_sugar_free: !!dish.is_sugar_free,
-      is_vegan: !!dish.is_vegan
+      is_vegan: !!dish.is_vegan,
+      image: dish.image || ''
     });
     setIsDishModalOpen(true);
   };
@@ -193,7 +197,8 @@ export default function ExhibitorDashboard() {
       is_gluten_free: false,
       is_lactose_free: false,
       is_sugar_free: false,
-      is_vegan: false
+      is_vegan: false,
+      image: ''
     });
     setIsDishModalOpen(true);
   };
@@ -225,15 +230,6 @@ export default function ExhibitorDashboard() {
 
         <div className="flex items-center gap-2 flex-wrap">
           <button
-            onClick={() => setIsTeamModalOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2.5 bg-amber-900 hover:bg-amber-950 text-white font-extrabold text-xs rounded-2xl shadow-xs transition-all border border-amber-950"
-            title="Új kiállító csapat felvétele a vásárra"
-          >
-            <UserPlus className="w-4 h-4 text-amber-300" />
-            <span>+ Új Csapat Regisztráció</span>
-          </button>
-
-          <button
             onClick={openNewDishModal}
             className="flex items-center gap-1.5 px-3.5 py-2.5 bg-amber-800 hover:bg-amber-700 text-white font-extrabold text-xs rounded-2xl shadow-xs transition-all"
           >
@@ -259,6 +255,51 @@ export default function ExhibitorDashboard() {
         </h3>
 
         <form onSubmit={handleProfileSave} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="md:col-span-2">
+              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Szervezet / csapat neve *</label>
+              <input type="text" required value={profileData.name}
+                onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-2xl text-sm font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Stand helye *</label>
+              <input type="text" required value={profileData.location}
+                onChange={(e) => setProfileData({ ...profileData, location: e.target.value })}
+                className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-2xl text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Szervezet kategóriája</label>
+              <select value={profileData.category} onChange={(e) => setProfileData({ ...profileData, category: e.target.value })}
+                className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 rounded-2xl text-sm font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40">
+                <option value="gasztro">Gasztro / Főzőcsapat</option>
+                <option value="civil">Civil szervezet</option>
+                <option value="egyesület">Egyesület</option>
+                <option value="iskola">Iskola / Intézmény</option>
+                <option value="közösség">Közösség</option>
+                <option value="egyéb">Egyéb</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Szervezet / stand képe <span className="normal-case font-medium text-stone-400">(opcionális)</span></label>
+              <div className="flex items-center gap-3">
+                {profileData.image && <img src={profileData.image} alt="" className="w-14 h-14 rounded-xl object-cover border border-stone-200" />}
+                <label className="flex-1 cursor-pointer px-3 py-2.5 bg-stone-50 border border-dashed border-stone-300 rounded-2xl text-sm font-semibold text-stone-700 hover:bg-stone-100">
+                  Kép kiválasztása
+                  <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      try { setProfileData({ ...profileData, image: await convertFileToBase64(file) }); }
+                      catch (err) { console.error('Profile image conversion error', err); }
+                    }
+                  }} />
+                </label>
+              </div>
+            </div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
@@ -927,6 +968,23 @@ export default function ExhibitorDashboard() {
                   onChange={(e) => setDishForm({ ...dishForm, tags: e.target.value })}
                   className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
                 />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">Étel fotó <span className="normal-case font-medium text-stone-400">(opcionális)</span></label>
+                <div className="flex items-center gap-3">
+                  {dishForm.image && <img src={dishForm.image} alt="" className="w-20 h-16 rounded-xl object-cover border border-stone-200" />}
+                  <label className="flex-1 cursor-pointer px-3 py-3 bg-stone-50 border border-dashed border-stone-300 rounded-2xl text-sm font-semibold text-stone-700 hover:bg-stone-100">
+                    Fotó kiválasztása
+                    <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        try { setDishForm({ ...dishForm, image: await convertFileToBase64(file) }); }
+                        catch (err) { console.error('Dish image conversion error', err); }
+                      }
+                    }} />
+                  </label>
+                </div>
               </div>
 
               <button
