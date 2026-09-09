@@ -14,6 +14,7 @@ import MapView from './components/MapView';
 import VisitKoszegLogo from './components/VisitKoszegLogo';
 import LiveReelBar from './components/LiveReelBar';
 import ReelsGallery from './components/ReelsGallery';
+import BackToTopButton from './components/BackToTopButton';
 import {
   Utensils,
   Info,

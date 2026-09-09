@@ -87,7 +87,6 @@ export default function VisitKoszegLogo({ onClick, onLongPress5s, className = ""
         />
       )}
 
-      <VisitKoszegIcon className="w-6 h-7" color="#b45309" />
       <div className="flex items-baseline font-semibold tracking-tight text-xl">
         <span className="font-medium text-stone-900">visit</span>
         <span className="font-bold text-amber-700">koszeg</span>
