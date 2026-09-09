@@ -103,6 +103,26 @@ export function OrsolyaProvider({ children }) {
     setActiveView('map');
   };
 
+  // Vote for a dish / item
+  const voteForItem = (itemId) => {
+    if (votedItemIds.includes(itemId)) {
+      showToast('Erre az ételre már leadtad a közönségszavazatodat!', 'error');
+      return false;
+    }
+
+    setVotedItemIds((prev) => [...prev, itemId]);
+    setMenuItems((prevItems) =>
+      prevItems.map((item) => {
+        if (item.id === itemId) {
+          return { ...item, votes: (item.votes || 0) + 1 };
+        }
+        return item;
+      })
+    );
+    showToast('Köszönjük a közönségszavazatot!', 'success');
+    return true;
+  };
+
   // Favorite Dish helper functions
   const toggleFavoriteItem = (itemId) => {
     setFavoriteItemIds((prev) => {
