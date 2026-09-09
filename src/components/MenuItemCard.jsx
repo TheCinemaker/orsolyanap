@@ -12,20 +12,25 @@ export default function MenuItemCard({ item, exhibitor }) {
   const isCooking = item.status === 'cooking';
 
   return (
-    <div className={`border rounded-2xl p-4 sm:p-4.5 transition-all flex flex-col justify-between group space-y-3 ${isSoldOut ? "bg-stone-200 border-stone-300 opacity-80 grayscale" : "bg-white border-stone-200/90 hover:border-amber-600/40 hover:shadow-md"}`}>
+    <div className={`border rounded-2xl p-4 sm:p-4.5 transition-all flex flex-col justify-between group space-y-3 ${isSoldOut ? "bg-stone-200 border-stone-300 opacity-80 grayscale" : isCooking ? "bg-white border-amber-200 hover:border-amber-400 hover:shadow-md" : "bg-white border-emerald-200 hover:border-emerald-400 hover:shadow-lg"}`}>
       <div>
         {/* Top Badges */}
         <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2">
           {/* Status Badge */}
           {isSoldOut ? (
-            <span className="bg-rose-700 text-white text-xs font-black px-2.5 py-1 rounded-full flex items-center gap-1 border border-rose-800 uppercase tracking-wider">
+            <span className="bg-stone-700 text-white text-xs font-black px-2.5 py-1 rounded-full flex items-center gap-1 border border-stone-600 uppercase tracking-wider">
               <AlertCircle className="w-3 h-3 text-white" />
-              <span>Elfogyott</span>
+              <span>ELFOGYOTT</span>
             </span>
           ) : isCooking ? (
             <span className="bg-amber-100 text-amber-900 text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 border border-amber-300">
               <Clock className="w-3 h-3 text-amber-700 animate-spin" />
-              <span>Fő / Készül</span>
+              <span>FŐ • KÉSZÜL</span>
+            </span>
+          ) : (
+            <span className="bg-emerald-100 text-emerald-900 text-xs font-black px-2.5 py-1 rounded-full flex items-center gap-1 border border-emerald-300">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+              <span>KÉSZ • KÓSTOLHATÓ</span>
             </span>
           )}
 
