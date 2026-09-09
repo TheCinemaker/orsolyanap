@@ -158,11 +158,7 @@ function MainApp() {
           <div className="max-w-5xl mx-auto px-3 sm:px-4 py-6 space-y-6">
             {/* Top Search & Category Section */}
             <div className="space-y-4">
-              <div className="space-y-1">
-                <span className="text-[10px] font-extrabold uppercase tracking-widest text-amber-800 bg-amber-100/90 px-2.5 py-0.5 rounded-full border border-amber-200 inline-block">
-                  ORSOLYA-NAPI VÁSÁR • DIÁKSÉTÁNY
-                </span>
-
+              <div>
                 <h1 className="text-3xl sm:text-4xl font-black text-stone-900 tracking-tight">
                   Civil Ízek Utcája
                 </h1>
