@@ -13,6 +13,7 @@ import MyOrdersModal from './components/MyOrdersModal';
 import MapView from './components/MapView';
 import VisitKoszegLogo from './components/VisitKoszegLogo';
 import LiveReelBar from './components/LiveReelBar';
+import ReelsGallery from './components/ReelsGallery';
 import {
   Utensils,
   Info,
@@ -157,6 +158,8 @@ function MainApp() {
           <ExhibitorAuthPage />
         ) : activeView === 'map' ? (
           <MapView />
+        ) : activeView === 'reels' ? (
+          <ReelsGallery />
         ) : (
           /* Visitor Main View */
           <div className="max-w-5xl mx-auto px-3 sm:px-4 pt-2 pb-4 space-y-4">

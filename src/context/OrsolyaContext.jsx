@@ -140,10 +140,18 @@ export function OrsolyaProvider({ children }) {
               );
             } else if (payload.eventType === 'INSERT' && payload.new) {
               if (payload.new.exhibitor_id) {
-                setMenuItems((prev) => {
-                  if (prev.some((item) => item.id === payload.new.id)) return prev;
-                  return [...prev, payload.new];
-                });
+                const handleInsert = async () => {
+                  let newItem = { ...payload.new };
+                  if (newItem.image && !newItem.image.startsWith('data:') && !newItem.image.startsWith('http')) {
+                    const { data } = await supabase.from('menu_items').select('*').eq('id', newItem.id).single();
+                    if (data) newItem = data;
+                  }
+                  setMenuItems((prev) => {
+                    if (prev.some((item) => item.id === newItem.id)) return prev;
+                    return [...prev, newItem];
+                  });
+                };
+                handleInsert();
               }
             } else if (payload.eventType === 'DELETE' && payload.old) {
               setMenuItems((prev) => prev.filter((item) => item.id !== payload.old.id));
@@ -155,10 +163,18 @@ export function OrsolyaProvider({ children }) {
           { event: '*', schema: 'public', table: 'reels' },
           (payload) => {
             if (payload.eventType === 'INSERT' && payload.new) {
-              setReels((prev) => {
-                if (prev.some((r) => r.id === payload.new.id)) return prev;
-                return [payload.new, ...prev];
-              });
+              const handleInsert = async () => {
+                let newReel = { ...payload.new };
+                if (newReel.image && !newReel.image.startsWith('data:') && !newReel.image.startsWith('http')) {
+                  const { data } = await supabase.from('reels').select('*').eq('id', newReel.id).single();
+                  if (data) newReel = data;
+                }
+                setReels((prev) => {
+                  if (prev.some((r) => r.id === newReel.id)) return prev;
+                  return [newReel, ...prev];
+                });
+              };
+              handleInsert();
             } else if (payload.eventType === 'UPDATE' && payload.new) {
               setReels((prev) => prev.map((r) => (r.id === payload.new.id ? { ...r, ...payload.new } : r)));
             } else if (payload.eventType === 'DELETE' && payload.old) {
