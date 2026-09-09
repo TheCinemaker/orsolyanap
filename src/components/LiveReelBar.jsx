@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
 import { Plus, Camera, Heart, MapPin, X, Send, Sparkles, Check, User } from 'lucide-react';
 
@@ -23,6 +23,10 @@ export default function LiveReelBar() {
   const [captionInput, setCaptionInput] = useState('');
   const [imageInput, setImageInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [likedReelIds, setLikedReelIds] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('orsolya_liked_reel_ids') || '[]'); } catch { return []; }
+  });
+  useEffect(() => { localStorage.setItem('orsolya_liked_reel_ids', JSON.stringify(likedReelIds)); }, [likedReelIds]);
   const uniqueReels = Array.from(new Map(reels.map((reel) => [String(reel.id), reel])).values());
 
   const handleFileChange = async (e) => {
@@ -150,10 +154,10 @@ export default function LiveReelBar() {
               </div>
 
               {/* Like counter badge */}
-              <div className="absolute top-2 right-2 z-10 bg-stone-900/80 backdrop-blur-xs text-rose-400 px-1.5 py-0.5 rounded-full text-[10px] font-extrabold flex items-center gap-0.5 border border-rose-500/30">
-                <Heart className="w-3 h-3 fill-rose-500 text-rose-500" />
-                <span>{reel.likes || 0}</span>
-              </div>
+              {(reel.likes || 0) > 0 && <div className="absolute top-2 right-2 z-10 bg-stone-900/80 backdrop-blur-xs text-rose-300 px-1.5 py-0.5 rounded-full text-[10px] font-extrabold flex items-center gap-0.5 border border-rose-500/30">
+                <Heart className={`w-3 h-3 ${likedReelIds.includes(reel.id) ? 'fill-rose-500 text-rose-500' : 'text-rose-300'}`} />
+                <span>{reel.likes}</span>
+              </div>}
 
               {/* Bottom Caption & Time */}
               <div className="absolute bottom-2.5 left-2.5 right-2.5 z-10 text-white space-y-0.5">
@@ -359,10 +363,14 @@ export default function LiveReelBar() {
 
               <div className="flex items-center justify-between gap-2 pt-1">
                 <button
-                  onClick={() => likeReel(activeStoryModal.id)}
+                  onClick={() => {
+                    if (likedReelIds.includes(activeStoryModal.id)) return;
+                    setLikedReelIds((prev) => [...prev, activeStoryModal.id]);
+                    likeReel(activeStoryModal.id);
+                  }}
                   className="flex items-center gap-1.5 px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white font-black text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
                 >
-                  <Heart className="w-4 h-4 fill-white" />
+                  <Heart className={`w-4 h-4 ${likedReelIds.includes(activeStoryModal.id) ? "fill-white" : ""}`} />
                   <span>{activeStoryModal.likes || 0} Kedvelés</span>
                 </button>
 
