@@ -8,7 +8,7 @@ export default function MenuItemCard({ item, exhibitor }) {
   const isVoted = votedItemIds.includes(item.id);
   const isTopVoted = (item.votes || 0) >= 40;
 
-  const isSoldOut = item.status === 'sold_out' || item.stock === 0;
+  const isSoldOut = item.status === 'sold_out';
   const isCooking = item.status === 'cooking';
 
   return (

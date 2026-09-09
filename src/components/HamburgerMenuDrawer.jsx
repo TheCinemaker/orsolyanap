@@ -54,10 +54,6 @@ export default function HamburgerMenuDrawer({
     onClose();
   };
 
-  const handleOpenLiveTV = () => {
-    setActiveView('tv');
-    onClose();
-  };
 
   return (
     <div className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex justify-start animate-in fade-in duration-200">
@@ -130,16 +126,7 @@ export default function HamburgerMenuDrawer({
               <ChevronRight className="w-4 h-4 opacity-50" />
             </button>
 
-            <button
-              onClick={handleOpenLiveTV}
-              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold text-stone-700 hover:bg-stone-100 transition-all"
-            >
-              <div className="flex items-center gap-2.5">
-                <Tv className="w-4 h-4 text-amber-700" />
-                <span>LIVE TV</span>
-              </div>
-              <ChevronRight className="w-4 h-4 opacity-50" />
-            </button>
+
           </div>
 
           {/* Quick Zone Section */}

@@ -135,17 +135,7 @@ export default function Header({
               <span>Térkép</span>
             </button>
 
-            <button
-              onClick={() => setActiveView('tv')}
-              className={`flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs transition-all ${
-                activeView === 'tv'
-                  ? 'bg-amber-900 text-white shadow-sm font-extrabold'
-                  : 'text-stone-700 hover:text-stone-900 font-semibold'
-              }`}
-            >
-              <Tv className={`w-3.5 h-3.5 ${activeView === 'tv' ? 'text-amber-200' : 'text-amber-700'}`} />
-              <span>LIVE TV</span>
-            </button>
+
 
             {/* Info Button */}
             <button

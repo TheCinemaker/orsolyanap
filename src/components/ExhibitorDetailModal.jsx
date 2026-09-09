@@ -193,8 +193,17 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
                 return (
                   <div
                     key={item.id}
-                    className="bg-white border border-stone-200 p-3.5 rounded-2xl flex items-center justify-between gap-3 shadow-2xs"
+                    className={`border p-3.5 rounded-2xl flex items-center justify-between gap-3 shadow-2xs transition-all ${
+                      item.status === 'sold_out' ? 'border-stone-300 bg-stone-100 opacity-80 grayscale' : 'bg-white border-stone-200'
+                    }`}
                   >
+                    {/* Item Image */}
+                    {item.image && (
+                      <div className="w-24 sm:w-32 aspect-video flex-shrink-0 rounded-xl overflow-hidden bg-stone-950 flex items-center justify-center border border-stone-200">
+                        <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
+                      </div>
+                    )}
+
                     <div className="flex-1 min-w-0 space-y-1">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <h5 className="font-extrabold text-stone-900 text-xs sm:text-sm">{item.name}</h5>

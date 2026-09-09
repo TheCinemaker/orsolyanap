@@ -123,7 +123,10 @@ export function OrsolyaProvider({ children }) {
                 )
               );
             } else if (payload.eventType === 'INSERT' && payload.new) {
-              setExhibitors((prev) => [...prev, { ...payload.new, hasDrinks: payload.new.has_drinks }]);
+              setExhibitors((prev) => {
+                if (prev.some((e) => e.id === payload.new.id)) return prev;
+                return [...prev, { ...payload.new, hasDrinks: payload.new.has_drinks }];
+              });
             }
           }
         )
@@ -137,7 +140,10 @@ export function OrsolyaProvider({ children }) {
               );
             } else if (payload.eventType === 'INSERT' && payload.new) {
               if (payload.new.exhibitor_id) {
-                setMenuItems((prev) => [...prev, payload.new]);
+                setMenuItems((prev) => {
+                  if (prev.some((item) => item.id === payload.new.id)) return prev;
+                  return [...prev, payload.new];
+                });
               }
             } else if (payload.eventType === 'DELETE' && payload.old) {
               setMenuItems((prev) => prev.filter((item) => item.id !== payload.old.id));

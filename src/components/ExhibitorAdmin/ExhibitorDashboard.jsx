@@ -33,7 +33,6 @@ export default function ExhibitorDashboard() {
     activeExhibitor,
     logoutExhibitor,
     menuItems,
-    updateItemStock,
     updateItemStatus,
     saveMenuItem,
     deleteMenuItem,
@@ -115,7 +114,6 @@ export default function ExhibitorDashboard() {
   const [dishForm, setDishForm] = useState({
     name: '',
     description: '',
-    initial_stock: 30,
     category: 'meleg_etel',
     tags: 'Meleg étel',
     available_day: 'both',
@@ -159,7 +157,6 @@ export default function ExhibitorDashboard() {
 
     saveMenuItem({
       ...dishForm,
-      initial_stock: Number(dishForm.initial_stock),
       tags: tagArray,
       id: editingDish ? editingDish.id : undefined
     });
@@ -173,7 +170,6 @@ export default function ExhibitorDashboard() {
     setDishForm({
       name: dish.name || '',
       description: dish.description || '',
-      initial_stock: dish.initial_stock || 30,
       category: dish.category || 'meleg_etel',
       tags: dish.tags ? dish.tags.join(', ') : '',
       available_day: dish.available_day || 'both',
@@ -191,7 +187,6 @@ export default function ExhibitorDashboard() {
     setDishForm({
       name: '',
       description: '',
-      initial_stock: 30,
       category: 'meleg_etel',
       tags: 'Meleg étel',
       available_day: 'both',
@@ -465,7 +460,7 @@ export default function ExhibitorDashboard() {
         <div className="flex items-center justify-between">
           <h3 className="text-base font-extrabold text-stone-900 flex items-center gap-2">
             <Flame className="w-4 h-4 text-amber-700" />
-            <span>Főzött Ételeid & Adagszámláló ({exhibitorItems.length})</span>
+            <span>Főzött Ételeid ({exhibitorItems.length})</span>
           </h3>
 
           <button
@@ -582,40 +577,6 @@ export default function ExhibitorDashboard() {
                       }`}
                     >
                       Elfogyott
-                    </button>
-                  </div>
-                </div>
-
-                {/* Touch Counter */}
-                <div className="bg-stone-50 p-3.5 rounded-2xl border border-stone-200 flex items-center justify-between gap-3">
-                  <div>
-                    <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block">
-                      Maradt
-                    </span>
-                    <span className="text-2xl font-black text-stone-900">
-                      {item.stock} adag
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      onClick={() => updateItemStock(item.id, -1)}
-                      disabled={item.stock <= 0}
-                      className="px-3 py-2 bg-white border border-stone-200 text-stone-900 font-bold text-xs rounded-xl shadow-xs hover:bg-stone-100"
-                    >
-                      -1
-                    </button>
-                    <button
-                      onClick={() => updateItemStock(item.id, 1)}
-                      className="px-3 py-2 bg-white border border-stone-200 text-stone-900 font-bold text-xs rounded-xl shadow-xs hover:bg-stone-100"
-                    >
-                      +1
-                    </button>
-                    <button
-                      onClick={() => updateItemStock(item.id, 10)}
-                      className="px-3 py-2 bg-amber-800 text-white font-bold text-xs rounded-xl shadow-xs hover:bg-amber-700"
-                    >
-                      +10
                     </button>
                   </div>
                 </div>
@@ -861,20 +822,7 @@ export default function ExhibitorDashboard() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
-                    Kezdő Adagszám
-                  </label>
-                  <input
-                    type="number"
-                    required
-                    value={dishForm.initial_stock}
-                    onChange={(e) => setDishForm({ ...dishForm, initial_stock: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
-                  />
-                </div>
-
+              <div className="grid grid-cols-1 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
                     Elérhetőség Napja

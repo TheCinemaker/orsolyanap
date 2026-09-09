@@ -82,7 +82,9 @@ export default function CompactExhibitorCard({ exhibitor, items, onOpenDetails }
             return (
               <div
                 key={item.id}
-                className="flex items-center justify-between text-xs bg-stone-50 p-2 rounded-xl border border-stone-100 gap-2"
+                className={`flex items-center justify-between text-xs p-2 rounded-xl border gap-2 transition-all ${
+                  item.status === 'sold_out' ? 'bg-stone-200 border-stone-300 opacity-80 grayscale' : 'bg-stone-50 border-stone-100'
+                }`}
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1">
