@@ -12,7 +12,26 @@ import CartDrawer from './components/CartDrawer';
 import MyOrdersModal from './components/MyOrdersModal';
 import MapView from './components/MapView';
 import VisitKoszegLogo from './components/VisitKoszegLogo';
-import { Utensils, Info, CheckCircle2, MapPin, LayoutGrid, List, Flame, Heart, ChevronDown, Store, Search, X } from 'lucide-react';
+import {
+  Utensils,
+  Info,
+  CheckCircle2,
+  MapPin,
+  LayoutGrid,
+  List,
+  Flame,
+  Heart,
+  ChevronDown,
+  Store,
+  Search,
+  X,
+  Sparkles,
+  Cake,
+  Cookie,
+  CupSoda,
+  Coffee,
+  Package
+} from 'lucide-react';
 import './App.css';
 
 function MainApp() {
@@ -32,19 +51,19 @@ function MainApp() {
   // Zone filters definitions
   const zones = [
     { id: 'all', label: 'Összes Stand (1-100)' },
-    { id: 'zone-1', label: '1-30. Vár felőli kapu' },
-    { id: 'zone-2', label: '31-70. Patakpart sáv' },
-    { id: 'zone-3', label: '71-100. Színpad & Park' }
+    { id: 'zone-1', label: '1-15. Várkapu' },
+    { id: 'zone-2', label: '16-30. Patakpart' },
+    { id: 'zone-3', label: '31-100. Színpad' }
   ];
 
   const intentCategories = [
-    { id: 'all', label: 'Összes', icon: '✨' },
-    { id: 'meleg_etel', label: 'Meleg étel', icon: '🍲' },
-    { id: 'sutemeny', label: 'Sütemény', icon: '🍰' },
-    { id: 'retes', label: 'Rétes', icon: '🥧' },
-    { id: 'ital', label: 'Ital', icon: '🥤' },
-    { id: 'kave_tea', label: 'Kávé / tea', icon: '☕' },
-    { id: 'helyi_termek', label: 'Helyi termék', icon: '🧀' }
+    { id: 'all', label: 'Összes kínálat', icon: Sparkles },
+    { id: 'meleg_etel', label: 'Meleg étel', icon: Flame },
+    { id: 'sutemeny', label: 'Sütemény', icon: Cake },
+    { id: 'retes', label: 'Rétes', icon: Cookie },
+    { id: 'ital', label: 'Ital kapható', icon: CupSoda },
+    { id: 'kave_tea', label: 'Kávé / tea', icon: Coffee },
+    { id: 'helyi_termek', label: 'Helyi termék', icon: Package }
   ];
 
   const filteredExhibitors = exhibitors.filter((ex) => {
@@ -137,63 +156,64 @@ function MainApp() {
         ) : (
           /* Visitor Main View */
           <div className="max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8 space-y-6 sm:space-y-8">
-            {/* Hero Section: 🔥 MI FŐ? */}
-            <div className="bg-white border border-stone-200/80 rounded-3xl p-6 sm:p-10 shadow-xs space-y-6">
-              <div className="space-y-2">
-                <span className="text-xs font-extrabold uppercase tracking-widest text-amber-800 bg-amber-100 px-3 py-1 rounded-full border border-amber-200 inline-block">
+            {/* Hero Section: MI FŐ A DIÁKSÉTÁNYON? */}
+            <div className="bg-white border border-stone-200/80 rounded-3xl p-5 sm:p-7 shadow-xs space-y-4">
+              <div className="space-y-1">
+                <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-widest text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-200 inline-block">
                   ORSOLYA-NAPI VÁSÁR • CIVIL ÍZEK UTCÁJA
                 </span>
 
-                <h1 className="text-3xl sm:text-5xl font-black text-stone-900 tracking-tight flex items-center gap-3">
-                  <span>🔥 MI FŐ?</span>
+                <h1 className="text-2xl sm:text-4xl font-black text-stone-900 tracking-tight">
+                  Mi fő a Diáksétányon?
                 </h1>
 
                 <p className="text-xs sm:text-sm text-stone-500 font-medium">
-                  Kőszegi Diáksétány • Keresd meg a legjobb bográcsos ételeket, réteseket és borokat!
+                  Keresd meg a legjobb bográcsos ételeket, réteseket és forró italokat!
                 </p>
               </div>
 
-              {/* Big Search Input */}
+              {/* Search Input */}
               <div className="relative max-w-2xl">
-                <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
+                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
                 <input
                   type="text"
                   placeholder="Mit keresel? (rétes, gulyás, süti, ital...)"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-10 py-3.5 bg-stone-50 border border-stone-200 focus:border-amber-600 rounded-2xl text-sm sm:text-base text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-4 focus:ring-amber-500/20 font-semibold transition-all shadow-inner"
+                  className="w-full pl-10 pr-9 py-2.5 bg-stone-50 border border-stone-200 focus:border-amber-700 rounded-xl text-xs sm:text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 font-semibold transition-all"
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-stone-400 hover:text-stone-700"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-stone-400 hover:text-stone-700"
                   >
-                    <X className="w-5 h-5" />
+                    <X className="w-4 h-4" />
                   </button>
                 )}
               </div>
 
-              {/* 6 Large Intent Category Buttons */}
-              <div className="space-y-2 pt-2">
-                <span className="text-[11px] font-extrabold uppercase tracking-wider text-stone-400 block">
-                  Kategóriaválasztó
+              {/* Sleek, Compact Intent Category Buttons */}
+              <div className="space-y-1.5 pt-1">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-stone-400 block">
+                  Gyors kategóriaszűrők:
                 </span>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+                <div className="flex flex-wrap items-center gap-1.5">
                   {intentCategories.map((cat) => {
                     const isSelected = selectedCategory === cat.id;
+                    const IconComp = cat.icon;
 
                     return (
                       <button
                         key={cat.id}
                         onClick={() => setSelectedCategory(cat.id)}
-                        className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-2xl text-xs sm:text-sm font-extrabold transition-all border shadow-2xs ${
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
                           isSelected
-                            ? 'bg-amber-800 text-white border-amber-900 scale-102 shadow-md'
+                            ? 'bg-amber-800 text-white border-amber-900 shadow-xs'
                             : 'bg-stone-50 hover:bg-stone-100 text-stone-700 border-stone-200 hover:border-stone-300'
                         }`}
                       >
-                        <span className="text-base">{cat.icon}</span>
+                        <IconComp className={`w-3.5 h-3.5 ${isSelected ? 'text-amber-200' : 'text-amber-800'}`} />
                         <span>{cat.label}</span>
                       </button>
                     );

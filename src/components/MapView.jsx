@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
 import { FESTIVAL_BOUNDS } from '../data/mockOrsolyaData';
-import { MapPin, ArrowRight, Compass, Waves, Trees, Castle, Heart, Navigation, Layers } from 'lucide-react';
+import { MapPin, ArrowRight, Compass, Waves, Trees, Castle, Heart, Navigation, Layers, CupSoda } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -82,14 +82,14 @@ export default function MapView() {
 
       const isSelected = ex.id === selectedExhibitorId;
       const isFav = favoriteExhibitorIds.includes(ex.id);
-      const drinkBadge = ex.hasDrinks ? '🥤' : '';
+      const drinkBadge = ex.hasDrinks ? '(Ital)' : '';
 
       const pinColor = isSelected ? '#78350f' : isFav ? '#be123c' : '#b45309';
 
       const customHtml = `
         <div class="relative group cursor-pointer transition-transform duration-200 hover:scale-110">
           <div style="background-color: ${pinColor};" class="px-2.5 py-1 rounded-full text-white font-extrabold text-[11px] shadow-lg flex items-center gap-1 border-2 border-white">
-            <span>${drinkBadge} ${ex.name.split(' ')[0]}</span>
+            <span>${ex.name.split(' ')[0]} ${drinkBadge}</span>
           </div>
         </div>
       `;
@@ -194,7 +194,8 @@ export default function MapView() {
                   : 'bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100'
               }`}
             >
-              <span>🥤 Csak italos árusok</span>
+              <CupSoda className="w-3.5 h-3.5 text-cyan-800" />
+              <span>Csak italos árusok</span>
             </button>
 
             <button

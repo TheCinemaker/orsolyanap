@@ -47,7 +47,8 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
 
               {exhibitor.hasDrinks && (
                 <span className="text-xs font-extrabold text-cyan-100 bg-cyan-900/80 backdrop-blur-md px-3 py-1 rounded-full border border-cyan-400/40 flex items-center gap-1">
-                  <span>🥤 Ital kapható</span>
+                  <CupSoda className="w-3.5 h-3.5 text-cyan-300" />
+                  <span>Ital kapható</span>
                 </span>
               )}
             </div>
@@ -70,7 +71,7 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
               }`}
             >
               <Heart className={`w-4 h-4 ${isFavorite ? 'fill-rose-700 text-rose-700' : ''}`} />
-              <span>{isFavorite ? 'Kedvenc árus' : '❤️ Mentés Kedvencekhez'}</span>
+              <span>{isFavorite ? 'Kedvenc árus' : 'Mentés Kedvencekhez'}</span>
             </button>
 
             <button
@@ -81,7 +82,7 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
               className="flex-1 py-2 px-3 bg-amber-800 hover:bg-amber-700 text-white rounded-2xl text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 shadow-xs"
             >
               <Map className="w-4 h-4" />
-              <span>📍 Mutasd a térképen</span>
+              <span>Mutasd a térképen</span>
             </button>
           </div>
         </div>
@@ -89,8 +90,9 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
         {/* Offerings Summary (Kínálat) */}
         {exhibitor.offerings && (
           <div className="bg-amber-50 border border-amber-200 p-4 rounded-2xl space-y-1">
-            <span className="text-xs font-black text-amber-900 uppercase tracking-wider block">
-              🍽️ Mit kínál nálunk az árus:
+            <span className="text-xs font-black text-amber-900 uppercase tracking-wider flex items-center gap-1">
+              <Utensils className="w-3.5 h-3.5 text-amber-800" />
+              <span>Mit kínál az árus:</span>
             </span>
             <p className="text-xs sm:text-sm font-semibold text-amber-950 leading-relaxed">
               {exhibitor.offerings}

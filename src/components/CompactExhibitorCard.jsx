@@ -18,7 +18,8 @@ export default function CompactExhibitorCard({ exhibitor, items, onOpenDetails }
 
           {exhibitor.hasDrinks && (
             <span className="text-[10px] font-extrabold text-cyan-900 bg-cyan-100 px-2 py-0.5 rounded-full border border-cyan-300 flex items-center gap-1">
-              <span>🥤 Ital kapható</span>
+              <CupSoda className="w-3 h-3 text-cyan-800" />
+              <span>Ital kapható</span>
             </span>
           )}
         </div>
@@ -107,7 +108,7 @@ export default function CompactExhibitorCard({ exhibitor, items, onOpenDetails }
           className="py-1.5 px-2 text-center text-xs font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 rounded-xl transition-all flex items-center justify-center gap-1 border border-amber-300/80"
         >
           <Map className="w-3.5 h-3.5 text-amber-800" />
-          <span>📍 Térkép</span>
+          <span>Térkép</span>
         </button>
 
         <button

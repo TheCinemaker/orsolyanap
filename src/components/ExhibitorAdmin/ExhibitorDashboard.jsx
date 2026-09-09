@@ -179,8 +179,8 @@ export default function ExhibitorDashboard() {
 
           <div className="flex items-center justify-between bg-stone-50 p-3.5 rounded-2xl border border-stone-200">
             <div>
-              <span className="font-extrabold text-stone-900 text-xs block">🥤 Ital kapható nálatok a standnál?</span>
-              <span className="text-[11px] text-stone-500 font-medium">Ha bekapcsolod, az árus bekerül az "Ital" szűrőbe és a térképes ital-keresőbe.</span>
+              <span className="font-extrabold text-stone-900 text-xs block">Ital kapható nálatok a standnál?</span>
+              <span className="text-[11px] text-stone-500 font-medium">Ha bekapcsolod, az árus bekerül az "Ital kapható" szűrőbe és a térképre.</span>
             </div>
 
             <button
@@ -192,7 +192,7 @@ export default function ExhibitorDashboard() {
                   : 'bg-white text-stone-600 border-stone-300'
               }`}
             >
-              {profileData.hasDrinks ? '🥤 Ital: BEKAPCSOLVA (ON)' : 'Ital: KIKAPCSOLVA (OFF)'}
+              {profileData.hasDrinks ? 'Ital: BEKAPCSOLVA (ON)' : 'Ital: KIKAPCSOLVA (OFF)'}
             </button>
           </div>
             <div>
