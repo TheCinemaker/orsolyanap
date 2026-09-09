@@ -155,70 +155,60 @@ function MainApp() {
           <MapView />
         ) : (
           /* Visitor Main View */
-          <div className="max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8 space-y-6 sm:space-y-8">
-            {/* Hero Section: MI FŐ A DIÁKSÉTÁNYON? */}
-            <div className="bg-white border border-stone-200/80 rounded-3xl p-5 sm:p-7 shadow-xs space-y-4">
+          <div className="max-w-5xl mx-auto px-3 sm:px-4 py-6 space-y-6">
+            {/* Top Search & Category Section */}
+            <div className="space-y-4">
               <div className="space-y-1">
-                <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-widest text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-200 inline-block">
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-amber-800 bg-amber-100/90 px-2.5 py-0.5 rounded-full border border-amber-200 inline-block">
                   ORSOLYA-NAPI VÁSÁR • CIVIL ÍZEK UTCÁJA
                 </span>
 
-                <h1 className="text-2xl sm:text-4xl font-black text-stone-900 tracking-tight">
+                <h1 className="text-3xl sm:text-4xl font-black text-stone-900 tracking-tight">
                   Mi fő a Diáksétányon?
                 </h1>
-
-                <p className="text-xs sm:text-sm text-stone-500 font-medium">
-                  Keresd meg a legjobb bográcsos ételeket, réteseket és forró italokat!
-                </p>
               </div>
 
-              {/* Search Input */}
-              <div className="relative max-w-2xl">
-                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400" />
+              {/* Large Clean Search Bar */}
+              <div className="relative">
+                <Search className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
                 <input
                   type="text"
                   placeholder="Mit keresel? (rétes, gulyás, süti, ital...)"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-9 py-2.5 bg-stone-50 border border-stone-200 focus:border-amber-700 rounded-xl text-xs sm:text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 font-semibold transition-all"
+                  className="w-full pl-11 pr-10 py-3 bg-white border border-stone-300 focus:border-amber-700 rounded-2xl text-sm text-stone-900 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-600/20 font-semibold transition-all shadow-xs"
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-stone-400 hover:text-stone-700"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-stone-400 hover:text-stone-700"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 )}
               </div>
 
-              {/* Sleek, Compact Intent Category Buttons */}
-              <div className="space-y-1.5 pt-1">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-stone-400 block">
-                  Gyors kategóriaszűrők:
-                </span>
+              {/* Sleek Horizontal Category Pills Bar */}
+              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1">
+                {intentCategories.map((cat) => {
+                  const isSelected = selectedCategory === cat.id;
+                  const IconComp = cat.icon;
 
-                <div className="flex flex-wrap items-center gap-1.5">
-                  {intentCategories.map((cat) => {
-                    const isSelected = selectedCategory === cat.id;
-                    const IconComp = cat.icon;
-
-                    return (
-                      <button
-                        key={cat.id}
-                        onClick={() => setSelectedCategory(cat.id)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
-                          isSelected
-                            ? 'bg-amber-800 text-white border-amber-900 shadow-xs'
-                            : 'bg-stone-50 hover:bg-stone-100 text-stone-700 border-stone-200 hover:border-stone-300'
-                        }`}
-                      >
-                        <IconComp className={`w-3.5 h-3.5 ${isSelected ? 'text-amber-200' : 'text-amber-800'}`} />
-                        <span>{cat.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
+                  return (
+                    <button
+                      key={cat.id}
+                      onClick={() => setSelectedCategory(cat.id)}
+                      className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all border ${
+                        isSelected
+                          ? 'bg-amber-800 text-white border-amber-900 shadow-xs'
+                          : 'bg-white text-stone-700 hover:bg-stone-100 border-stone-200'
+                      }`}
+                    >
+                      <IconComp className={`w-3.5 h-3.5 ${isSelected ? 'text-amber-200' : 'text-amber-800'}`} />
+                      <span>{cat.label}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -232,162 +222,89 @@ function MainApp() {
               />
             ) : (
               <>
-                {/* Filters Bar for 100+ Exhibitors */}
-                <div className="bg-white border border-stone-200/90 rounded-3xl p-4 sm:p-5 shadow-xs space-y-4">
-              {/* Top Control Bar: View Mode Switcher & Zone Selector */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-stone-100 pb-3">
-                {/* Zone Select Tabs */}
-                <div className="flex items-center gap-1 overflow-x-auto scrollbar-none pb-1 sm:pb-0">
-                  {zones.map((zone) => (
-                    <button
-                      key={zone.id}
-                      onClick={() => {
-                        setSelectedZone(zone.id);
-                        setVisibleCount(12);
-                      }}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-                        selectedZone === zone.id
-                          ? 'bg-amber-800 text-white shadow-xs'
-                          : 'bg-stone-100 text-stone-600 hover:bg-stone-200/70'
-                      }`}
-                    >
-                      {zone.label}
-                    </button>
-                  ))}
-                </div>
+                {/* Minimal Zone Filter Bar */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 pt-2 border-t border-stone-200/60">
+                  {/* Zone Tabs */}
+                  <div className="flex items-center gap-1 overflow-x-auto scrollbar-none w-full sm:w-auto">
+                    {zones.map((zone) => (
+                      <button
+                        key={zone.id}
+                        onClick={() => {
+                          setSelectedZone(zone.id);
+                          setVisibleCount(12);
+                        }}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                          selectedZone === zone.id
+                            ? 'bg-stone-900 text-white shadow-xs'
+                            : 'bg-stone-100 text-stone-600 hover:bg-stone-200/70'
+                        }`}
+                      >
+                        {zone.label}
+                      </button>
+                    ))}
+                  </div>
 
-                {/* Grid / List Mode Toggle */}
-                <div className="flex items-center gap-1 bg-stone-100 p-1 rounded-2xl border border-stone-200 self-start sm:self-center">
+                  {/* Favorites Filter */}
                   <button
-                    onClick={() => setViewMode('compact')}
-                    className={`flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold transition-all ${
-                      viewMode === 'compact'
-                        ? 'bg-white text-stone-900 shadow-xs'
-                        : 'text-stone-500 hover:text-stone-900'
+                    onClick={() => setShowOnlyFavorites((prev) => !prev)}
+                    className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      showOnlyFavorites
+                        ? 'bg-rose-100 border-rose-300 text-rose-800'
+                        : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-100'
                     }`}
-                    title="Kompakt Ráccsbeosztás"
                   >
-                    <LayoutGrid className="w-3.5 h-3.5 text-amber-700" />
-                    <span className="hidden sm:inline">Kompakt Ráccs</span>
-                  </button>
-
-                  <button
-                    onClick={() => setViewMode('detailed')}
-                    className={`flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold transition-all ${
-                      viewMode === 'detailed'
-                        ? 'bg-white text-stone-900 shadow-xs'
-                        : 'text-stone-500 hover:text-stone-900'
-                    }`}
-                    title="Részletes Lista"
-                  >
-                    <List className="w-3.5 h-3.5 text-amber-700" />
-                    <span className="hidden sm:inline">Kifejtett Lista</span>
+                    <Heart className={`w-3.5 h-3.5 ${showOnlyFavorites ? 'fill-rose-700 text-rose-700' : 'text-rose-600'}`} />
+                    <span>Kedvenceim ({favoriteExhibitorIds.length})</span>
                   </button>
                 </div>
-              </div>
 
-              {/* Status Quick Filter Toggles */}
-              <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
-                <button
-                  onClick={() => setShowOnlyCooking((prev) => !prev)}
-                  className={`px-3 py-1.5 rounded-full border transition-all flex items-center gap-1.5 ${
-                    showOnlyCooking
-                      ? 'bg-amber-100 border-amber-400 text-amber-900 font-extrabold'
-                      : 'bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100'
-                  }`}
-                >
-                  <Flame className="w-3.5 h-3.5 text-amber-700" />
-                  <span>Csak élőben főző standok</span>
-                </button>
-
-                <button
-                  onClick={() => setShowOnlyFavorites((prev) => !prev)}
-                  className={`px-3 py-1.5 rounded-full border transition-all flex items-center gap-1.5 ${
-                    showOnlyFavorites
-                      ? 'bg-rose-100 border-rose-300 text-rose-800 font-extrabold'
-                      : 'bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100'
-                  }`}
-                >
-                  <Heart className="w-3.5 h-3.5 text-rose-600" />
-                  <span>Csak a Kedvenceim ({favoriteExhibitorIds.length})</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Exhibitors Grid/List Feed */}
-            <div className="space-y-4 sm:space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-base sm:text-lg font-bold text-stone-900 flex items-center gap-2">
-                  <Utensils className="w-4 h-4 text-amber-700 flex-shrink-0" />
-                  <span>Standok a Diáksétányon</span>
-                </h2>
-                <span className="text-xs text-stone-500 font-bold bg-stone-100 px-2.5 py-1 rounded-full border border-stone-200">
-                  Megjelenítve: {visibleExhibitors.length} / {filteredExhibitors.length} stand
-                </span>
-              </div>
-
-              {filteredExhibitors.length === 0 ? (
-                <div className="bg-white border border-stone-200 rounded-3xl p-8 sm:p-12 text-center text-stone-400">
-                  <Info className="w-8 h-8 mx-auto mb-2 opacity-40" />
-                  <p className="text-sm font-bold text-stone-700">Nincs a szűrésnek megfelelő stand.</p>
-                </div>
-              ) : viewMode === 'compact' ? (
-                /* Compact 2-Column Grid View */
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-                  {visibleExhibitors.map((exhibitor) => {
-                    const exItems = menuItems.filter(
-                      (item) =>
-                        item.exhibitor_id === exhibitor.id &&
-                        (selectedCategory === 'all' || item.category === selectedCategory)
-                    );
-
-                    return (
-                      <CompactExhibitorCard
-                        key={exhibitor.id}
-                        exhibitor={exhibitor}
-                        items={exItems}
-                        onOpenDetails={(ex) => setSelectedDetailExhibitor(ex)}
-                      />
-                    );
-                  })}
-                </div>
-              ) : (
-                /* Detailed Expanded List View */
+                {/* Exhibitors Feed */}
                 <div className="space-y-4">
-                  {visibleExhibitors.map((exhibitor) => {
-                    const exItems = menuItems.filter(
-                      (item) =>
-                        item.exhibitor_id === exhibitor.id &&
-                        (selectedCategory === 'all' || item.category === selectedCategory)
-                    );
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-sm font-extrabold text-stone-900 uppercase tracking-wider flex items-center gap-1.5">
+                      <Store className="w-4 h-4 text-amber-800" />
+                      <span>Standok a Diáksétányon ({filteredExhibitors.length})</span>
+                    </h2>
+                  </div>
 
-                    return (
-                      <ExhibitorCard
-                        key={exhibitor.id}
-                        exhibitor={exhibitor}
-                        items={exItems}
-                      />
-                    );
-                  })}
-                </div>
-              )}
+                  {filteredExhibitors.length === 0 ? (
+                    <div className="bg-white border border-stone-200 rounded-3xl p-8 sm:p-12 text-center text-stone-400">
+                      <Info className="w-8 h-8 mx-auto mb-2 opacity-40" />
+                      <p className="text-sm font-bold text-stone-700">Nincs a keresésnek megfelelő stand.</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {visibleExhibitors.map((exhibitor) => {
+                        const exItems = menuItems.filter((item) => item.exhibitor_id === exhibitor.id);
 
-              {/* Batch Pagination Button ("További standok betöltése") */}
-              {visibleCount < filteredExhibitors.length && (
-                <div className="text-center pt-4">
-                  <button
-                    onClick={() => setVisibleCount((prev) => prev + 12)}
-                    className="px-6 py-3 bg-white hover:bg-stone-50 border border-stone-300 text-stone-800 font-extrabold text-xs rounded-2xl shadow-xs transition-all flex items-center gap-2 mx-auto"
-                  >
-                    <span>További 12 stand betöltése ({visibleCount} / {filteredExhibitors.length})</span>
-                    <ChevronDown className="w-4 h-4 text-amber-700" />
-                  </button>
+                        return (
+                          <CompactExhibitorCard
+                            key={exhibitor.id}
+                            exhibitor={exhibitor}
+                            items={exItems}
+                            onOpenDetails={(ex) => setSelectedDetailExhibitor(ex)}
+                          />
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Batch Pagination Button */}
+                  {visibleCount < filteredExhibitors.length && (
+                    <div className="text-center pt-4">
+                      <button
+                        onClick={() => setVisibleCount((prev) => prev + 12)}
+                        className="px-6 py-3 bg-white hover:bg-stone-50 border border-stone-300 text-stone-800 font-extrabold text-xs rounded-2xl shadow-xs transition-all flex items-center gap-2 mx-auto"
+                      >
+                        <span>További standok betöltése ({visibleCount} / {filteredExhibitors.length})</span>
+                        <ChevronDown className="w-4 h-4 text-amber-700" />
+                      </button>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          </>
-        )}
-      </div>
+              </>
+            )}
+          </div>
     )}
   </main>
 
