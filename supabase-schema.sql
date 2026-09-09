@@ -104,40 +104,22 @@ BEGIN;
   CREATE PUBLICATION supabase_realtime FOR TABLE public.exhibitors, public.menu_items;
 COMMIT;
 
--- 5. Seed Initial Exhibitor Data (Standok & Csapatok)
-INSERT INTO public.exhibitors (id, name, location, pin, category, has_drinks, offerings, days, story, cause, phone, email, facebook_url, instagram_url, image, notice)
-VALUES 
-('ex-1', 'Jurisics Vár Bográcsozója', 'Diáksétány 1.', '1234', 'meleg_etel', false, 'Bográcsos marhapörkölt, szüretes gulyásleves, tejfölös babgulyás, csülkös pacal', 'both', 'Kőszegi hagyományőrző baráti társaság vagyunk. Minden évben szabad tűzön, eredeti vasi receptek alapján főzünk a Diáksétányon.', 'A kőszegi gyermekmentők és a helyi cserkészcsapat javára gyűjtünk adományokat.', '+36 94 563 100', 'info@jurisicsvar.hu', 'https://facebook.com', 'https://instagram.com', 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80', 'A marhapörkölt frissen rotyog a Diáksétányon!'),
-('ex-2', 'Kőszegi Borosgazdák Egyesülete', 'Diáksétány 3.', '2345', 'italok', true, 'Kőszegi Kékfrankos borok, forró fűszeres forralt bor, friss szőlőmust, borpárlat', 'both', 'A Kőszegi Hegyközség szőlősgazdái. A kőszegi Kékfrankos és a helyi borkultúra ápolása a szívügyünk.', 'A kőszegi szőlőjövő és a történelmi szőlőskert felújítására gyűjtünk.', '+36 30 998 7654', 'bor@koszeg.hu', 'https://facebook.com', '', 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=800&q=80', 'Forró fűszeres forralt bor és friss szőlőmust kapható a patakparton!'),
-('ex-3', 'Pékegér & Kőszegi Rétesház', 'Diáksétány 5.', '3456', 'sutemeny', true, 'Házi meggyes-mákos rétes, vasi tökös-mákos rétes, kézműves pogácsa', 'saturday', 'Kézműves családi pékség. Dédszüleink receptjei alapján, kézzel nyújtott tésztából sütjük a kőszegi réteseket.', 'A helyi kézműves hagyományőrző iskola javára.', '+36 30 445 1122', 'pekeger@koszeg.hu', '', '', 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80', 'Friss meleg meggyes-mákos rétes a kemencéből!'),
-('ex-4', 'Kőszegi Kürtőskalács & Kávézó', 'Diáksétány 8.', '4567', 'street_food', true, 'Faszénen sült diós és fahéjas kürtőskalács, eszpresszó, cappuccino, forró csoki', 'both', 'Hagyományos faszénparázson sült kürtőskalácsok mesterei.', 'Gyermeknevelési alapítvány támogatása.', '+36 20 334 5566', '', '', '', 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=800&q=80', 'Friss meleg kürtőskalács sütés és forró kávé folyamatosan!'),
-('ex-5', 'Vasi Vadászok & Erdészklub', 'Diáksétány 12.', '5678', 'meleg_etel', false, 'Erdei gombás szarvaspörkölt dödöllével, tepsis vasi dödölle pirított hagymával', 'sunday', 'A Kőszegi-hegység erdészei és vadászai. Kőszegi erdei gombákkal és vadételekkel várunk mindenkit.', 'Az erdei tanösvények és vadrezervátum támogatására.', '+36 30 777 8899', 'vadaszok@koszeg.hu', '', '', 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80', 'Erdei szarvaspörkölt dödöllével kész Vasárnap!'),
-('ex-6', 'Írott-kő Sajt- & Mézkészítők', 'Diáksétány 15.', '6789', 'hideg_etel', false, 'Bükki és kőszegi kézműves sajtok, fűszeres sajtgolyók, akácméz, erdei méz', 'both', 'Alpokaljai családi gazdaság. Natúrparki kézműves sajtokat és erdei mézeket kóstoltatunk.', 'A helyi méhészeti egyesület támogatására.', '+36 94 360 220', '', '', '', 'https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&w=800&q=80', 'Kézműves sajtkóstoló friss kőszegi kenyérrel!')
-ON CONFLICT (id) DO UPDATE SET
-    name = EXCLUDED.name,
-    location = EXCLUDED.location,
-    offerings = EXCLUDED.offerings,
-    days = EXCLUDED.days,
-    category = EXCLUDED.category,
-    has_drinks = EXCLUDED.has_drinks;
+-- =====================================================================
+-- SEGÍTSÉG ÉS TÖMEGES BETÖLTŐ SCRIPT ELEMEK (SUPABASE SQL EDITOR-HOZ)
+-- =====================================================================
 
--- 6. Seed Initial Menu Items Data (Ételek Katalógusa)
-INSERT INTO public.menu_items (id, exhibitor_id, name, description, initial_stock, stock, status, votes, category, available_day, is_gluten_free, is_lactose_free, is_sugar_free, is_vegan, tags, image)
+-- 1. ADATBÁZIS FULL NULLÁZÁSA / TÖRLÉSE TESZTELÉSHEZ (Szükség esetén futtatható):
+-- TRUNCATE public.exhibitors, public.menu_items, public.votes, public.orders CASCADE;
+
+-- 2. MINTA TÖMEGES CSAPAT & ÉTEL FELTÖLTŐ SCRIPT (Tömeges importáláshoz):
+/*
+INSERT INTO public.exhibitors (id, name, location, pin, category, offerings, days, phone, email)
+VALUES 
+  ('ex-101', 'Minta Csapat 1', 'Diáksétány 1.', '1234', 'meleg_etel', 'Bográcsos marhapörkölt', 'both', '+36 30 111 2233'),
+  ('ex-102', 'Minta Csapat 2', 'Diáksétány 2.', '5678', 'sutemeny', 'Házi rétesek', 'saturday', '+36 30 222 3344');
+
+INSERT INTO public.menu_items (exhibitor_id, name, description, category, available_day, is_gluten_free, is_lactose_free)
 VALUES
-('item-101', 'ex-1', 'Bográcsos Marhapörkölt Tarhonyával', 'Szabad tűzön, vörösborral és kőszegi fűszerpaprikával főzött szaftos marhapörkölt, házi tarhonyával.', 50, 42, 'ready', 42, 'meleg_etel', 'both', false, true, true, false, ARRAY['Meleg ételek', 'Bográcsos', 'Pörkölt'], 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80'),
-('item-102', 'ex-1', 'Gluténmentes Szüretes Gulyásleves', 'Gazdag gulyásleves füstölt csülökkel és gluténmentes csipetkével.', 40, 38, 'ready', 38, 'meleg_etel', 'saturday', true, true, true, false, ARRAY['Meleg ételek', 'Gulyás', 'Gluténmentes'], 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=800&q=80'),
-('item-201', 'ex-2', 'Fűszeres Forralt Kékfrankos', 'Minőségi kőszegi Kékfrankos bor narancshéjjal, fahéjjal és szegfűszeggel melegítve.', 100, 85, 'ready', 35, 'italok', 'both', true, true, false, true, ARRAY['Italok', 'Forralt bor', 'Kékfrankos'], 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=800&q=80'),
-('item-202', 'ex-2', 'Friss Kőszegi Szőlőmust', 'Alkoholmentes, frissen préselt édes Kőszegi Kékfrankos szőlőlé.', 60, 52, 'ready', 19, 'italok', 'both', true, true, true, true, ARRAY['Italok', 'Must', 'Alkoholmentes'], 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=800&q=80'),
-('item-301', 'ex-3', 'Házi Meggyes-Mákos Rétes', 'Kézzel nyújtott vékony tészta, bőséges meggyes-mákos töltelékkel.', 60, 51, 'ready', 51, 'sutemeny', 'saturday', false, true, false, false, ARRAY['Sütemény', 'Meggyes rétes', 'Házi'], 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80'),
-('item-401', 'ex-4', 'Diós Kürtőskalács', 'Faszénfelett forgatott, karamellizált dióburokban.', 50, 31, 'ready', 31, 'street_food', 'both', false, true, false, false, ARRAY['Street Food', 'Kürtőskalács'], 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=800&q=80'),
-('item-501', 'ex-5', 'Gluténmentes Vasi Dödölle Pirított Hagymával', 'Burgonyás dödölle ropogósra pirítva, fokhagymás tejföllel.', 50, 47, 'ready', 47, 'meleg_etel', 'sunday', true, false, true, true, ARRAY['Meleg ételek', 'Dödölle', 'Gluténmentes'], 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80'),
-('item-601', 'ex-6', 'Írott-kő Kézműves Sajttál', 'Bükki és kőszegi érlelt sajtok variációja házi mézzel és dióval.', 40, 27, 'ready', 27, 'hideg_etel', 'both', true, false, true, false, ARRAY['Hideg ételek', 'Sajt', 'Helyi'], 'https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&w=800&q=80')
-ON CONFLICT (id) DO UPDATE SET
-    name = EXCLUDED.name,
-    description = EXCLUDED.description,
-    is_gluten_free = EXCLUDED.is_gluten_free,
-    is_lactose_free = EXCLUDED.is_lactose_free,
-    is_sugar_free = EXCLUDED.is_sugar_free,
-    is_vegan = EXCLUDED.is_vegan,
-    available_day = EXCLUDED.available_day,
-    category = EXCLUDED.category;
+  ('ex-101', 'Bográcsos Marhapörkölt', 'Friss marhapörkölt házi tarhonyával', 'meleg_etel', 'both', false, true),
+  ('ex-102', 'Gluténmentes Meggyes Rétes', 'Kézzel nyújtott mentes rétes', 'sutemeny', 'saturday', true, true);
+*/

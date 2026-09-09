@@ -16,29 +16,29 @@ export function OrsolyaProvider({ children }) {
   // State: Exhibitors, Menu Items, Orders
   const [exhibitors, setExhibitors] = useState(() => {
     const saved = localStorage.getItem('orsolya_exhibitors');
-    return saved ? JSON.parse(saved) : INITIAL_EXHIBITORS;
+    return saved ? JSON.parse(saved) : [];
   });
 
   const [menuItems, setMenuItems] = useState(() => {
     const saved = localStorage.getItem('orsolya_menu_items');
-    return saved ? JSON.parse(saved) : INITIAL_MENU_ITEMS;
+    return saved ? JSON.parse(saved) : [];
   });
 
   const [orders, setOrders] = useState(() => {
     const saved = localStorage.getItem('orsolya_orders');
-    return saved ? JSON.parse(saved) : INITIAL_ORDERS;
+    return saved ? JSON.parse(saved) : [];
   });
 
-  // Scanned Favorite Exhibitors (by QR code or manual favorite)
+  // Scanned Favorite Exhibitors
   const [favoriteExhibitorIds, setFavoriteExhibitorIds] = useState(() => {
     const saved = localStorage.getItem('orsolya_favorite_exhibitor_ids');
-    return saved ? JSON.parse(saved) : ['ex-1'];
+    return saved ? JSON.parse(saved) : [];
   });
 
   // Favorite Dish IDs
   const [favoriteItemIds, setFavoriteItemIds] = useState(() => {
     const saved = localStorage.getItem('orsolya_favorite_item_ids');
-    return saved ? JSON.parse(saved) : ['item-101'];
+    return saved ? JSON.parse(saved) : [];
   });
 
   // Focused Exhibitor ID on Map
@@ -50,7 +50,7 @@ export function OrsolyaProvider({ children }) {
   const [isMyOrdersOpen, setIsMyOrdersOpen] = useState(false);
   const [myOrderIds, setMyOrderIds] = useState(() => {
     const saved = localStorage.getItem('orsolya_my_order_ids');
-    return saved ? JSON.parse(saved) : ['ORD-1001'];
+    return saved ? JSON.parse(saved) : [];
   });
 
   // Public Voting system: voted item IDs persisted in LocalStorage
@@ -82,7 +82,7 @@ export function OrsolyaProvider({ children }) {
     const fetchSupabaseData = async () => {
       try {
         const { data: exData, error: exErr } = await supabase.from('exhibitors').select('*');
-        if (!exErr && exData && exData.length > 0) {
+        if (!exErr && exData) {
           const formattedEx = exData.map((e) => ({
             ...e,
             hasDrinks: e.has_drinks !== undefined ? e.has_drinks : e.hasDrinks
@@ -91,11 +91,11 @@ export function OrsolyaProvider({ children }) {
         }
 
         const { data: itemData, error: itemErr } = await supabase.from('menu_items').select('*');
-        if (!itemErr && itemData && itemData.length > 0) {
+        if (!itemErr && itemData) {
           setMenuItems(itemData);
         }
       } catch (err) {
-        console.warn('Supabase fetch notice: Using local fallback', err);
+        console.warn('Supabase fetch notice: Using local state', err);
       }
     };
 
