@@ -149,7 +149,10 @@ export function OrsolyaProvider({ children }) {
           { event: '*', schema: 'public', table: 'reels' },
           (payload) => {
             if (payload.eventType === 'INSERT' && payload.new) {
-              setReels((prev) => [payload.new, ...prev]);
+              setReels((prev) => {
+                if (prev.some((r) => r.id === payload.new.id)) return prev;
+                return [payload.new, ...prev];
+              });
             } else if (payload.eventType === 'UPDATE' && payload.new) {
               setReels((prev) => prev.map((r) => (r.id === payload.new.id ? { ...r, ...payload.new } : r)));
             } else if (payload.eventType === 'DELETE' && payload.old) {
@@ -639,16 +642,32 @@ export function OrsolyaProvider({ children }) {
       created_at: new Date().toISOString()
     };
 
-    setReels((prev) => [newReel, ...prev]);
-
     try {
-      await supabase.from('reels').insert([newReel]);
-    } catch (e) {
-      console.warn('Supabase reel insert notice:', e);
-    }
+      const { data, error } = await supabase
+        .from('reels')
+        .insert([newReel])
+        .select()
+        .single();
 
-    showToast('📸 Élő pillanat sikeresen közzétéve!', 'success');
-    return newReel;
+      if (error) {
+        console.error('Supabase reel insert error:', error);
+        showToast(`A fotó mentése nem sikerült: ${error.message}`, 'error');
+        return null;
+      }
+
+      const savedReel = data || newReel;
+      setReels((prev) => {
+        if (prev.some((r) => r.id === savedReel.id)) return prev;
+        return [savedReel, ...prev];
+      });
+
+      showToast('📸 Élő pillanat sikeresen közzétéve!', 'success');
+      return savedReel;
+    } catch (e) {
+      console.error('Supabase reel insert exception:', e);
+      showToast('A fotó mentése nem sikerült. Ellenőrizd a kapcsolatot!', 'error');
+      return null;
+    }
   };
 
   // Like a live Reel / Story
