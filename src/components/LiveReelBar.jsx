@@ -23,6 +23,7 @@ export default function LiveReelBar() {
   const [captionInput, setCaptionInput] = useState('');
   const [imageInput, setImageInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const uniqueReels = Array.from(new Map(reels.map((reel) => [String(reel.id), reel])).values());
 
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
@@ -79,7 +80,7 @@ export default function LiveReelBar() {
           <span>Élő Vásári Pillanatok (Reels)</span>
         </h3>
         <span className="text-[10px] font-bold text-amber-900 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-300">
-          {reels.length} élő fotó
+          {uniqueReels.length} élő fotó
         </span>
       </div>
 
@@ -115,7 +116,7 @@ export default function LiveReelBar() {
         {/* ---------------------------------------------------------------- */}
         {/* REEL STORY CARDS */}
         {/* ---------------------------------------------------------------- */}
-        {reels.map((reel) => {
+        {uniqueReels.map((reel) => {
           const exhibitor = exhibitors.find((e) => e.id === reel.exhibitor_id);
           const isExhibitorPost = !!reel.exhibitor_id;
 
