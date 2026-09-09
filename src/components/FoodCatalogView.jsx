@@ -205,6 +205,13 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
                   </div>
                 )}
 
+                {/* Item Image */}
+                {item.image && (
+                  <div className="w-full h-40 sm:h-48 rounded-xl overflow-hidden mt-2 mb-2 border border-stone-100">
+                    <img src={item.image} alt={item.name} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                  </div>
+                )}
+
                 {/* Title & Description */}
                 <div className="space-y-1">
                   <div className="flex items-center gap-1 flex-wrap">

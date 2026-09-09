@@ -43,6 +43,13 @@ export default function MenuItemCard({ item, exhibitor }) {
           )}
         </div>
 
+        {/* Item Image */}
+        {item.image && (
+          <div className="w-full h-40 sm:h-48 rounded-xl overflow-hidden mb-3 border border-stone-100">
+            <img src={item.image} alt={item.name} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+          </div>
+        )}
+
         {/* Title */}
         <h3 className="text-sm sm:text-base font-extrabold text-stone-900 group-hover:text-amber-800 transition-colors leading-snug">
           {item.name}

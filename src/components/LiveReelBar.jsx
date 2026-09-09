@@ -11,7 +11,8 @@ export default function LiveReelBar() {
     likeReel,
     convertFileToBase64,
     focusExhibitorOnMap,
-    showToast
+    showToast,
+    setActiveView
   } = useOrsolya();
 
   const [activeStoryModal, setActiveStoryModal] = useState(null);
@@ -75,23 +76,33 @@ export default function LiveReelBar() {
     return `${date.getMonth() + 1}.${date.getDate()}.`;
   };
 
+  // Only display reels from the last 1 hour on the main page bar (all reels are kept in Supabase)
+  const oneHourAgo = Date.now() - 60 * 60 * 1000;
+  const recentReels = reels.filter((r) => {
+    const created = new Date(r.created_at).getTime();
+    return !isNaN(created) ? created >= oneHourAgo : true;
+  });
+
   return (
     <div className="space-y-2">
       {/* Section Header */}
       <div className="flex items-center justify-between px-1">
         <h3 className="text-xs font-black text-amber-950 uppercase tracking-widest flex items-center gap-1.5">
           <Camera className="w-4 h-4 text-amber-700 animate-pulse" />
-          <span>Élő Vásári Pillanatok (Reels)</span>
+          <span>Élő Stand Pillanatok (Friss 1 óra)</span>
         </h3>
-        <span className="text-[10px] font-bold text-amber-900 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-300">
-          {uniqueReels.length} élő fotó
-        </span>
+        <button
+          onClick={() => setActiveView('reels')}
+          className="text-[10px] font-black text-amber-950 bg-amber-100 hover:bg-amber-200 px-2.5 py-1 rounded-full border border-amber-300 transition-colors flex items-center gap-1 cursor-pointer"
+        >
+          <span>Összes Fotó ({reels.length})</span>
+        </button>
       </div>
 
       {/* Horizontal Story Reel Bar (Facebook / Instagram Style) */}
       <div className="flex gap-2.5 overflow-x-auto pb-2 pt-1 px-1 scrollbar-none snap-x touch-pan-x">
         {/* ---------------------------------------------------------------- */}
-        {/* CARD 1: ADD REEL BUTTON FOR ALL USERS & EXHIBITORS */}
+        {/* CARD 1: ADD REEL BUTTON */}
         {/* ---------------------------------------------------------------- */}
         <div
           onClick={() => {
@@ -111,16 +122,13 @@ export default function LiveReelBar() {
             <p className="text-xs font-extrabold leading-tight text-white">
               Élő Pillanat
             </p>
-            <p className="text-[9px] text-amber-200/80 leading-none">
-              Mindenki posztolhat!
-            </p>
           </div>
         </div>
 
         {/* ---------------------------------------------------------------- */}
-        {/* REEL STORY CARDS */}
+        {/* REEL STORY CARDS (LAST 1 HOUR) */}
         {/* ---------------------------------------------------------------- */}
-        {uniqueReels.map((reel) => {
+        {recentReels.map((reel) => {
           const exhibitor = exhibitors.find((e) => e.id === reel.exhibitor_id);
           const isExhibitorPost = !!reel.exhibitor_id;
 
