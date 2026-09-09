@@ -122,7 +122,8 @@ export default function ExhibitorDashboard() {
     is_gluten_free: false,
     is_lactose_free: false,
     is_sugar_free: false,
-    is_vegan: false
+    is_vegan: false,
+    image: ''
   });
 
   const handleProfileSave = (e) => {
