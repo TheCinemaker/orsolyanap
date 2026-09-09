@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { INITIAL_EXHIBITORS, INITIAL_MENU_ITEMS, INITIAL_ORDERS } from '../data/mockOrsolyaData';
+import { supabase } from '../lib/supabaseClient';
 
 const OrsolyaContext = createContext();
 
 export function OrsolyaProvider({ children }) {
-  // Active View Mode: 'visitor' | 'exhibitor' | 'map' | 'login'
+  // Active View Mode: 'visitor' | 'exhibitor' | 'map' | 'login' | 'tv'
   const [activeView, setActiveView] = useState('visitor');
 
   // Logged-in exhibitor ID (null if guest/visitor)
@@ -67,6 +68,80 @@ export function OrsolyaProvider({ children }) {
       setToastMessage((prev) => (prev?.text === msg ? null : prev));
     }, 3500);
   };
+
+  // ---------------------------------------------------------------------------
+  // Supabase Initial Fetch & Real-time Subscriptions
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    let channel;
+
+    const fetchSupabaseData = async () => {
+      try {
+        const { data: exData, error: exErr } = await supabase.from('exhibitors').select('*');
+        if (!exErr && exData && exData.length > 0) {
+          const formattedEx = exData.map((e) => ({
+            ...e,
+            hasDrinks: e.has_drinks !== undefined ? e.has_drinks : e.hasDrinks
+          }));
+          setExhibitors(formattedEx);
+        }
+
+        const { data: itemData, error: itemErr } = await supabase.from('menu_items').select('*');
+        if (!itemErr && itemData && itemData.length > 0) {
+          setMenuItems(itemData);
+        }
+      } catch (err) {
+        console.warn('Supabase fetch notice: Using local fallback', err);
+      }
+    };
+
+    fetchSupabaseData();
+
+    // Subscribe to Realtime Postgres changes across all connected devices & screens
+    try {
+      channel = supabase
+        .channel('orsolya-realtime-channel')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'exhibitors' },
+          (payload) => {
+            if (payload.eventType === 'UPDATE' && payload.new) {
+              setExhibitors((prev) =>
+                prev.map((e) =>
+                  e.id === payload.new.id
+                    ? { ...e, ...payload.new, hasDrinks: payload.new.has_drinks ?? e.hasDrinks }
+                    : e
+                )
+              );
+            } else if (payload.eventType === 'INSERT' && payload.new) {
+              setExhibitors((prev) => [...prev, { ...payload.new, hasDrinks: payload.new.has_drinks }]);
+            }
+          }
+        )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'menu_items' },
+          (payload) => {
+            if (payload.eventType === 'UPDATE' && payload.new) {
+              setMenuItems((prev) =>
+                prev.map((item) => (item.id === payload.new.id ? { ...item, ...payload.new } : item))
+              );
+            } else if (payload.eventType === 'INSERT' && payload.new) {
+              setMenuItems((prev) => [...prev, payload.new]);
+            } else if (payload.eventType === 'DELETE' && payload.old) {
+              setMenuItems((prev) => prev.filter((item) => item.id !== payload.old.id));
+            }
+          }
+        )
+        .subscribe();
+    } catch (err) {
+      console.warn('Realtime subscription fallback:', err);
+    }
+
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, []);
 
   // Sync to LocalStorage & cross-tab sync
   useEffect(() => {
@@ -162,11 +237,16 @@ export function OrsolyaProvider({ children }) {
   };
 
   // Toggle exhibitor hasDrinks
-  const updateExhibitorDrinks = (exhibitorId, hasDrinks) => {
+  const updateExhibitorDrinks = async (exhibitorId, hasDrinks) => {
     setExhibitors((prev) =>
       prev.map((ex) => (ex.id === exhibitorId ? { ...ex, hasDrinks } : ex))
     );
-    showToast(hasDrinks ? '🥤 Ital elérhetőség bekapcsolva!' : 'Ital elérhetőség kikapcsolva.');
+    try {
+      await supabase.from('exhibitors').update({ has_drinks: hasDrinks }).eq('id', exhibitorId);
+    } catch (e) {
+      console.warn('Supabase sync warning:', e);
+    }
+    showToast(hasDrinks ? 'Ital elérhetőség bekapcsolva!' : 'Ital elérhetőség kikapcsolva.');
   };
 
   // Login as Exhibitor with PIN
@@ -190,29 +270,50 @@ export function OrsolyaProvider({ children }) {
   };
 
   // Exhibitor Profile update (Bio, Story, Cause)
-  const updateExhibitorProfile = (exhibitorId, updatedData) => {
+  const updateExhibitorProfile = async (exhibitorId, updatedData) => {
     setExhibitors((prev) =>
       prev.map((ex) => (ex.id === exhibitorId ? { ...ex, ...updatedData } : ex))
     );
+    try {
+      await supabase.from('exhibitors').update({
+        story: updatedData.story,
+        cause: updatedData.cause,
+        notice: updatedData.notice,
+        location: updatedData.location,
+        offerings: updatedData.offerings,
+        has_drinks: updatedData.hasDrinks
+      }).eq('id', exhibitorId);
+    } catch (e) {
+      console.warn('Supabase sync warning:', e);
+    }
     showToast('Stand adatok és történet frissítve!', 'success');
   };
 
   // Real-time Stock Adjustments
-  const updateItemStock = (itemId, delta) => {
+  const updateItemStock = async (itemId, delta) => {
+    let targetStock = 0;
+    let targetStatus = 'ready';
+
     setMenuItems((prevItems) =>
       prevItems.map((item) => {
         if (item.id === itemId) {
-          const newStock = Math.max(0, item.stock + delta);
-          const newStatus = newStock === 0 ? 'sold_out' : item.status === 'sold_out' ? 'ready' : item.status;
-          return { ...item, stock: newStock, status: newStatus };
+          targetStock = Math.max(0, item.stock + delta);
+          targetStatus = targetStock === 0 ? 'sold_out' : item.status === 'sold_out' ? 'ready' : item.status;
+          return { ...item, stock: targetStock, status: targetStatus };
         }
         return item;
       })
     );
+
+    try {
+      await supabase.from('menu_items').update({ stock: targetStock, status: targetStatus }).eq('id', itemId);
+    } catch (e) {
+      console.warn('Supabase sync warning:', e);
+    }
   };
 
   // Update item status
-  const updateItemStatus = (itemId, status, etaMinutes = 0) => {
+  const updateItemStatus = async (itemId, status, etaMinutes = 0) => {
     setMenuItems((prevItems) =>
       prevItems.map((item) => {
         if (item.id === itemId) {
@@ -221,31 +322,58 @@ export function OrsolyaProvider({ children }) {
         return item;
       })
     );
+    try {
+      await supabase.from('menu_items').update({ status }).eq('id', itemId);
+    } catch (e) {
+      console.warn('Supabase sync warning:', e);
+    }
     showToast('Állapot frissítve!');
   };
 
   // Save/Add menu item dynamically
-  const saveMenuItem = (itemData) => {
+  const saveMenuItem = async (itemData) => {
     if (itemData.id) {
       setMenuItems((prev) => prev.map((i) => (i.id === itemData.id ? { ...i, ...itemData } : i)));
+      try {
+        await supabase.from('menu_items').update({
+          name: itemData.name,
+          description: itemData.description,
+          initial_stock: Number(itemData.initial_stock),
+          category: itemData.category,
+          tags: itemData.tags
+        }).eq('id', itemData.id);
+      } catch (e) {
+        console.warn('Supabase sync warning:', e);
+      }
       showToast('Étel frissítve!', 'success');
     } else {
       const newItem = {
         ...itemData,
         id: `item-${Date.now()}`,
         exhibitor_id: activeExhibitorId,
-        stock: itemData.initial_stock || 20,
-        initial_stock: itemData.initial_stock || 20,
-        status: 'ready'
+        stock: Number(itemData.initial_stock) || 30,
+        initial_stock: Number(itemData.initial_stock) || 30,
+        status: 'ready',
+        votes: 0
       };
       setMenuItems((prev) => [...prev, newItem]);
+      try {
+        await supabase.from('menu_items').insert([newItem]);
+      } catch (e) {
+        console.warn('Supabase sync warning:', e);
+      }
       showToast('Új étel hozzáadva a standodhoz!', 'success');
     }
   };
 
   // Delete menu item
-  const deleteMenuItem = (itemId) => {
+  const deleteMenuItem = async (itemId) => {
     setMenuItems((prev) => prev.filter((i) => i.id !== itemId));
+    try {
+      await supabase.from('menu_items').delete().eq('id', itemId);
+    } catch (e) {
+      console.warn('Supabase sync warning:', e);
+    }
     showToast('Étel eltávolítva.');
   };
 
