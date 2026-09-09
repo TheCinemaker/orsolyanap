@@ -14,8 +14,10 @@ import {
   X,
   MapPin,
   Heart,
-  Save
+  Save,
+  QrCode
 } from 'lucide-react';
+import ExhibitorQRCard from '../ExhibitorQRCard';
 
 export default function ExhibitorDashboard() {
   const {
@@ -340,6 +342,9 @@ export default function ExhibitorDashboard() {
           </div>
         )}
       </div>
+
+      {/* Stand QR Code & Printable Banner Section */}
+      <ExhibitorQRCard exhibitor={activeExhibitor} />
 
       {/* Add / Edit Dish Modal */}
       {isDishModalOpen && (
