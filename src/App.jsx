@@ -12,7 +12,7 @@ import CartDrawer from './components/CartDrawer';
 import MyOrdersModal from './components/MyOrdersModal';
 import MapView from './components/MapView';
 import VisitKoszegLogo from './components/VisitKoszegLogo';
-import { Utensils, Info, CheckCircle2, MapPin, LayoutGrid, List, Flame, Heart, ChevronDown, Store } from 'lucide-react';
+import { Utensils, Info, CheckCircle2, MapPin, LayoutGrid, List, Flame, Heart, ChevronDown, Store, Search, X } from 'lucide-react';
 import './App.css';
 
 function MainApp() {
