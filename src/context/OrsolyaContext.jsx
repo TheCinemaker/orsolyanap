@@ -172,12 +172,12 @@ export function OrsolyaProvider({ children }) {
 
   // Sync to LocalStorage & cross-tab sync
   useEffect(() => {
-    localStorage.setItem('orsolya_exhibitors', JSON.stringify(exhibitors));
-  }, [exhibitors]);
-
-  useEffect(() => {
-    localStorage.setItem('orsolya_menu_items', JSON.stringify(menuItems));
-  }, [menuItems]);
+    // Exhibitors, menu items and orders are server state. Do not persist them in
+    // localStorage: menu item images are now Supabase Storage URLs and older
+    // cached Base64 images can exceed the browser's ~5 MB storage quota.
+    localStorage.removeItem('orsolya_exhibitors');
+    localStorage.removeItem('orsolya_menu_items');
+  }, [exhibitors, menuItems]);
 
   useEffect(() => {
     localStorage.setItem('orsolya_orders', JSON.stringify(orders));
