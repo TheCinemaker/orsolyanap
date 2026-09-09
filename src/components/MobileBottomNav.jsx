@@ -7,18 +7,18 @@ export default function MobileBottomNav({ onOpenFavorites, onOpenHamburger }) {
   const totalFavs = favoriteExhibitorIds.length + (favoriteItemIds?.length || 0);
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/98 backdrop-blur-2xl border-t-2 border-stone-300 shadow-2xl px-2 py-2 pb-safe">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl border-t border-stone-200 shadow-lg px-2 py-2 pb-safe">
       <div className="flex items-center justify-around">
         {/* Ételek */}
         <button
           onClick={() => setActiveView('visitor')}
           className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
             activeView === 'visitor'
-              ? 'text-stone-950 font-black scale-105'
-              : 'text-stone-700 font-bold hover:text-stone-950'
+              ? 'text-amber-900 font-extrabold'
+              : 'text-stone-500 font-medium hover:text-stone-900'
           }`}
         >
-          <Utensils className={`w-5 h-5 ${activeView === 'visitor' ? 'text-amber-700' : ''}`} />
+          <Utensils className={`w-5 h-5 ${activeView === 'visitor' ? 'text-amber-800' : 'text-stone-500'}`} />
           <span className="text-[10px]">Ételek</span>
         </button>
 
@@ -27,23 +27,23 @@ export default function MobileBottomNav({ onOpenFavorites, onOpenHamburger }) {
           onClick={() => setActiveView('map')}
           className={`flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all ${
             activeView === 'map'
-              ? 'text-stone-950 font-black scale-105'
-              : 'text-stone-700 font-bold hover:text-stone-950'
+              ? 'text-amber-900 font-extrabold'
+              : 'text-stone-500 font-medium hover:text-stone-900'
           }`}
         >
-          <MapPin className={`w-5 h-5 ${activeView === 'map' ? 'text-amber-700' : ''}`} />
+          <MapPin className={`w-5 h-5 ${activeView === 'map' ? 'text-amber-800' : 'text-stone-500'}`} />
           <span className="text-[10px]">Térkép</span>
         </button>
 
         {/* Kedvencek */}
         <button
           onClick={onOpenFavorites}
-          className="flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all text-stone-800 hover:text-stone-950 font-extrabold relative"
+          className="flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all text-stone-500 hover:text-stone-900 font-medium relative"
         >
           <div className="relative">
             <Heart className="w-5 h-5 text-rose-700 fill-rose-700" />
             {totalFavs > 0 && (
-              <span className="absolute -top-1 -right-2 bg-rose-700 text-white font-black text-[9px] px-1 rounded-full min-w-[14px] text-center border border-white">
+              <span className="absolute -top-1 -right-2 bg-rose-700 text-white font-extrabold text-[9px] px-1 rounded-full min-w-[14px] text-center">
                 {totalFavs}
               </span>
             )}
@@ -54,9 +54,9 @@ export default function MobileBottomNav({ onOpenFavorites, onOpenHamburger }) {
         {/* Menü (Hamburger) */}
         <button
           onClick={onOpenHamburger}
-          className="flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all text-stone-800 hover:text-stone-950 font-extrabold"
+          className="flex flex-col items-center gap-0.5 py-1 px-3 rounded-xl transition-all text-stone-500 hover:text-stone-900 font-medium"
         >
-          <Menu className="w-5 h-5 text-stone-950" />
+          <Menu className="w-5 h-5 text-amber-800" />
           <span className="text-[10px]">Menü</span>
         </button>
       </div>

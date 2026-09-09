@@ -119,19 +119,19 @@ function MainApp() {
   const visibleExhibitors = filteredExhibitors.slice(0, visibleCount);
 
   return (
-    <div className="min-h-screen bg-[#fafafa] text-stone-950 flex flex-col justify-between font-sans selection:bg-amber-800 selection:text-white pb-20 md:pb-0">
+    <div className="min-h-screen bg-[#fdfbf7] text-stone-900 flex flex-col justify-between font-sans selection:bg-amber-800 selection:text-white pb-20 md:pb-0">
       {/* Toast Notification */}
       {toastMessage && (
         <div
-          className={`fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 px-4 py-3 rounded-2xl shadow-2xl font-extrabold text-xs flex items-center gap-2 border-2 animate-in slide-in-from-bottom duration-200 ${
+          className={`fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 px-4 py-3 rounded-2xl shadow-xl font-extrabold text-xs flex items-center gap-2 border animate-in slide-in-from-bottom duration-200 ${
             toastMessage.type === 'error'
-              ? 'bg-rose-950 text-white border-rose-700'
+              ? 'bg-rose-900 text-white border-rose-800'
               : toastMessage.type === 'success'
-              ? 'bg-emerald-950 text-white border-emerald-600'
-              : 'bg-black text-white border-stone-700'
+              ? 'bg-emerald-900 text-white border-emerald-800'
+              : 'bg-stone-900 text-white border-stone-800'
           }`}
         >
-          <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+          <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-amber-300" />
           <span>{toastMessage.text}</span>
         </div>
       )}
@@ -162,17 +162,17 @@ function MainApp() {
             {/* Top Title & Category Section */}
             <div className="space-y-4">
               <div className="text-center py-1">
-                <h1 className="text-3xl sm:text-4xl font-black text-black tracking-tight">
+                <h1 className="text-3xl sm:text-4xl font-black text-amber-950 tracking-tight">
                   Civil Ízek Utcája
                 </h1>
               </div>
 
-              {/* High-Contrast Apple-Style Centered Category Dropdown */}
+              {/* Chestnut Brown Centered Category Dropdown Menu */}
               <div className="flex justify-center pt-1">
                 <div className="relative inline-block text-left w-full sm:w-80">
                   <button
                     onClick={() => setIsCategoryDropdownOpen((prev) => !prev)}
-                    className="w-full flex items-center justify-between gap-3 px-4 py-3 bg-white border-2 border-stone-900 rounded-2xl text-sm font-black text-stone-950 shadow-md hover:bg-stone-50 transition-all focus:outline-none focus:ring-2 focus:ring-stone-950 cursor-pointer"
+                    className="w-full flex items-center justify-between gap-3 px-4 py-3 bg-white border-2 border-amber-900/80 rounded-2xl text-sm font-extrabold text-amber-950 shadow-xs hover:bg-amber-50/60 transition-all focus:outline-none focus:ring-2 focus:ring-amber-800 cursor-pointer"
                   >
                     <div className="flex items-center gap-3 truncate">
                       {activeCategoryObj && (
@@ -181,7 +181,7 @@ function MainApp() {
                       <span className="truncate">{activeCategoryObj?.label || 'Kategória választás'}</span>
                     </div>
                     <ChevronDown
-                      className={`w-4 h-4 text-stone-900 flex-shrink-0 transition-transform duration-200 ${
+                      className={`w-4 h-4 text-amber-900 flex-shrink-0 transition-transform duration-200 ${
                         isCategoryDropdownOpen ? 'rotate-180' : ''
                       }`}
                     />
@@ -195,7 +195,7 @@ function MainApp() {
                         className="fixed inset-0 z-30"
                         onClick={() => setIsCategoryDropdownOpen(false)}
                       />
-                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border-2 border-stone-950 rounded-2xl shadow-2xl z-40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 p-1.5 space-y-1">
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border-2 border-amber-900 rounded-2xl shadow-2xl z-40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 p-1.5 space-y-1">
                         {intentCategories.map((cat) => {
                           const isSelected = selectedCategory === cat.id;
                           const IconComp = cat.icon;
@@ -209,15 +209,15 @@ function MainApp() {
                               }}
                               className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-black transition-all cursor-pointer ${
                                 isSelected
-                                  ? 'bg-stone-950 text-white shadow-xs'
-                                  : 'text-stone-900 hover:bg-stone-100'
+                                  ? 'bg-amber-900 text-white shadow-xs'
+                                  : 'text-stone-800 hover:bg-amber-100/60'
                               }`}
                             >
                               <div className="flex items-center gap-3">
-                                <IconComp className={`w-4 h-4 ${isSelected ? 'text-amber-400' : 'text-amber-800'}`} />
+                                <IconComp className={`w-4 h-4 ${isSelected ? 'text-amber-200' : 'text-amber-800'}`} />
                                 <span>{cat.label}</span>
                               </div>
-                              {isSelected && <CheckCircle2 className="w-4 h-4 text-amber-400" />}
+                              {isSelected && <CheckCircle2 className="w-4 h-4 text-amber-200" />}
                             </button>
                           );
                         })}

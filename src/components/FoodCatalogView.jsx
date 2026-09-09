@@ -60,19 +60,19 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
             return (
               <div
                 key={item.id}
-                className="bg-white border-2 border-stone-200 hover:border-stone-900 rounded-2xl p-4 shadow-xs hover:shadow-md transition-all flex flex-col justify-between space-y-3 relative group"
+                className="bg-white border border-stone-200/90 rounded-2xl p-4 shadow-xs hover:border-amber-500/60 transition-all flex flex-col justify-between space-y-3 relative group"
               >
                 {/* Stand Info Badge & Top Voted */}
                 {exhibitor && (
                   <div className="flex items-center justify-between gap-1.5">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-white bg-stone-900 px-2.5 py-0.5 rounded-full border border-stone-950 inline-flex items-center gap-1">
-                      <MapPin className="w-2.5 h-2.5 text-amber-400" />
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-800 bg-amber-100/80 px-2.5 py-0.5 rounded-full border border-amber-300/60 inline-flex items-center gap-1">
+                      <MapPin className="w-2.5 h-2.5 text-amber-700" />
                       <span className="truncate">{exhibitor.name}</span>
                     </span>
 
                     {isTopVoted && (
-                      <span className="text-[9px] font-black text-amber-950 bg-amber-100 px-2 py-0.5 rounded-full flex items-center gap-1 border border-amber-400">
-                        <Trophy className="w-2.5 h-2.5 text-amber-800" /> Kedvenc
+                      <span className="text-[9px] font-extrabold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full flex items-center gap-1 border border-amber-300">
+                        <Trophy className="w-2.5 h-2.5 text-amber-700" /> Kedvenc
                       </span>
                     )}
                   </div>
@@ -80,11 +80,11 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
 
                 {/* Title & Description */}
                 <div className="space-y-1">
-                  <h3 className="font-black text-stone-950 text-sm sm:text-base leading-snug group-hover:text-amber-900 transition-colors">
+                  <h3 className="font-extrabold text-stone-900 text-sm sm:text-base leading-snug group-hover:text-amber-800 transition-colors">
                     {item.name}
                   </h3>
                   {item.description && (
-                    <p className="text-xs font-bold text-stone-700 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed font-medium">
                       {item.description}
                     </p>
                   )}
@@ -94,7 +94,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
                 {item.tags && item.tags.length > 0 && (
                   <div className="flex flex-wrap gap-1">
                     {item.tags.map((t) => (
-                      <span key={t} className="text-[10px] text-stone-900 bg-stone-100 px-2 py-0.5 rounded-md font-black border border-stone-300">
+                      <span key={t} className="text-[10px] text-stone-500 bg-stone-100 px-2 py-0.5 rounded-md font-semibold">
                         #{t}
                       </span>
                     ))}
@@ -102,8 +102,8 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
                 )}
 
                 {/* Footer Action Bar: Donation Info + Vote Button */}
-                <div className="pt-2.5 border-t border-stone-200 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-1 text-[11px] font-black text-amber-950">
+                <div className="pt-2.5 border-t border-stone-100 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1 text-[11px] font-bold text-amber-900">
                     <Heart className="w-3.5 h-3.5 text-rose-700 fill-rose-700" />
                     <span>Adományos kóstolás</span>
                   </div>
