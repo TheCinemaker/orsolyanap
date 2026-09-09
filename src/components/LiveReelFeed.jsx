@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
 import { Camera, Heart, MapPin, Store, Sparkles, Clock, Flame, Image as ImageIcon } from 'lucide-react';
 
 export default function LiveReelFeed() {
   const { reels, exhibitors, likeReel, focusExhibitorOnMap, setActiveView } = useOrsolya();
   const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [likedReelIds, setLikedReelIds] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('orsolya_liked_reel_ids') || '[]'); } catch { return []; }
+  });
+  useEffect(() => { localStorage.setItem('orsolya_liked_reel_ids', JSON.stringify(likedReelIds)); }, [likedReelIds]);
   const uniqueReels = Array.from(new Map(reels.map((reel) => [String(reel.id), reel])).values());
 
   const formatTimeAgo = (isoString) => {
