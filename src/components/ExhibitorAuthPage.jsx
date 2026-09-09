@@ -221,20 +221,7 @@ export default function ExhibitorAuthPage() {
               ))}
             </div>
 
-            <div className="pt-3 border-t border-stone-200 flex items-center justify-between gap-2">
-              <button
-                onClick={() => {
-                  if (window.confirm('BIZTOSAN TÖRÖLNI AKAROD az összes online Supabase adatbázisban lévő teszt árust és ételt? Ez a művelet nem visszavonható!')) {
-                    clearAllDatabaseData();
-                    setIsOrganizerDirectoryOpen(false);
-                  }
-                }}
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-800 font-bold text-xs rounded-xl border border-rose-200"
-              >
-                <Trash2 className="w-3.5 h-3.5 text-rose-700" />
-                <span>Adatbázis Nullázása (Purgálás)</span>
-              </button>
-
+            <div className="pt-3 border-t border-stone-200 flex justify-end">
               <button
                 onClick={() => setIsOrganizerDirectoryOpen(false)}
                 className="px-4 py-2 bg-stone-900 text-white font-bold text-xs rounded-xl"
