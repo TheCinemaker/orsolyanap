@@ -208,6 +208,16 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
                 {/* Title & Description */}
                 <div className="space-y-1">
                   <div className="flex items-center gap-1 flex-wrap">
+                    {item.status === 'sold_out' || item.stock === 0 ? (
+                      <span className="text-[10px] font-black text-white bg-rose-700 px-2.5 py-0.5 rounded-md border border-rose-800 uppercase tracking-wider animate-pulse">
+                        ELFOGYOTT
+                      </span>
+                    ) : item.status === 'cooking' ? (
+                      <span className="text-[10px] font-extrabold text-amber-900 bg-amber-100 px-2.5 py-0.5 rounded-md border border-amber-300">
+                        FŐZÉS ALATT
+                      </span>
+                    ) : null}
+
                     <span className="text-[9px] font-bold text-stone-500 bg-stone-100 px-2 py-0.5 rounded-md">
                       {item.available_day === 'saturday' ? 'Szombat' : item.available_day === 'sunday' ? 'Vasárnap' : 'Mindkét nap'}
                     </span>
@@ -233,11 +243,15 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
                     )}
                   </div>
 
-                  <h3 className="font-extrabold text-stone-900 text-sm sm:text-base leading-snug group-hover:text-amber-800 transition-colors">
+                  <h3 className={`font-extrabold text-sm sm:text-base leading-snug transition-colors ${
+                    item.status === 'sold_out' || item.stock === 0 ? 'text-stone-400 line-through' : 'text-stone-900 group-hover:text-amber-800'
+                  }`}>
                     {item.name}
                   </h3>
                   {item.description && (
-                    <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed font-medium">
+                    <p className={`text-xs line-clamp-2 leading-relaxed font-medium ${
+                      item.status === 'sold_out' || item.stock === 0 ? 'text-stone-400' : 'text-stone-500'
+                    }`}>
                       {item.description}
                     </p>
                   )}

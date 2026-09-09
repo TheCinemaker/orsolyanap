@@ -1,6 +1,6 @@
 import React from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { Flame, Clock, ThumbsUp, Check, Heart, Trophy, CheckCircle2 } from 'lucide-react';
+import { Flame, Clock, ThumbsUp, Check, Heart, Trophy, CheckCircle2, AlertCircle } from 'lucide-react';
 
 export default function MenuItemCard({ item, exhibitor }) {
   const { addToCart, cart, votedItemIds, voteForItem } = useOrsolya();
@@ -8,7 +8,7 @@ export default function MenuItemCard({ item, exhibitor }) {
   const isVoted = votedItemIds.includes(item.id);
   const isTopVoted = (item.votes || 0) >= 40;
 
-  const isSoldOut = item.status === 'sold_out';
+  const isSoldOut = item.status === 'sold_out' || item.stock === 0;
   const isCooking = item.status === 'cooking';
 
   return (
@@ -18,8 +18,9 @@ export default function MenuItemCard({ item, exhibitor }) {
         <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2">
           {/* Status Badge */}
           {isSoldOut ? (
-            <span className="bg-stone-100 text-stone-400 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
-              ❌ Elfogyott
+            <span className="bg-rose-700 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-rose-800 uppercase tracking-wider">
+              <AlertCircle className="w-3 h-3 text-white" />
+              <span>Elfogyott</span>
             </span>
           ) : isCooking ? (
             <span className="bg-amber-100 text-amber-900 text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 border border-amber-300">

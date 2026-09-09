@@ -326,6 +326,28 @@ export function OrsolyaProvider({ children }) {
     return newTeam;
   };
 
+  // Update Exhibitor PIN (Organizer / Admin helper)
+  const updateExhibitorPin = async (exhibitorId, newPin) => {
+    const cleanPin = newPin.trim();
+    if (!cleanPin || cleanPin.length < 4) {
+      showToast('A PIN kódnak legalább 4 karakteresnek kell lennie!', 'error');
+      return false;
+    }
+
+    setExhibitors((prev) =>
+      prev.map((ex) => (ex.id === exhibitorId ? { ...ex, pin: cleanPin } : ex))
+    );
+
+    try {
+      await supabase.from('exhibitors').update({ pin: cleanPin }).eq('id', exhibitorId);
+    } catch (e) {
+      console.warn('Supabase PIN update warning:', e);
+    }
+
+    showToast('PIN kód sikeresen frissítve!', 'success');
+    return true;
+  };
+
   // Exhibitor Profile update (Bio, Story, Cause, Contacts, Days)
   const updateExhibitorProfile = async (exhibitorId, updatedData) => {
     setExhibitors((prev) =>
@@ -557,6 +579,7 @@ export function OrsolyaProvider({ children }) {
         saveMenuItem,
         deleteMenuItem,
         addExhibitorTeam,
+        updateExhibitorPin,
         updateExhibitorProfile,
         updateOrderStatus,
         selectedDay,
