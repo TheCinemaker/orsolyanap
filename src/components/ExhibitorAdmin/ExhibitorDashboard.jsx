@@ -54,8 +54,8 @@ export default function ExhibitorDashboard() {
     name: '',
     description: '',
     initial_stock: 30,
-    category: 'bogracs',
-    tags: 'Bográcsos'
+    category: 'meleg_etel',
+    tags: 'Meleg étel'
   });
 
   const handleProfileSave = (e) => {
@@ -430,6 +430,24 @@ export default function ExhibitorDashboard() {
                   onChange={(e) => setDishForm({ ...dishForm, initial_stock: e.target.value })}
                   className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
                 />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
+                  Étel Kategóriája
+                </label>
+                <select
+                  value={dishForm.category}
+                  onChange={(e) => setDishForm({ ...dishForm, category: e.target.value })}
+                  className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 font-bold focus:outline-none focus:ring-2 focus:ring-amber-500/40 cursor-pointer"
+                >
+                  <option value="meleg_etel">Meleg ételek</option>
+                  <option value="hideg_etel">Hideg ételek</option>
+                  <option value="sutemeny">Sütemény</option>
+                  <option value="street_food">Street Food</option>
+                  <option value="italok">Italok</option>
+                  <option value="egyeb">Egyéb</option>
+                </select>
               </div>
 
               <div>

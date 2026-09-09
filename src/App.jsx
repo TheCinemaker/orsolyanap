@@ -58,12 +58,12 @@ function MainApp() {
 
   const intentCategories = [
     { id: 'all', label: 'Összes kínálat', icon: Sparkles },
-    { id: 'meleg_etel', label: 'Meleg étel', icon: Flame },
+    { id: 'meleg_etel', label: 'Meleg ételek', icon: Flame },
+    { id: 'hideg_etel', label: 'Hideg ételek', icon: Utensils },
     { id: 'sutemeny', label: 'Sütemény', icon: Cake },
-    { id: 'retes', label: 'Rétes', icon: Cookie },
-    { id: 'ital', label: 'Ital kapható', icon: CupSoda },
-    { id: 'kave_tea', label: 'Kávé / tea', icon: Coffee },
-    { id: 'helyi_termek', label: 'Helyi termék', icon: Package }
+    { id: 'street_food', label: 'Street Food', icon: Cookie },
+    { id: 'italok', label: 'Italok', icon: CupSoda },
+    { id: 'egyeb', label: 'Egyéb', icon: Package }
   ];
 
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
@@ -95,7 +95,7 @@ function MainApp() {
     // Category matching (visitor intent)
     const matchesCategory =
       selectedCategory === 'all' ||
-      (selectedCategory === 'ital' && (ex.hasDrinks || ex.category === 'ital')) ||
+      (selectedCategory === 'italok' && (ex.hasDrinks || ex.category === 'italok' || ex.category === 'ital')) ||
       ex.category === selectedCategory ||
       exItems.some((i) => i.category === selectedCategory);
 
@@ -167,9 +167,9 @@ function MainApp() {
                 </h1>
               </div>
 
-              {/* Chestnut Brown Centered Category Dropdown Menu */}
+              {/* Chestnut Brown Centered Category Dropdown Menu (Sleek Narrow Width) */}
               <div className="flex justify-center pt-1">
-                <div className="relative inline-block text-left w-full sm:w-80">
+                <div className="relative inline-block text-left w-full sm:w-64">
                   <button
                     onClick={() => setIsCategoryDropdownOpen((prev) => !prev)}
                     className="w-full flex items-center justify-between gap-3 px-4 py-3 bg-white border-2 border-amber-900/80 rounded-2xl text-sm font-extrabold text-amber-950 shadow-xs hover:bg-amber-50/60 transition-all focus:outline-none focus:ring-2 focus:ring-amber-800 cursor-pointer"

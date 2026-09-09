@@ -156,8 +156,8 @@ export const INITIAL_MENU_ITEMS = [
     description: 'Minőségi kőszegi Kékfrankos bor narancshéjjal, fahéjjal és szegfűszeggel melegítve.',
     status: 'ready',
     votes: 35,
-    tags: ['Ital', 'Forralt bor', 'Kékfrankos'],
-    category: 'ital',
+    tags: ['Italok', 'Forralt bor', 'Kékfrankos'],
+    category: 'italok',
     image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=800&q=80'
   },
   {
@@ -167,8 +167,8 @@ export const INITIAL_MENU_ITEMS = [
     description: 'Alkoholmentes, frissen préselt édes Kőszegi Kékfrankos szőlőlé.',
     status: 'ready',
     votes: 19,
-    tags: ['Ital', 'Must', 'Alkoholmentes'],
-    category: 'ital',
+    tags: ['Italok', 'Must', 'Alkoholmentes'],
+    category: 'italok',
     image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=800&q=80'
   },
   {
@@ -178,8 +178,8 @@ export const INITIAL_MENU_ITEMS = [
     description: 'Kézzel nyújtott vékony tészta, bőséges meggyes-mákos töltelékkel.',
     status: 'ready',
     votes: 51,
-    tags: ['Rétes', 'Meggyes rétes', 'Házi'],
-    category: 'retes',
+    tags: ['Sütemény', 'Meggyes rétes', 'Házi'],
+    category: 'sutemeny',
     image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80'
   },
   {
@@ -189,8 +189,8 @@ export const INITIAL_MENU_ITEMS = [
     description: 'Tradicionális vas megyei sült tökös és darált mákos rétes különlegesség.',
     status: 'ready',
     votes: 23,
-    tags: ['Rétes', 'Vasi Specialitás'],
-    category: 'retes',
+    tags: ['Sütemény', 'Vasi Specialitás'],
+    category: 'sutemeny',
     image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80'
   },
   {
@@ -200,8 +200,8 @@ export const INITIAL_MENU_ITEMS = [
     description: 'Faszénfelett forgatott, karamellizált dióburokban.',
     status: 'ready',
     votes: 31,
-    tags: ['Sütemény', 'Kürtőskalács'],
-    category: 'sutemeny',
+    tags: ['Street Food', 'Kürtőskalács'],
+    category: 'street_food',
     image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=800&q=80'
   },
   {
@@ -211,7 +211,7 @@ export const INITIAL_MENU_ITEMS = [
     description: 'Kőszegi erdei gombákkal párolt szarvascomb, serpenyőben pirított vasi dödöllével.',
     status: 'ready',
     votes: 47,
-    tags: ['Meleg étel', 'Dödölle', 'Szarvas'],
+    tags: ['Meleg ételek', 'Dödölle', 'Szarvas'],
     category: 'meleg_etel',
     image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80'
   },
@@ -222,9 +222,20 @@ export const INITIAL_MENU_ITEMS = [
     description: 'Burgonyás dödölle ropogósra pirítva, házi fokhagymás tejföllel és sült hagymával.',
     status: 'ready',
     votes: 36,
-    tags: ['Meleg étel', 'Dödölle'],
+    tags: ['Meleg ételek', 'Dödölle'],
     category: 'meleg_etel',
     image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80'
+  },
+  {
+    id: 'item-601',
+    exhibitor_id: 'ex-6',
+    name: 'Írott-kő Kézműves Sajttál',
+    description: 'Bükki és kőszegi érlelt sajtok variációja házi mézzel és dióval.',
+    status: 'ready',
+    votes: 27,
+    tags: ['Hideg ételek', 'Sajt', 'Helyi'],
+    category: 'hideg_etel',
+    image: 'https://images.unsplash.com/photo-1452195100486-9cc805987862?auto=format&fit=crop&w=800&q=80'
   }
 ];
 
