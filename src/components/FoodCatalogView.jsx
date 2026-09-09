@@ -268,16 +268,11 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
                   </div>
                 )}
 
-                {/* Footer Action Bar: Donation Info + Vote Button */}
-                <div className="pt-2.5 border-t border-stone-100 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-1 text-[11px] font-bold text-amber-900">
-                    <Heart className="w-3.5 h-3.5 text-rose-700 fill-rose-700" />
-                    <span>Adományos kóstolás</span>
-                  </div>
-
+                {/* Footer Action Bar: Vote Button */}
+                <div className="pt-2.5 border-t border-stone-100 flex items-center justify-end gap-2">
                   <button
                     onClick={() => voteForItem(item.id)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all border shadow-2xs ${
+                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition-all border shadow-2xs ${
                       isVoted
                         ? 'bg-emerald-800 text-white border-emerald-800'
                         : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-300/80'

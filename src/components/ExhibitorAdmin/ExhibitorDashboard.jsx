@@ -38,7 +38,8 @@ export default function ExhibitorDashboard() {
     saveMenuItem,
     deleteMenuItem,
     updateExhibitorProfile,
-    addExhibitorTeam
+    addExhibitorTeam,
+    clearAllDatabaseData
   } = useOrsolya();
 
   if (!activeExhibitor) return null;
@@ -194,6 +195,19 @@ export default function ExhibitorDashboard() {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={() => {
+              if (window.confirm('BIZTOSAN TÖRÖLNI AKAROD az összes Supabase-ben lévő csapatot és ételt? Ez a művelet nem visszavonható!')) {
+                clearAllDatabaseData();
+              }
+            }}
+            className="flex items-center gap-1.5 px-3 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-800 font-bold text-xs rounded-2xl transition-all border border-rose-200"
+            title="Törli az összes online Supabase adatot és beégetett elemet"
+          >
+            <Trash2 className="w-4 h-4 text-rose-700" />
+            <span>Adatbázis Nullázása</span>
+          </button>
+
           <button
             onClick={() => setIsTeamModalOpen(true)}
             className="flex items-center gap-1.5 px-3.5 py-2.5 bg-amber-900 hover:bg-amber-950 text-white font-extrabold text-xs rounded-2xl shadow-xs transition-all border border-amber-950"

@@ -76,7 +76,7 @@ export default function OrsolyaInfoModal({ isOpen, onClose }) {
                 <strong>Őszi ízek kavalkádja:</strong> Sült gesztenye, kürtőskalács, mézeskalács és a híres kőszegi Kékfrankos borok kóstolója.
               </li>
               <li>
-                <strong>Közösségi főzés:</strong> Hagyományos szabadtéri civil főzőverseny és adományos kóstolás a Diáksétányon.
+                <strong>Közösségi főzés:</strong> Hagyományos szabadtéri civil főzőverseny a Diáksétányon.
               </li>
             </ul>
           </div>

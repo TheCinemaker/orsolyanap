@@ -340,7 +340,6 @@ export default function MapView() {
                   >
                     <div>
                       <span className="font-bold text-stone-900 block">{item.name}</span>
-                      <span className="text-[10px] text-amber-800 font-semibold">Adományos kóstolás</span>
                     </div>
                     <button
                       onClick={() => addToCart(item, selectedExhibitor)}

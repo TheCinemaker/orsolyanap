@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
 import VisitKoszegLogo from './VisitKoszegLogo';
-import { Key, ArrowRight, ArrowLeft, ShieldCheck, Copy, Check, Plus, X, Lock } from 'lucide-react';
+import { Key, ArrowRight, ArrowLeft, ShieldCheck, Copy, Check, Plus, X, Lock, Trash2 } from 'lucide-react';
 
 export default function ExhibitorAuthPage() {
-  const { loginExhibitor, setActiveView, exhibitors, updateExhibitorPin, showToast } = useOrsolya();
+  const { loginExhibitor, setActiveView, exhibitors, updateExhibitorPin, clearAllDatabaseData, showToast } = useOrsolya();
   const [pinInput, setPinInput] = useState('');
   const [isOrganizerDirectoryOpen, setIsOrganizerDirectoryOpen] = useState(false);
   const [copiedPinId, setCopiedPinId] = useState(null);
@@ -80,22 +80,24 @@ export default function ExhibitorAuthPage() {
           </button>
         </form>
 
-        {/* Demo PIN shortcuts */}
-        <div className="pt-4 border-t border-stone-100 text-center space-y-2">
-          <p className="text-xs text-stone-400 font-medium">Teszt belépési PIN kódok:</p>
-          <div className="flex flex-wrap justify-center gap-1.5 text-[11px] font-mono font-bold">
-            {exhibitors.slice(0, 4).map((ex) => (
-              <button
-                key={ex.id}
-                type="button"
-                onClick={() => setPinInput(ex.pin)}
-                className="bg-stone-100 hover:bg-stone-200 text-stone-700 px-2.5 py-1 rounded-xl border border-stone-200 transition-colors"
-              >
-                {ex.pin} ({ex.name.split(' ')[0]})
-              </button>
-            ))}
+        {/* Live Registered PIN shortcuts */}
+        {exhibitors.length > 0 && (
+          <div className="pt-4 border-t border-stone-100 text-center space-y-2">
+            <p className="text-xs text-stone-400 font-medium">Gyors belépés (Regisztrált standok):</p>
+            <div className="flex flex-wrap justify-center gap-1.5 text-[11px] font-mono font-bold">
+              {exhibitors.slice(0, 4).map((ex) => (
+                <button
+                  key={ex.id}
+                  type="button"
+                  onClick={() => setPinInput(ex.pin)}
+                  className="bg-stone-100 hover:bg-stone-200 text-stone-700 px-2.5 py-1 rounded-xl border border-stone-200 transition-colors"
+                >
+                  {ex.pin} ({ex.name.split(' ')[0]})
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Organizer PIN directory button */}
         <div className="pt-2 border-t border-stone-100">
@@ -219,7 +221,20 @@ export default function ExhibitorAuthPage() {
               ))}
             </div>
 
-            <div className="pt-2 flex justify-end">
+            <div className="pt-3 border-t border-stone-200 flex items-center justify-between gap-2">
+              <button
+                onClick={() => {
+                  if (window.confirm('BIZTOSAN TÖRÖLNI AKAROD az összes online Supabase adatbázisban lévő teszt árust és ételt? Ez a művelet nem visszavonható!')) {
+                    clearAllDatabaseData();
+                    setIsOrganizerDirectoryOpen(false);
+                  }
+                }}
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-800 font-bold text-xs rounded-xl border border-rose-200"
+              >
+                <Trash2 className="w-3.5 h-3.5 text-rose-700" />
+                <span>Adatbázis Nullázása (Purgálás)</span>
+              </button>
+
               <button
                 onClick={() => setIsOrganizerDirectoryOpen(false)}
                 className="px-4 py-2 bg-stone-900 text-white font-bold text-xs rounded-xl"

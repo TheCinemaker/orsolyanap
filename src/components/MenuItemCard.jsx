@@ -71,12 +71,7 @@ export default function MenuItemCard({ item, exhibitor }) {
       </div>
 
       {/* Footer / Voting Action Button */}
-      <div className="pt-3 border-t border-stone-100 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-1 text-[11px] font-bold text-amber-900">
-          <Heart className="w-3.5 h-3.5 text-rose-700 fill-rose-700" />
-          <span>Adományos kóstolás</span>
-        </div>
-
+      <div className="pt-3 border-t border-stone-100 flex items-center justify-end gap-2">
         {/* Public Vote Button */}
         <button
           onClick={() => voteForItem(item.id)}

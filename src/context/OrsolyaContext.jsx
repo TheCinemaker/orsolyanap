@@ -330,6 +330,35 @@ export function OrsolyaProvider({ children }) {
     return newTeam;
   };
 
+  // Full Database & State Purge (Super Admin helper)
+  const clearAllDatabaseData = async () => {
+    setExhibitors([]);
+    setMenuItems([]);
+    setOrders([]);
+    setCart([]);
+    setFavoriteExhibitorIds([]);
+    setFavoriteItemIds([]);
+    setVotedItemIds([]);
+
+    localStorage.removeItem('orsolya_exhibitors');
+    localStorage.removeItem('orsolya_menu_items');
+    localStorage.removeItem('orsolya_orders');
+    localStorage.removeItem('orsolya_favorite_exhibitor_ids');
+    localStorage.removeItem('orsolya_favorite_item_ids');
+    localStorage.removeItem('orsolya_voted_item_ids');
+
+    try {
+      await supabase.from('menu_items').delete().neq('id', '0');
+      await supabase.from('exhibitors').delete().neq('id', '0');
+      await supabase.from('orders').delete().neq('id', '0');
+      await supabase.from('votes').delete().neq('id', '0');
+    } catch (e) {
+      console.warn('Supabase purge error:', e);
+    }
+
+    showToast('Az adatbázis és az összes teszt adat sikeresen kitörölve!', 'success');
+  };
+
   // Update Exhibitor PIN (Organizer / Admin helper)
   const updateExhibitorPin = async (exhibitorId, newPin) => {
     const cleanPin = newPin.trim();

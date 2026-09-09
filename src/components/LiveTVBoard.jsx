@@ -148,9 +148,6 @@ export default function LiveTVBoard() {
                         <div className="flex items-center gap-2">
                           <h4 className="text-sm font-extrabold truncate">{item.name}</h4>
                         </div>
-                        <span className="text-xs font-bold text-amber-400/90 block">
-                          Adományos kóstolás
-                        </span>
                       </div>
 
                       {/* Stock Badge */}
