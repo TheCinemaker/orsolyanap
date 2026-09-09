@@ -5,7 +5,7 @@ import FavoritesModal from './FavoritesModal';
 import QRScannerModal from './QRScannerModal';
 import MobileBottomNav from './MobileBottomNav';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { Utensils, MapPin, Store, Heart, Search, X, Info, QrCode, Calendar, Clock, Menu, ThumbsUp, Flame, CheckCircle2 } from 'lucide-react';
+import { Utensils, MapPin, Store, Heart, Search, X, Info, QrCode, Calendar, Clock, Menu, ThumbsUp, Flame, CheckCircle2, Tv } from 'lucide-react';
 import HamburgerMenuDrawer from './HamburgerMenuDrawer';
 
 export default function Header({
@@ -96,7 +96,7 @@ export default function Header({
               }`}
             >
               <Store className="w-3.5 h-3.5 text-amber-700" />
-              <span>50 Sátor Nézet</span>
+              <span>Standok</span>
             </button>
 
             <button
@@ -111,7 +111,7 @@ export default function Header({
               }`}
             >
               <Utensils className="w-3.5 h-3.5 text-amber-700" />
-              <span>200 Étel Katalógus</span>
+              <span>Ételek</span>
             </button>
 
             <button
@@ -123,7 +123,19 @@ export default function Header({
               }`}
             >
               <MapPin className="w-3.5 h-3.5 text-amber-700" />
-              <span>Diáksétány Térkép</span>
+              <span>Térkép</span>
+            </button>
+
+            <button
+              onClick={() => setActiveView('tv')}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs transition-all ${
+                activeView === 'tv'
+                  ? 'bg-white text-stone-900 shadow-sm font-bold'
+                  : 'text-stone-600 hover:text-stone-900 font-medium'
+              }`}
+            >
+              <Tv className="w-3.5 h-3.5 text-amber-700" />
+              <span>LIVE TV</span>
             </button>
 
             {/* Info Button */}
@@ -132,7 +144,7 @@ export default function Header({
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-800 hover:bg-stone-200/60 transition-all"
             >
               <Info className="w-3.5 h-3.5 text-amber-700" />
-              <span>Vásár Info</span>
+              <span>Info</span>
             </button>
           </div>
 
