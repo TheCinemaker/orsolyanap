@@ -75,26 +75,35 @@ CREATE INDEX IF NOT EXISTS idx_menu_items_category ON public.menu_items(category
 CREATE INDEX IF NOT EXISTS idx_menu_items_allergens ON public.menu_items(is_gluten_free, is_lactose_free, is_sugar_free, is_vegan);
 CREATE INDEX IF NOT EXISTS idx_exhibitors_days ON public.exhibitors(days);
 
--- 3. Row Level Security (RLS) & Public Policies
+-- 3. Row Level Security (RLS) & Public Policies (Safe Re-creation)
 ALTER TABLE public.exhibitors ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.menu_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.votes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 
--- Allow Public Read Access
+-- Drop existing policies first to prevent 42710 "already exists" errors
+DROP POLICY IF EXISTS "Public exhibitors access" ON public.exhibitors;
+DROP POLICY IF EXISTS "Public menu_items access" ON public.menu_items;
+DROP POLICY IF EXISTS "Public votes read access" ON public.votes;
+DROP POLICY IF EXISTS "Public exhibitors update" ON public.exhibitors;
+DROP POLICY IF EXISTS "Public exhibitors insert" ON public.exhibitors;
+DROP POLICY IF EXISTS "Public exhibitors delete" ON public.exhibitors;
+DROP POLICY IF EXISTS "Public menu_items update" ON public.menu_items;
+DROP POLICY IF EXISTS "Public menu_items insert" ON public.menu_items;
+DROP POLICY IF EXISTS "Public menu_items delete" ON public.menu_items;
+DROP POLICY IF EXISTS "Public votes insert" ON public.votes;
+DROP POLICY IF EXISTS "Public orders access" ON public.orders;
+
+-- Re-create Policies
 CREATE POLICY "Public exhibitors access" ON public.exhibitors FOR SELECT USING (true);
 CREATE POLICY "Public menu_items access" ON public.menu_items FOR SELECT USING (true);
 CREATE POLICY "Public votes read access" ON public.votes FOR SELECT USING (true);
-
--- Allow Public Mutations (for exhibitor admin PIN auth, new team creation & public voting)
 CREATE POLICY "Public exhibitors update" ON public.exhibitors FOR UPDATE USING (true);
 CREATE POLICY "Public exhibitors insert" ON public.exhibitors FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public exhibitors delete" ON public.exhibitors FOR DELETE USING (true);
-
 CREATE POLICY "Public menu_items update" ON public.menu_items FOR UPDATE USING (true);
 CREATE POLICY "Public menu_items insert" ON public.menu_items FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public menu_items delete" ON public.menu_items FOR DELETE USING (true);
-
 CREATE POLICY "Public votes insert" ON public.votes FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public orders access" ON public.orders FOR ALL USING (true);
 
@@ -104,14 +113,12 @@ BEGIN;
   CREATE PUBLICATION supabase_realtime FOR TABLE public.exhibitors, public.menu_items;
 COMMIT;
 
--- =====================================================================
--- SEGÍTSÉG ÉS TÖMEGES BETÖLTŐ SCRIPT ELEMEK (SUPABASE SQL EDITOR-HOZ)
--- =====================================================================
+-- 5. ADATBÁZIS TÁBLÁK FULL NULLÁZÁSA (Tiszta üres táblák létrehozása teszteléshez)
+TRUNCATE public.exhibitors, public.menu_items, public.votes, public.orders CASCADE;
 
--- 1. ADATBÁZIS FULL NULLÁZÁSA / TÖRLÉSE TESZTELÉSHEZ (Szükség esetén futtatható):
--- TRUNCATE public.exhibitors, public.menu_items, public.votes, public.orders CASCADE;
-
--- 2. MINTA TÖMEGES CSAPAT & ÉTEL FELTÖLTŐ SCRIPT (Tömeges importáláshoz):
+-- =====================================================================
+-- MINTA TÖMEGES FELTÖLTŐ SCRIPT (Későbbi tömeges adatbetöltéshez)
+-- =====================================================================
 /*
 INSERT INTO public.exhibitors (id, name, location, pin, category, offerings, days, phone, email)
 VALUES 

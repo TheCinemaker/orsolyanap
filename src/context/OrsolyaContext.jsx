@@ -16,12 +16,16 @@ export function OrsolyaProvider({ children }) {
   // State: Exhibitors, Menu Items, Orders
   const [exhibitors, setExhibitors] = useState(() => {
     const saved = localStorage.getItem('orsolya_exhibitors');
-    return saved ? JSON.parse(saved) : [];
+    if (!saved) return [];
+    const parsed = JSON.parse(saved);
+    return parsed.filter((e) => !['ex-1', 'ex-2', 'ex-3', 'ex-4', 'ex-5', 'ex-6'].includes(e.id));
   });
 
   const [menuItems, setMenuItems] = useState(() => {
     const saved = localStorage.getItem('orsolya_menu_items');
-    return saved ? JSON.parse(saved) : [];
+    if (!saved) return [];
+    const parsed = JSON.parse(saved);
+    return parsed.filter((i) => !['item-101', 'item-102', 'item-103', 'item-201', 'item-202', 'item-301', 'item-401', 'item-501', 'item-601'].includes(i.id));
   });
 
   const [orders, setOrders] = useState(() => {
