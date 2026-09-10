@@ -45,24 +45,11 @@ export default function MapView() {
         scrollWheelZoom: true
       });
 
-      // CartoDB Light Tile Layer (Apple Design Compatible Light Mode)
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        maxZoom: 20,
-        subdomains: 'abcd',
-        attribution: '&copy; OpenStreetMap &copy; CARTO'
+      // OpenStreetMap Standard Free Tiles (100% Free, NO API KEY Required)
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
       }).addTo(map);
-
-      // Draw Festival 4-Corner Polygon
-      const polygon = L.polygon(FESTIVAL_BOUNDS, {
-        color: '#b45309',
-        weight: 3,
-        fillColor: '#d97706',
-        fillOpacity: 0.18,
-        dashArray: '5, 8'
-      }).addTo(map);
-
-      // Fit map bounds smoothly
-      map.fitBounds(polygon.getBounds(), { padding: [30, 30] });
 
       leafletMapRef.current = map;
     }
