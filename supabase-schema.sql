@@ -1,16 +1,10 @@
 -- =====================================================================
 -- ORSOLYA-NAPI VÁSÁR • CIVIL ÍZEK UTCÁJA — SUPABASE DATABASE SCHEMA
--- Execute this script in your Supabase SQL Editor (https://supabase.com)
+-- Safe Schema Script: Does NOT drop tables or delete any existing data!
 -- =====================================================================
 
--- 1. Reset and Recreate Clean Tables
-DROP TABLE IF EXISTS public.orders CASCADE;
-DROP TABLE IF EXISTS public.votes CASCADE;
-DROP TABLE IF EXISTS public.menu_items CASCADE;
-DROP TABLE IF EXISTS public.exhibitors CASCADE;
-
 -- Exhibitors (Árusok & Csapatok)
-CREATE TABLE public.exhibitors (
+CREATE TABLE IF NOT EXISTS public.exhibitors (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
     location TEXT NOT NULL DEFAULT 'Diáksétány',
@@ -18,8 +12,8 @@ CREATE TABLE public.exhibitors (
     pin TEXT NOT NULL DEFAULT '1234',
     category TEXT DEFAULT 'meleg_etel',
     has_drinks BOOLEAN DEFAULT false,
-    offerings TEXT NOT NULL, -- Kötelező: Mit főznek / Kínálat
-    days TEXT DEFAULT 'both', -- 'saturday' | 'sunday' | 'both'
+    offerings TEXT NOT NULL,
+    days TEXT DEFAULT 'both',
     is_open BOOLEAN DEFAULT true,
     story TEXT,
     cause TEXT,
@@ -33,22 +27,23 @@ CREATE TABLE public.exhibitors (
 );
 
 -- Menu Items / Dishes (Ételek & Kínálat)
-CREATE TABLE public.menu_items (
+CREATE TABLE IF NOT EXISTS public.menu_items (
     id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
     exhibitor_id TEXT REFERENCES public.exhibitors(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
     description TEXT,
     initial_stock INTEGER DEFAULT 30,
     stock INTEGER DEFAULT 30,
-    status TEXT DEFAULT 'ready', -- 'ready' | 'cooking' | 'sold_out'
+    status TEXT DEFAULT 'ready',
     votes INTEGER DEFAULT 0,
-    category TEXT DEFAULT 'meleg_etel', -- 'meleg_etel' | 'hideg_etel' | 'sutemeny' | 'street_food' | 'italok' | 'egyeb'
-    available_day TEXT DEFAULT 'both', -- 'saturday' | 'sunday' | 'both'
+    category TEXT DEFAULT 'meleg_etel',
+    available_day TEXT DEFAULT 'both',
     is_gluten_free BOOLEAN DEFAULT false,
     is_lactose_free BOOLEAN DEFAULT false,
     is_sugar_free BOOLEAN DEFAULT false,
     is_vegan BOOLEAN DEFAULT false,
     tags TEXT[] DEFAULT '{}',
+    price TEXT,
     image TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -61,8 +56,8 @@ CREATE TABLE IF NOT EXISTS public.votes (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Live Reels / Stories (Élő Stand Pillanatok)
-CREATE TABLE public.reels (
+-- Live Reels / Stories (Orsolya REELS)
+CREATE TABLE IF NOT EXISTS public.reels (
     id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
     exhibitor_id TEXT REFERENCES public.exhibitors(id) ON DELETE CASCADE,
     exhibitor_name TEXT NOT NULL,
@@ -84,14 +79,14 @@ CREATE TABLE IF NOT EXISTS public.orders (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 2. Indexes for High-Speed Filtering
+-- Indexes for High-Speed Filtering
 CREATE INDEX IF NOT EXISTS idx_menu_items_exhibitor ON public.menu_items(exhibitor_id);
 CREATE INDEX IF NOT EXISTS idx_menu_items_category ON public.menu_items(category);
 CREATE INDEX IF NOT EXISTS idx_menu_items_allergens ON public.menu_items(is_gluten_free, is_lactose_free, is_sugar_free, is_vegan);
 CREATE INDEX IF NOT EXISTS idx_exhibitors_days ON public.exhibitors(days);
 CREATE INDEX IF NOT EXISTS idx_reels_exhibitor ON public.reels(exhibitor_id);
 
--- 3. Row Level Security (RLS) & Public Policies (Safe Re-creation)
+-- Enable Row Level Security
 ALTER TABLE public.exhibitors ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.menu_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.reels ENABLE ROW LEVEL SECURITY;
@@ -115,7 +110,7 @@ DROP POLICY IF EXISTS "Public reels delete" ON public.reels;
 DROP POLICY IF EXISTS "Public votes insert" ON public.votes;
 DROP POLICY IF EXISTS "Public orders access" ON public.orders;
 
--- Re-create Policies
+-- Re-create Safe Public Access Policies
 CREATE POLICY "Public exhibitors access" ON public.exhibitors FOR SELECT USING (true);
 CREATE POLICY "Public menu_items access" ON public.menu_items FOR SELECT USING (true);
 CREATE POLICY "Public reels access" ON public.reels FOR SELECT USING (true);
@@ -132,26 +127,8 @@ CREATE POLICY "Public reels delete" ON public.reels FOR DELETE USING (true);
 CREATE POLICY "Public votes insert" ON public.votes FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public orders access" ON public.orders FOR ALL USING (true);
 
--- 4. Enable Supabase Realtime Subscriptions
+-- Enable Supabase Realtime Subscriptions
 BEGIN;
   DROP PUBLICATION IF EXISTS supabase_realtime;
   CREATE PUBLICATION supabase_realtime FOR TABLE public.exhibitors, public.menu_items, public.reels;
 COMMIT;
-
--- 5. ADATBÁZIS TÁBLÁK FULL NULLÁZÁSA (Tiszta üres táblák létrehozása teszteléshez)
-TRUNCATE public.exhibitors, public.menu_items, public.reels, public.votes, public.orders CASCADE;
-
--- =====================================================================
--- MINTA TÖMEGES FELTÖLTŐ SCRIPT (Későbbi tömeges adatbetöltéshez)
--- =====================================================================
-/*
-INSERT INTO public.exhibitors (id, name, location, pin, category, offerings, days, phone, email)
-VALUES 
-  ('ex-101', 'Minta Csapat 1', 'Diáksétány 1.', '1234', 'meleg_etel', 'Bográcsos marhapörkölt', 'both', '+36 30 111 2233'),
-  ('ex-102', 'Minta Csapat 2', 'Diáksétány 2.', '5678', 'sutemeny', 'Házi rétesek', 'saturday', '+36 30 222 3344');
-
-INSERT INTO public.menu_items (exhibitor_id, name, description, category, available_day, is_gluten_free, is_lactose_free)
-VALUES
-  ('ex-101', 'Bográcsos Marhapörkölt', 'Friss marhapörkölt házi tarhonyával', 'meleg_etel', 'both', false, true),
-  ('ex-102', 'Gluténmentes Meggyes Rétes', 'Kézzel nyújtott mentes rétes', 'sutemeny', 'saturday', true, true);
-*/

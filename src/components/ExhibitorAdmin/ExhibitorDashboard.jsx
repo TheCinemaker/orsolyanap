@@ -24,7 +24,9 @@ import {
   WheatOff,
   MilkOff,
   Sparkles,
-  Leaf
+  Leaf,
+  CupSoda,
+  Tag
 } from 'lucide-react';
 import ExhibitorQRCard from '../ExhibitorQRCard';
 
@@ -115,6 +117,7 @@ export default function ExhibitorDashboard() {
     name: '',
     description: '',
     category: 'meleg_etel',
+    price: '',
     tags: 'Meleg étel',
     available_day: 'both',
     is_gluten_free: false,
@@ -153,7 +156,7 @@ export default function ExhibitorDashboard() {
     e.preventDefault();
     const tagArray = dishForm.tags
       ? dishForm.tags.split(',').map((t) => t.trim())
-      : ['Helyi Recept'];
+      : [dishForm.category === 'italok' ? 'Ital' : 'Helyi Recept'];
 
     saveMenuItem({
       ...dishForm,
@@ -171,6 +174,7 @@ export default function ExhibitorDashboard() {
       name: dish.name || '',
       description: dish.description || '',
       category: dish.category || 'meleg_etel',
+      price: dish.price || '',
       tags: dish.tags ? dish.tags.join(', ') : '',
       available_day: dish.available_day || 'both',
       is_gluten_free: !!dish.is_gluten_free,
@@ -182,13 +186,14 @@ export default function ExhibitorDashboard() {
     setIsDishModalOpen(true);
   };
 
-  const openNewDishModal = () => {
+  const openNewDishModal = (defaultCategory = 'meleg_etel') => {
     setEditingDish(null);
     setDishForm({
       name: '',
       description: '',
-      category: 'meleg_etel',
-      tags: 'Meleg étel',
+      category: defaultCategory,
+      price: '',
+      tags: defaultCategory === 'italok' ? 'Ital, Frissítő' : 'Meleg étel',
       available_day: 'both',
       is_gluten_free: false,
       is_lactose_free: false,
@@ -226,11 +231,18 @@ export default function ExhibitorDashboard() {
 
         <div className="flex items-center gap-2 flex-wrap">
           <button
-            onClick={openNewDishModal}
+            onClick={() => openNewDishModal('meleg_etel')}
             className="flex items-center gap-1.5 px-3.5 py-2.5 bg-amber-800 hover:bg-amber-700 text-white font-extrabold text-xs rounded-md shadow-xs transition-all"
           >
             <PlusCircle className="w-4 h-4" />
-            <span>+ Étel Hozzáadása</span>
+            <span>+ Új Étel</span>
+          </button>
+          <button
+            onClick={() => openNewDishModal('italok')}
+            className="flex items-center gap-1.5 px-3.5 py-2.5 bg-cyan-800 hover:bg-cyan-700 text-white font-extrabold text-xs rounded-md shadow-xs transition-all"
+          >
+            <CupSoda className="w-4 h-4" />
+            <span>+ Új Ital</span>
           </button>
 
           <button
@@ -457,30 +469,49 @@ export default function ExhibitorDashboard() {
 
       {/* Dishes List & Stock Counter */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <h3 className="text-base font-extrabold text-stone-900 flex items-center gap-2">
             <Flame className="w-4 h-4 text-amber-700" />
-            <span>Főzött Ételeid ({exhibitorItems.length})</span>
+            <span>Stand Kínálata: Ételek & Italok ({exhibitorItems.length})</span>
           </h3>
 
-          <button
-            onClick={openNewDishModal}
-            className="text-xs font-bold text-amber-800 hover:underline flex items-center gap-1"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Új étel hozzáadása</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => openNewDishModal('meleg_etel')}
+              className="text-xs font-bold bg-amber-100 hover:bg-amber-200 text-amber-900 px-3 py-1.5 rounded-md border border-amber-300 flex items-center gap-1 transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>+ Új Étel</span>
+            </button>
+            <button
+              onClick={() => openNewDishModal('italok')}
+              className="text-xs font-bold bg-cyan-100 hover:bg-cyan-200 text-cyan-900 px-3 py-1.5 rounded-md border border-cyan-300 flex items-center gap-1 transition-colors"
+            >
+              <CupSoda className="w-3.5 h-3.5 text-cyan-800" />
+              <span>+ Új Ital</span>
+            </button>
+          </div>
         </div>
 
         {exhibitorItems.length === 0 ? (
-          <div className="bg-white border border-stone-200 rounded-md p-8 text-center text-stone-500">
-            <p className="text-xs font-medium">Még nem vettél fel ételt a standodhoz.</p>
-            <button
-              onClick={openNewDishModal}
-              className="mt-3 px-4 py-2 bg-amber-800 text-white font-bold text-xs rounded-md"
-            >
-              + Új étel hozzáadása
-            </button>
+          <div className="bg-white border border-stone-200 rounded-md p-8 text-center text-stone-500 space-y-3">
+            <p className="text-xs font-medium">Még nem vettél fel ételt vagy italt a standodhoz.</p>
+            <div className="flex items-center justify-center gap-3">
+              <button
+                onClick={() => openNewDishModal('meleg_etel')}
+                className="px-4 py-2 bg-amber-800 text-white font-bold text-xs rounded-md shadow-xs flex items-center gap-1.5"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>+ Új Étel Hozzáadása</span>
+              </button>
+              <button
+                onClick={() => openNewDishModal('italok')}
+                className="px-4 py-2 bg-cyan-800 text-white font-bold text-xs rounded-md shadow-xs flex items-center gap-1.5"
+              >
+                <CupSoda className="w-3.5 h-3.5" />
+                <span>+ Új Ital Hozzáadása</span>
+              </button>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -493,9 +524,33 @@ export default function ExhibitorDashboard() {
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <div className="flex items-center gap-1.5 flex-wrap mb-1">
+                        {item.category === 'italok' ? (
+                          <span className="text-[10px] font-black text-cyan-900 bg-cyan-100 px-2 py-0.5 rounded-md border border-cyan-300 flex items-center gap-1">
+                            <CupSoda className="w-3 h-3 text-cyan-700" />
+                            ITAL
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-md border border-amber-200">
+                            {item.category === 'sutemeny' ? 'SÜTEMÉNY' : item.category === 'hideg_etel' ? 'HIDEG ÉTEL' : item.category === 'street_food' ? 'STREET FOOD' : 'MELEG ÉTEL'}
+                          </span>
+                        )}
+
                         <span className="text-[10px] font-bold text-stone-500 bg-stone-100 px-2 py-0.5 rounded-md">
                           {item.available_day === 'saturday' ? 'Szombat' : item.available_day === 'sunday' ? 'Vasárnap' : 'Mindkét nap'}
                         </span>
+
+                        {/* Price Badge in Admin */}
+                        {(item.price || item.category === 'italok') && (
+                          <span className={`text-[10px] font-black px-2 py-0.5 rounded-md border flex items-center gap-1 ${
+                            !item.price || item.price === '0' || String(item.price).toLowerCase() === 'ingyenes'
+                              ? 'bg-emerald-100 text-emerald-950 border-emerald-300'
+                              : 'bg-amber-100 text-amber-950 border-amber-300'
+                          }`}>
+                            <Tag className="w-2.5 h-2.5 text-stone-600" />
+                            {item.price ? (!isNaN(Number(item.price)) ? `${Number(item.price).toLocaleString('hu-HU')} Ft` : item.price) : 'Ingyenes'}
+                          </span>
+                        )}
+
                         {item.is_gluten_free && (
                           <span className="text-[9px] font-extrabold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md border border-emerald-200">
                             Gluténmentes
@@ -547,33 +602,36 @@ export default function ExhibitorDashboard() {
                   {/* Status buttons */}
                   <div className="flex items-center gap-1.5 mt-3">
                     <button
-                      onClick={() => updateItemStatus(item.id, 'ready', 0)}
-                      className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all ${
+                      type="button"
+                      onClick={() => updateItemStatus(item.id, 'ready', 30)}
+                      className={`px-3 py-1.5 rounded-md text-[11px] font-extrabold transition-all border ${
                         item.status === 'ready'
-                          ? 'bg-emerald-700 text-white'
-                          : 'bg-stone-100 text-stone-600'
+                          ? 'bg-emerald-800 text-white border-emerald-800 shadow-2xs'
+                          : 'bg-stone-100 text-stone-600 border-stone-200 hover:bg-stone-200'
                       }`}
                     >
-                      Kész, kapható
+                      Kész
                     </button>
 
                     <button
-                      onClick={() => updateItemStatus(item.id, 'cooking', 15)}
-                      className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all ${
+                      type="button"
+                      onClick={() => updateItemStatus(item.id, 'cooking', 30)}
+                      className={`px-3 py-1.5 rounded-md text-[11px] font-extrabold transition-all border ${
                         item.status === 'cooking'
-                          ? 'bg-amber-800 text-white'
-                          : 'bg-stone-100 text-stone-600'
+                          ? 'bg-amber-800 text-white border-amber-800 shadow-2xs'
+                          : 'bg-stone-100 text-stone-600 border-stone-200 hover:bg-stone-200'
                       }`}
                     >
-                      Főzés alatt
+                      Fő az étel
                     </button>
 
                     <button
+                      type="button"
                       onClick={() => updateItemStatus(item.id, 'sold_out', 0)}
-                      className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all ${
-                        item.status === 'sold_out' || item.stock === 0
-                          ? 'bg-rose-700 text-white'
-                          : 'bg-stone-100 text-stone-600'
+                      className={`px-3 py-1.5 rounded-md text-[11px] font-extrabold transition-all border ${
+                        item.status === 'sold_out'
+                          ? 'bg-rose-700 text-white border-rose-700 shadow-2xs'
+                          : 'bg-stone-100 text-stone-600 border-stone-200 hover:bg-stone-200'
                       }`}
                     >
                       Elfogyott
@@ -790,70 +848,93 @@ export default function ExhibitorDashboard() {
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="text-lg font-extrabold text-stone-900">
-              {editingDish ? 'Étel Szerkesztése' : 'Új Étel Hozzáadása'}
+            <h3 className="text-lg font-extrabold text-stone-900 flex items-center gap-2">
+              {dishForm.category === 'italok' ? (
+                <CupSoda className="w-5 h-5 text-cyan-700" />
+              ) : (
+                <Flame className="w-5 h-5 text-amber-700" />
+              )}
+              <span>
+                {editingDish
+                  ? dishForm.category === 'italok' ? 'Ital Szerkesztése' : 'Étel Szerkesztése'
+                  : dishForm.category === 'italok' ? 'Új Ital Hozzáadása' : 'Új Étel Hozzáadása'}
+              </span>
             </h3>
 
             <form onSubmit={handleDishSave} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
-                  Étel Megnevezése *
+                  {dishForm.category === 'italok' ? 'Ital Megnevezése *' : 'Étel Megnevezése *'}
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="Pl. Bográcsos Marhapörkölt"
+                  placeholder={dishForm.category === 'italok' ? 'Pl. Házi Almalé / Kőszegi Forralt Bor' : 'Pl. Bográcsos Marhapörkölt'}
                   value={dishForm.name}
                   onChange={(e) => setDishForm({ ...dishForm, name: e.target.value })}
-                  className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                  className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40 font-bold"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
-                  Leírás & Összetevők
+                  {dishForm.category === 'italok' ? 'Leírás / Kiszerelés (opcionális)' : 'Leírás & Összetevők'}
                 </label>
                 <textarea
                   rows={2}
-                  placeholder="Pl. Szabad tűzön főzött marhapörkölt házi tarhonyával..."
+                  placeholder={dishForm.category === 'italok' ? 'Pl. 3 dl frissen préselt almalé...' : 'Pl. Szabad tűzön főzött marhapörkölt házi tarhonyával...'}
                   value={dishForm.description}
                   onChange={(e) => setDishForm({ ...dishForm, description: e.target.value })}
                   className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
                 />
               </div>
 
-              <div className="grid grid-cols-1 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
-                    Elérhetőség Napja
+                    Kategória *
                   </label>
                   <select
-                    value={dishForm.available_day}
-                    onChange={(e) => setDishForm({ ...dishForm, available_day: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 font-bold focus:outline-none cursor-pointer"
+                    value={dishForm.category}
+                    onChange={(e) => setDishForm({ ...dishForm, category: e.target.value })}
+                    className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 font-bold focus:outline-none focus:ring-2 focus:ring-amber-500/40 cursor-pointer"
                   >
-                    <option value="both">Mindkét nap</option>
-                    <option value="saturday">Szombat</option>
-                    <option value="sunday">Vasárnap</option>
+                    <option value="italok">🥤 Italok (Alkoholos / Mentes)</option>
+                    <option value="meleg_etel">🍲 Meleg ételek</option>
+                    <option value="hideg_etel">🥗 Hideg ételek</option>
+                    <option value="sutemeny">🍰 Sütemény / Édesség</option>
+                    <option value="street_food">🍔 Street Food</option>
+                    <option value="egyeb">📦 Egyéb</option>
                   </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1 flex items-center justify-between">
+                    <span>Ár (Ft)</span>
+                    <span className="normal-case font-medium text-emerald-700 text-[10px]">Opcionális (ha üres: Ingyenes)</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Pl. 500 (üres = Ingyenes)"
+                    value={dishForm.price}
+                    onChange={(e) => setDishForm({ ...dishForm, price: e.target.value })}
+                    className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 font-bold focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                  />
                 </div>
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
-                  Étel Kategóriája
+                  Elérhetőség Napja
                 </label>
                 <select
-                  value={dishForm.category}
-                  onChange={(e) => setDishForm({ ...dishForm, category: e.target.value })}
-                  className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 font-bold focus:outline-none focus:ring-2 focus:ring-amber-500/40 cursor-pointer"
+                  value={dishForm.available_day}
+                  onChange={(e) => setDishForm({ ...dishForm, available_day: e.target.value })}
+                  className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 font-bold focus:outline-none cursor-pointer"
                 >
-                  <option value="meleg_etel">Meleg ételek</option>
-                  <option value="hideg_etel">Hideg ételek</option>
-                  <option value="sutemeny">Sütemény</option>
-                  <option value="street_food">Street Food</option>
-                  <option value="italok">Italok</option>
-                  <option value="egyeb">Egyéb</option>
+                  <option value="both">Mindkét nap</option>
+                  <option value="saturday">Szombat</option>
+                  <option value="sunday">Vasárnap</option>
                 </select>
               </div>
 
@@ -938,9 +1019,13 @@ export default function ExhibitorDashboard() {
 
               <button
                 type="submit"
-                className="w-full py-3 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-md shadow-xs mt-2"
+                className={`w-full py-3 font-extrabold text-xs rounded-md shadow-xs mt-2 text-white transition-colors ${
+                  dishForm.category === 'italok'
+                    ? 'bg-cyan-800 hover:bg-cyan-700'
+                    : 'bg-amber-800 hover:bg-amber-700'
+                }`}
               >
-                Étel Mentése
+                {dishForm.category === 'italok' ? 'Ital Mentése' : 'Étel Mentése'}
               </button>
             </form>
           </div>

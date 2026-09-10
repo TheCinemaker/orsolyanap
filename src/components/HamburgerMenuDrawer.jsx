@@ -6,7 +6,6 @@ import {
   Store,
   Utensils,
   MapPin,
-  Tv,
   Heart,
   Info,
   ChevronRight,

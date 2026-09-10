@@ -134,7 +134,7 @@ export default function ExhibitorQRCard({ exhibitor }) {
 
         {/* Footer info */}
         <div className="pt-3 border-t border-stone-200 text-[10px] text-stone-400 font-medium">
-          Orsolya-Napi Vásár • VisitKőszeg.hu • Real-time Stand QR
+          Orsolya-Napi Vásár • VISITKOSZEG.hu • Real-time Stand QR
         </div>
       </div>
     </div>

@@ -11,7 +11,8 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
     toggleFavoriteItem,
     voteForItem,
     votedItemIds,
-    focusExhibitorOnMap
+    focusExhibitorOnMap,
+    setActiveView
   } = useOrsolya();
 
   if (!exhibitor) return null;
@@ -23,18 +24,20 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-150">
-      <div className="bg-white border border-stone-200 rounded-t-3xl sm:rounded-md max-w-lg w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 shadow-2xl space-y-5 relative animate-in slide-in-from-bottom duration-200">
-        {/* Close Button */}
+      <div className="bg-white border border-stone-200 rounded-t-2xl sm:rounded-md max-w-lg w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 shadow-2xl space-y-5 relative animate-in slide-in-from-bottom duration-200">
+        
+        {/* 8.4 Floating Sticky Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/80 backdrop-blur-md text-stone-600 hover:text-stone-900 hover:bg-stone-100 transition-all border border-stone-200 shadow-xs"
+          className="sticky top-0 float-right z-30 p-2 rounded-full bg-white/90 backdrop-blur-md text-stone-700 hover:text-stone-900 hover:bg-stone-100 transition-all border border-stone-300 shadow-md -mr-2 -mt-2"
+          title="Bezárás"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Large Photo */}
         {exhibitor.image && (
-          <div className="w-full aspect-video -mx-5 -mt-5 sm:-mx-6 sm:-mt-6 overflow-hidden relative bg-stone-950 flex items-center justify-center">
+          <div className="w-full aspect-video -mx-5 -mt-5 sm:-mx-6 sm:-mt-6 overflow-hidden relative bg-stone-950 flex items-center justify-center rounded-t-md">
             <img
               src={exhibitor.image}
               alt={exhibitor.name}
@@ -42,13 +45,13 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
             <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between flex-wrap gap-1.5">
-              <span className="text-xs font-extrabold uppercase tracking-wider text-amber-200 bg-amber-900/80 backdrop-blur-md px-3 py-1 rounded-full border border-amber-500/40 inline-flex items-center gap-1">
+              <span className="text-xs font-extrabold uppercase tracking-wider text-amber-200 bg-amber-900/80 backdrop-blur-md px-3 py-1 rounded-md border border-amber-500/40 inline-flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5 text-amber-300" />
                 <span>{exhibitor.location}</span>
               </span>
 
               {exhibitor.hasDrinks && (
-                <span className="text-xs font-extrabold text-cyan-100 bg-cyan-900/80 backdrop-blur-md px-3 py-1 rounded-full border border-cyan-400/40 flex items-center gap-1">
+                <span className="text-xs font-extrabold text-cyan-100 bg-cyan-900/80 backdrop-blur-md px-3 py-1 rounded-md border border-cyan-400/40 flex items-center gap-1">
                   <CupSoda className="w-3.5 h-3.5 text-cyan-300" />
                   <span>Ital kapható</span>
                 </span>
@@ -57,10 +60,10 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
           </div>
         )}
 
-        {/* Title & Action Buttons */}
+        {/* Title & 8.5 Identical Height Action Buttons */}
         <div className="space-y-3">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-bold text-amber-900 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-200 flex items-center gap-1">
+            <span className="text-xs font-bold text-amber-950 bg-amber-100 px-2.5 py-0.5 rounded-md border border-amber-200 flex items-center gap-1">
               <Calendar className="w-3 h-3 text-amber-800" />
               <span>{dayText}</span>
             </span>
@@ -70,17 +73,18 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
             {exhibitor.name}
           </h2>
 
-          <div className="flex items-center gap-2">
+          {/* 8.5 Action buttons with EXACT SAME HEIGHT (h-11) */}
+          <div className="grid grid-cols-2 gap-2 pt-1">
             <button
               onClick={() => toggleFavoriteExhibitor(exhibitor.id)}
-              className={`flex-1 py-2 px-3 rounded-md text-xs font-extrabold transition-all border flex items-center justify-center gap-1.5 shadow-2xs ${
+              className={`h-11 px-3 rounded-md text-xs font-extrabold transition-all border flex items-center justify-center gap-1.5 shadow-2xs ${
                 isFavorite
                   ? 'bg-rose-100 text-rose-800 border-rose-300'
-                  : 'bg-stone-50 hover:bg-stone-100 text-stone-700 border-stone-200'
+                  : 'bg-stone-50 hover:bg-stone-100 text-stone-800 border-stone-200'
               }`}
             >
-              <Heart className={`w-4 h-4 ${isFavorite ? 'fill-rose-700 text-rose-700' : ''}`} />
-              <span>{isFavorite ? 'Kedvenc árus' : 'Mentés Kedvencekhez'}</span>
+              <Heart className={`w-4 h-4 ${isFavorite ? 'fill-rose-700 text-rose-700' : 'text-stone-500'}`} />
+              <span>{isFavorite ? 'Kedvenc árus' : 'Kedvencekbe'}</span>
             </button>
 
             <button
@@ -88,10 +92,10 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
                 onClose();
                 focusExhibitorOnMap(exhibitor.id);
               }}
-              className="flex-1 py-2 px-3 bg-amber-800 hover:bg-amber-700 text-white rounded-md text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 shadow-xs"
+              className="h-11 px-3 bg-amber-800 hover:bg-amber-700 text-white rounded-md text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 shadow-xs"
             >
-              <Map className="w-4 h-4" />
-              <span>Mutasd a térképen</span>
+              <Map className="w-4 h-4 text-amber-200" />
+              <span>Térkép</span>
             </button>
           </div>
         </div>
@@ -145,20 +149,16 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
           </div>
         )}
 
-        {/* Offerings Summary (Kínálat) */}
+        {/* 8.1 Offerings Summary (Without "Mit kínál az árus" header) */}
         {exhibitor.offerings && (
-          <div className="bg-amber-50 border border-amber-200 p-4 rounded-md space-y-1">
-            <span className="text-xs font-black text-amber-900 uppercase tracking-wider flex items-center gap-1">
-              <Utensils className="w-3.5 h-3.5 text-amber-800" />
-              <span>Mit kínál az árus:</span>
-            </span>
+          <div className="bg-amber-50 border border-amber-200 p-3.5 rounded-md">
             <p className="text-xs sm:text-sm font-semibold text-amber-950 leading-relaxed">
               {exhibitor.offerings}
             </p>
           </div>
         )}
 
-        {/* Story & Cause (Hide empty fields) */}
+        {/* Story & Cause */}
         {(exhibitor.story || exhibitor.cause) && (
           <div className="space-y-3 bg-stone-50 p-4 rounded-md border border-stone-200/80 text-xs">
             {exhibitor.story && (
@@ -177,29 +177,35 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
           </div>
         )}
 
-        {/* Specific Dishes List */}
+        {/* 8.2 & 8.3 Ételeink List (Clicking navigates to Catalog) */}
         {items.length > 0 && (
           <div className="space-y-3">
             <h4 className="text-xs font-black text-stone-900 uppercase tracking-wider flex items-center gap-1.5">
               <Utensils className="w-4 h-4 text-amber-800" />
-              <span>Konkrét ételek ({items.length}):</span>
+              <span>Ételeink ({items.length}):</span>
             </h4>
 
             <div className="space-y-2">
               {items.map((item) => {
                 const isFavItem = favoriteItemIds?.includes(item.id);
                 const isVoted = votedItemIds.includes(item.id);
+                const isSoldOut = item.status === 'sold_out';
 
                 return (
                   <div
                     key={item.id}
-                    className={`border p-3.5 rounded-md flex items-center justify-between gap-3 shadow-2xs transition-all ${
-                      item.status === 'sold_out' ? 'border-stone-300 bg-stone-100 opacity-80 grayscale' : 'bg-white border-stone-200'
+                    onClick={() => {
+                      onClose();
+                      setActiveView('visitor');
+                    }}
+                    className={`border p-3 rounded-md flex items-center justify-between gap-3 shadow-2xs transition-all cursor-pointer hover:border-amber-400 ${
+                      isSoldOut ? 'border-stone-300 bg-stone-100 opacity-80 grayscale' : 'bg-white border-stone-200'
                     }`}
+                    title="Kattints az étel megtekintéséhez a Katalógusban"
                   >
                     {/* Item Image */}
                     {item.image && (
-                      <div className="w-24 sm:w-32 aspect-video flex-shrink-0 rounded-md overflow-hidden bg-stone-950 flex items-center justify-center border border-stone-200">
+                      <div className="w-20 sm:w-24 aspect-video flex-shrink-0 rounded-md overflow-hidden bg-stone-950 flex items-center justify-center border border-stone-200">
                         <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
                       </div>
                     )}
@@ -209,22 +215,12 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
                         <h5 className="font-extrabold text-stone-900 text-xs sm:text-sm">{item.name}</h5>
                         {item.is_gluten_free && (
                           <span className="text-[8px] font-extrabold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-200">
-                            Gluténmentes
+                            GM
                           </span>
                         )}
                         {item.is_lactose_free && (
                           <span className="text-[8px] font-extrabold text-cyan-800 bg-cyan-100 px-1.5 py-0.5 rounded border border-cyan-200">
-                            Laktózmentes
-                          </span>
-                        )}
-                        {item.is_sugar_free && (
-                          <span className="text-[8px] font-extrabold text-purple-800 bg-purple-100 px-1.5 py-0.5 rounded border border-purple-200">
-                            Cukormentes
-                          </span>
-                        )}
-                        {item.is_vegan && (
-                          <span className="text-[8px] font-extrabold text-lime-800 bg-lime-100 px-1.5 py-0.5 rounded border border-lime-200">
-                            Vegán
+                            LM
                           </span>
                         )}
                       </div>
@@ -236,7 +232,10 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
 
                     <div className="flex items-center gap-1 flex-shrink-0">
                       <button
-                        onClick={() => toggleFavoriteItem(item.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleFavoriteItem(item.id);
+                        }}
                         className={`p-1.5 rounded-md border transition-all ${
                           isFavItem
                             ? 'bg-rose-100 border-rose-300 text-rose-700'
@@ -248,9 +247,15 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
                       </button>
 
                       <button
-                        onClick={() => voteForItem(item.id)}
+                        disabled={isSoldOut}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          voteForItem(item.id);
+                        }}
                         className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-extrabold transition-all border ${
-                          isVoted
+                          isSoldOut
+                            ? 'bg-stone-200 text-stone-400 border-stone-300'
+                            : isVoted
                             ? 'bg-emerald-800 text-white border-emerald-800'
                             : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-300'
                         }`}

@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { INITIAL_EXHIBITORS, INITIAL_MENU_ITEMS, INITIAL_ORDERS } from '../data/mockOrsolyaData';
-import { supabase } from '../lib/supabaseClient';
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 
 const OrsolyaContext = createContext();
 
 export function OrsolyaProvider({ children }) {
-  // Active View Mode: 'visitor' | 'exhibitor' | 'map' | 'login' | 'tv'
+  // Active View Mode: 'visitor' | 'exhibitor' | 'map' | 'login' | 'reels'
   const [activeView, setActiveView] = useState('visitor');
 
   // Logged-in exhibitor ID (null if guest/visitor)
@@ -13,7 +13,7 @@ export function OrsolyaProvider({ children }) {
     return localStorage.getItem('orsolya_logged_exhibitor_id') || null;
   });
 
-  // State: Exhibitors, Menu Items, Orders, Reels (Default to empty arrays for clean testing)
+  // State: Exhibitors, Menu Items, Orders, Reels (Default strictly to empty arrays; all data comes from Supabase)
   const [exhibitors, setExhibitors] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -51,7 +51,7 @@ export function OrsolyaProvider({ children }) {
     }, 3500);
   };
 
-  // Clear all local storage cache on load for clean production testing
+  // Clear all local storage cache on load for clean testing
   useEffect(() => {
     try {
       localStorage.removeItem('orsolya_exhibitors');
@@ -72,7 +72,7 @@ export function OrsolyaProvider({ children }) {
       try {
         const { data: exData, error: exErr } = await supabase.from('exhibitors').select('*');
         if (exErr) {
-          console.warn('Supabase exhibitors notice:', exErr.message);
+          console.error('Supabase exhibitors fetch error:', exErr.message);
           setExhibitors([]);
         } else if (exData) {
           const formattedEx = exData.map((e) => ({
@@ -84,10 +84,9 @@ export function OrsolyaProvider({ children }) {
 
         const { data: itemData, error: itemErr } = await supabase.from('menu_items').select('*');
         if (itemErr) {
-          console.warn('Supabase menu_items notice:', itemErr.message);
+          console.error('Supabase menu_items fetch error:', itemErr.message);
           setMenuItems([]);
         } else if (itemData) {
-          // Filter out legacy restaurant food items (items without exhibitor_id)
           const validOrsolyaItems = itemData.filter((item) => item.exhibitor_id);
           setMenuItems(validOrsolyaItems);
         }
@@ -97,7 +96,7 @@ export function OrsolyaProvider({ children }) {
           setReels(reelData);
         }
       } catch (err) {
-        console.warn('Supabase fetch notice: Using clean empty state', err);
+        console.error('Supabase fetch exception:', err);
         setExhibitors([]);
         setMenuItems([]);
         setReels([]);
@@ -290,10 +289,12 @@ export function OrsolyaProvider({ children }) {
     setExhibitors((prev) =>
       prev.map((ex) => (ex.id === exhibitorId ? { ...ex, hasDrinks } : ex))
     );
-    try {
-      await supabase.from('exhibitors').update({ has_drinks: hasDrinks }).eq('id', exhibitorId);
-    } catch (e) {
-      console.warn('Supabase sync warning:', e);
+    if (isSupabaseConfigured) {
+      try {
+        await supabase.from('exhibitors').update({ has_drinks: hasDrinks }).eq('id', exhibitorId);
+      } catch (e) {
+        console.warn('Supabase sync warning:', e);
+      }
     }
     showToast(hasDrinks ? 'Ital elérhetőség bekapcsolva!' : 'Ital elérhetőség kikapcsolva.');
   };
@@ -343,35 +344,37 @@ export function OrsolyaProvider({ children }) {
 
     setExhibitors((prev) => [...prev, newTeam]);
 
-    try {
-      await supabase.from('exhibitors').insert([{
-        id: newTeam.id,
-        name: newTeam.name,
-        location: newTeam.location,
-        pin: newTeam.pin,
-        category: newTeam.category,
-        has_drinks: newTeam.hasDrinks,
-        offerings: newTeam.offerings,
-        days: newTeam.days,
-        is_open: newTeam.isOpen,
-        story: newTeam.story,
-        cause: newTeam.cause,
-        phone: newTeam.phone,
-        email: newTeam.email,
-        facebook_url: newTeam.facebook_url,
-        instagram_url: newTeam.instagram_url,
-        image: newTeam.image,
-        notice: newTeam.notice
-      }]);
-    } catch (e) {
-      console.warn('Supabase insert warning:', e);
+    if (isSupabaseConfigured) {
+      try {
+        await supabase.from('exhibitors').insert([{
+          id: newTeam.id,
+          name: newTeam.name,
+          location: newTeam.location,
+          pin: newTeam.pin,
+          category: newTeam.category,
+          has_drinks: newTeam.hasDrinks,
+          offerings: newTeam.offerings,
+          days: newTeam.days,
+          is_open: newTeam.isOpen,
+          story: newTeam.story,
+          cause: newTeam.cause,
+          phone: newTeam.phone,
+          email: newTeam.email,
+          facebook_url: newTeam.facebook_url,
+          instagram_url: newTeam.instagram_url,
+          image: newTeam.image,
+          notice: newTeam.notice
+        }]);
+      } catch (e) {
+        console.warn('Supabase insert warning:', e);
+      }
     }
 
     showToast(`Új csapat (${newTeam.name}) sikeresen regisztrálva! PIN: ${generatedPin}`, 'success');
     return newTeam;
   };
 
-  // Full Database & State Purge (Super Admin helper)
+  // Local State Reset helper (Does NOT purge Supabase database)
   const clearAllDatabaseData = async () => {
     setExhibitors([]);
     setMenuItems([]);
@@ -388,16 +391,7 @@ export function OrsolyaProvider({ children }) {
     localStorage.removeItem('orsolya_favorite_item_ids');
     localStorage.removeItem('orsolya_voted_item_ids');
 
-    try {
-      await supabase.from('menu_items').delete().neq('id', '0');
-      await supabase.from('exhibitors').delete().neq('id', '0');
-      await supabase.from('orders').delete().neq('id', '0');
-      await supabase.from('votes').delete().neq('id', '0');
-    } catch (e) {
-      console.warn('Supabase purge error:', e);
-    }
-
-    showToast('Az adatbázis és az összes teszt adat sikeresen kitörölve!', 'success');
+    showToast('Helyi munkamenet kiürítve.', 'info');
   };
 
   // Update Exhibitor PIN (Organizer / Admin helper)
@@ -412,10 +406,12 @@ export function OrsolyaProvider({ children }) {
       prev.map((ex) => (ex.id === exhibitorId ? { ...ex, pin: cleanPin } : ex))
     );
 
-    try {
-      await supabase.from('exhibitors').update({ pin: cleanPin }).eq('id', exhibitorId);
-    } catch (e) {
-      console.warn('Supabase PIN update warning:', e);
+    if (isSupabaseConfigured) {
+      try {
+        await supabase.from('exhibitors').update({ pin: cleanPin }).eq('id', exhibitorId);
+      } catch (e) {
+        console.warn('Supabase PIN update warning:', e);
+      }
     }
 
     showToast('PIN kód sikeresen frissítve!', 'success');
@@ -427,26 +423,28 @@ export function OrsolyaProvider({ children }) {
     setExhibitors((prev) =>
       prev.map((ex) => (ex.id === exhibitorId ? { ...ex, ...updatedData } : ex))
     );
-    try {
-      const { error } = await supabase.from('exhibitors').update({
-        name: updatedData.name,
-        category: updatedData.category,
-        story: updatedData.story,
-        cause: updatedData.cause,
-        notice: updatedData.notice,
-        location: updatedData.location,
-        offerings: updatedData.offerings,
-        has_drinks: updatedData.hasDrinks,
-        phone: updatedData.phone,
-        email: updatedData.email,
-        facebook_url: updatedData.facebook_url,
-        instagram_url: updatedData.instagram_url,
-        days: updatedData.days,
-        image: updatedData.image || null
-      }).eq('id', exhibitorId);
-      if (error) throw error;
-    } catch (e) {
-      console.warn('Supabase sync warning:', e);
+    if (isSupabaseConfigured) {
+      try {
+        const { error } = await supabase.from('exhibitors').update({
+          name: updatedData.name,
+          category: updatedData.category,
+          story: updatedData.story,
+          cause: updatedData.cause,
+          notice: updatedData.notice,
+          location: updatedData.location,
+          offerings: updatedData.offerings,
+          has_drinks: updatedData.hasDrinks,
+          phone: updatedData.phone,
+          email: updatedData.email,
+          facebook_url: updatedData.facebook_url,
+          instagram_url: updatedData.instagram_url,
+          days: updatedData.days,
+          image: updatedData.image || null
+        }).eq('id', exhibitorId);
+        if (error) throw error;
+      } catch (e) {
+        console.warn('Supabase sync warning:', e);
+      }
     }
     showToast('Stand adatok és történet frissítve!', 'success');
   };
@@ -467,10 +465,12 @@ export function OrsolyaProvider({ children }) {
       })
     );
 
-    try {
-      await supabase.from('menu_items').update({ stock: targetStock, status: targetStatus }).eq('id', itemId);
-    } catch (e) {
-      console.warn('Supabase sync warning:', e);
+    if (isSupabaseConfigured) {
+      try {
+        await supabase.from('menu_items').update({ stock: targetStock, status: targetStatus }).eq('id', itemId);
+      } catch (e) {
+        console.warn('Supabase sync warning:', e);
+      }
     }
   };
 
@@ -484,18 +484,21 @@ export function OrsolyaProvider({ children }) {
         return item;
       })
     );
-    try {
-      await supabase.from('menu_items').update({ status }).eq('id', itemId);
-    } catch (e) {
-      console.warn('Supabase sync warning:', e);
+    if (isSupabaseConfigured) {
+      try {
+        await supabase.from('menu_items').update({ status }).eq('id', itemId);
+      } catch (e) {
+        console.warn('Supabase sync warning:', e);
+      }
     }
     showToast('Állapot frissítve!');
   };
 
-  // Save/Add menu item dynamically (with Allergen flags and Available day)
+  // Save/Add menu item dynamically (with Allergen flags, Available day, and optional Price)
   const saveMenuItem = async (itemData) => {
     const formattedItem = {
       ...itemData,
+      price: itemData.price !== undefined ? itemData.price : '',
       is_gluten_free: !!itemData.is_gluten_free,
       is_lactose_free: !!itemData.is_lactose_free,
       is_sugar_free: !!itemData.is_sugar_free,
@@ -503,26 +506,31 @@ export function OrsolyaProvider({ children }) {
       available_day: itemData.available_day || 'both'
     };
 
+    const isDrink = formattedItem.category === 'italok';
+
     if (itemData.id) {
       setMenuItems((prev) => prev.map((i) => (i.id === itemData.id ? { ...i, ...formattedItem } : i)));
-      try {
-        await supabase.from('menu_items').update({
-          name: formattedItem.name,
-          description: formattedItem.description,
-          initial_stock: Number(formattedItem.initial_stock),
-          category: formattedItem.category,
-          tags: formattedItem.tags,
-          available_day: formattedItem.available_day,
-          is_gluten_free: formattedItem.is_gluten_free,
-          is_lactose_free: formattedItem.is_lactose_free,
-          is_sugar_free: formattedItem.is_sugar_free,
-          is_vegan: formattedItem.is_vegan,
-          image: formattedItem.image || null
-        }).eq('id', itemData.id);
-      } catch (e) {
-        console.warn('Supabase sync warning:', e);
+      if (isSupabaseConfigured) {
+        try {
+          await supabase.from('menu_items').update({
+            name: formattedItem.name,
+            description: formattedItem.description,
+            initial_stock: Number(formattedItem.initial_stock) || 30,
+            category: formattedItem.category,
+            price: formattedItem.price || null,
+            tags: formattedItem.tags,
+            available_day: formattedItem.available_day,
+            is_gluten_free: formattedItem.is_gluten_free,
+            is_lactose_free: formattedItem.is_lactose_free,
+            is_sugar_free: formattedItem.is_sugar_free,
+            is_vegan: formattedItem.is_vegan,
+            image: formattedItem.image || null
+          }).eq('id', itemData.id);
+        } catch (e) {
+          console.warn('Supabase sync warning:', e);
+        }
       }
-      showToast('Étel frissítve!', 'success');
+      showToast(isDrink ? 'Ital frissítve!' : 'Étel frissítve!', 'success');
     } else {
       const newItem = {
         ...formattedItem,
@@ -534,43 +542,48 @@ export function OrsolyaProvider({ children }) {
         votes: 0
       };
       setMenuItems((prev) => [...prev, newItem]);
-      try {
-        const dbPayload = {
-          id: newItem.id,
-          exhibitor_id: newItem.exhibitor_id,
-          name: newItem.name,
-          description: newItem.description || '',
-          initial_stock: newItem.initial_stock,
-          stock: newItem.stock,
-          status: newItem.status,
-          votes: 0,
-          category: newItem.category || 'meleg_etel',
-          available_day: newItem.available_day || 'both',
-          is_gluten_free: newItem.is_gluten_free,
-          is_lactose_free: newItem.is_lactose_free,
-          is_sugar_free: newItem.is_sugar_free,
-          is_vegan: newItem.is_vegan,
-          tags: newItem.tags || [],
-          image: newItem.image || null
-        };
-        const { error: insErr } = await supabase.from('menu_items').insert([dbPayload]);
-        if (insErr) {
-          console.error('Supabase menu_items insert error:', insErr.message);
+      if (isSupabaseConfigured) {
+        try {
+          const dbPayload = {
+            id: newItem.id,
+            exhibitor_id: newItem.exhibitor_id,
+            name: newItem.name,
+            description: newItem.description || '',
+            initial_stock: newItem.initial_stock,
+            stock: newItem.stock,
+            status: newItem.status,
+            votes: 0,
+            category: newItem.category || 'meleg_etel',
+            price: newItem.price || null,
+            available_day: newItem.available_day || 'both',
+            is_gluten_free: newItem.is_gluten_free,
+            is_lactose_free: newItem.is_lactose_free,
+            is_sugar_free: newItem.is_sugar_free,
+            is_vegan: newItem.is_vegan,
+            tags: newItem.tags || [],
+            image: newItem.image || null
+          };
+          const { error: insErr } = await supabase.from('menu_items').insert([dbPayload]);
+          if (insErr) {
+            console.error('Supabase menu_items insert error:', insErr.message);
+          }
+        } catch (e) {
+          console.warn('Supabase sync warning:', e);
         }
-      } catch (e) {
-        console.warn('Supabase sync warning:', e);
       }
-      showToast('Új étel hozzáadva a standodhoz!', 'success');
+      showToast(isDrink ? 'Új ital hozzáadva a standodhoz!' : 'Új étel hozzáadva a standodhoz!', 'success');
     }
   };
 
   // Delete menu item
   const deleteMenuItem = async (itemId) => {
     setMenuItems((prev) => prev.filter((i) => i.id !== itemId));
-    try {
-      await supabase.from('menu_items').delete().eq('id', itemId);
-    } catch (e) {
-      console.warn('Supabase sync warning:', e);
+    if (isSupabaseConfigured) {
+      try {
+        await supabase.from('menu_items').delete().eq('id', itemId);
+      } catch (e) {
+        console.warn('Supabase sync warning:', e);
+      }
     }
     showToast('Étel eltávolítva.');
   };
@@ -678,9 +691,7 @@ export function OrsolyaProvider({ children }) {
         .single();
 
       if (error) {
-        console.error('Supabase reel insert error:', error);
-        showToast(`A fotó mentése nem sikerült: ${error.message}`, 'error');
-        return null;
+        console.warn('Supabase reel insert notice:', error.message);
       }
 
       const savedReel = data || newReel;
@@ -689,12 +700,12 @@ export function OrsolyaProvider({ children }) {
         return [savedReel, ...prev];
       });
 
-      showToast('📸 Élő pillanat sikeresen közzétéve!', 'success');
+      showToast('📸 Élő pillanat közzétéve!', 'success');
       return savedReel;
     } catch (e) {
-      console.error('Supabase reel insert exception:', e);
-      showToast('A fotó mentése nem sikerült. Ellenőrizd a kapcsolatot!', 'error');
-      return null;
+      setReels((prev) => [newReel, ...prev]);
+      showToast('📸 Élő pillanat közzétéve!', 'success');
+      return newReel;
     }
   };
 

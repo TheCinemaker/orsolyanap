@@ -5,7 +5,7 @@ export const FESTIVAL_BOUNDS = [
   [47.390622403025804, 16.539972560296093]
 ];
 
-// Empty Initial Data for Clean Production & Live Testing
+// Strictly Empty Initial Arrays - All Data comes strictly from Supabase
 export const INITIAL_EXHIBITORS = [];
 export const INITIAL_MENU_ITEMS = [];
 export const INITIAL_ORDERS = [];

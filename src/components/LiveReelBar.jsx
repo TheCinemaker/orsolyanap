@@ -76,11 +76,11 @@ export default function LiveReelBar() {
     return `${date.getMonth() + 1}.${date.getDate()}.`;
   };
 
-  // Only display reels from the last 1 hour on the main page bar (all reels are kept in Supabase)
-  const oneHourAgo = Date.now() - 60 * 60 * 1000;
+  // Only display reels from the last 2 hours on the main page bar (all reels are kept in Supabase)
+  const twoHoursAgo = Date.now() - 2 * 60 * 60 * 1000;
   const recentReels = reels.filter((r) => {
     const created = new Date(r.created_at).getTime();
-    return !isNaN(created) ? created >= oneHourAgo : true;
+    return !isNaN(created) ? created >= twoHoursAgo : true;
   });
 
   return (
@@ -88,41 +88,30 @@ export default function LiveReelBar() {
       {/* Section Header */}
       <div className="flex items-center justify-between px-1">
         <h3 className="text-xs font-black text-amber-950 uppercase tracking-widest flex items-center gap-1.5">
-          <Camera className="w-4 h-4 text-amber-700 animate-pulse" />
-          <span>Élő Stand Pillanatok (Friss 1 óra)</span>
+          <Camera className="w-4 h-4 text-amber-700" />
+          <span>Orsolya REELS</span>
         </h3>
-        <button
-          onClick={() => setActiveView('reels')}
-          className="text-[10px] font-black text-amber-950 bg-amber-100 hover:bg-amber-200 px-2.5 py-1 rounded-full border border-amber-300 transition-colors flex items-center gap-1 cursor-pointer"
-        >
-          <span>Összes Fotó ({reels.length})</span>
-        </button>
       </div>
 
       {/* Horizontal Story Reel Bar (Facebook / Instagram Style) */}
       <div className="flex gap-2.5 overflow-x-auto pb-2 pt-1 px-1 scrollbar-none snap-x touch-pan-x">
-        {/* ---------------------------------------------------------------- */}
         {/* CARD 1: ADD REEL BUTTON */}
-        {/* ---------------------------------------------------------------- */}
         <div
           onClick={() => {
             setNameInput(activeExhibitor ? activeExhibitor.name : '');
             setIsAddModalOpen(true);
           }}
-          className="flex-shrink-0 w-28 sm:w-32 h-44 sm:h-48 rounded-md bg-gradient-to-b from-amber-900 via-amber-950 to-stone-900 text-white relative overflow-hidden cursor-pointer group shadow-xs hover:shadow-md transition-all border-2 border-amber-600/40 snap-start flex flex-col justify-between p-2.5"
+          className="flex-shrink-0 w-28 sm:w-32 h-44 sm:h-48 rounded-md bg-gradient-to-b from-amber-900 via-amber-950 to-stone-900 text-white relative overflow-hidden cursor-pointer group shadow-xs hover:shadow-md transition-all border-2 border-amber-600/40 snap-start flex flex-col items-center justify-between p-3"
         >
-          <div className="w-9 h-9 rounded-full bg-amber-500 text-stone-950 flex items-center justify-center font-black shadow-lg group-hover:scale-110 transition-transform">
-            <Plus className="w-5 h-5 stroke-[3]" />
+          <div className="flex-1 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-amber-500 text-stone-950 flex items-center justify-center font-black shadow-lg group-hover:scale-110 transition-transform">
+              <Plus className="w-6 h-6 stroke-[3]" />
+            </div>
           </div>
 
-          <div className="space-y-0.5">
-            <span className="text-[10px] font-black uppercase tracking-wider text-amber-300 block">
-              FOTÓ POSZTOLÁSA
-            </span>
-            <p className="text-xs font-extrabold leading-tight text-white">
-              Élő Pillanat
-            </p>
-          </div>
+          <p className="text-xs font-extrabold leading-tight text-white text-center">
+            Dobj egy sztorit
+          </p>
         </div>
 
         {/* ---------------------------------------------------------------- */}

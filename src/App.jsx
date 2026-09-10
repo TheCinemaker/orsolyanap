@@ -20,19 +20,13 @@ import {
   Info,
   CheckCircle2,
   MapPin,
-  LayoutGrid,
-  List,
   Flame,
-  Heart,
   ChevronDown,
   Store,
-  Search,
-  X,
   Sparkles,
   Cake,
   Cookie,
   CupSoda,
-  Coffee,
   Package
 } from 'lucide-react';
 import './App.css';
@@ -43,21 +37,9 @@ function MainApp() {
   const [mainTab, setMainTab] = useState('tents'); // 'tents' | 'food'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedZone, setSelectedZone] = useState('all'); // 'all' | 'zone-1' | 'zone-2' | 'zone-3'
-  const [viewMode, setViewMode] = useState('compact'); // 'compact' | 'detailed'
-  const [showOnlyCooking, setShowOnlyCooking] = useState(false);
-  const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
-
+  const [selectedZone, setSelectedZone] = useState('all');
   const [selectedDetailExhibitor, setSelectedDetailExhibitor] = useState(null);
-  const [visibleCount, setVisibleCount] = useState(12); // Batch pagination for 100+ items
-
-  // Zone filters definitions
-  const zones = [
-    { id: 'all', label: 'Összes Stand (1-100)' },
-    { id: 'zone-1', label: '1-15. Várkapu' },
-    { id: 'zone-2', label: '16-30. Patakpart' },
-    { id: 'zone-3', label: '31-100. Színpad' }
-  ];
+  const [visibleCount, setVisibleCount] = useState(12);
 
   const intentCategories = [
     { id: 'all', label: 'Összes kínálat', icon: Sparkles },
@@ -74,12 +56,7 @@ function MainApp() {
 
   const filteredExhibitors = exhibitors.filter((ex) => {
     const exItems = menuItems.filter((i) => i.exhibitor_id === ex.id);
-
-    // Tolerant Drink search matching ("ital", "üdítő", "bor", "fröccs", etc.)
     const lowerQuery = searchQuery.trim().toLowerCase();
-    const isDrinkSearch = ['ital', 'üdítő', 'bor', 'sör', 'must', 'forralt bor', 'fröccs'].some((s) =>
-      lowerQuery.includes(s)
-    );
 
     const matchesSearch =
       !lowerQuery ||
@@ -87,7 +64,6 @@ function MainApp() {
       ex.location.toLowerCase().includes(lowerQuery) ||
       (ex.story && ex.story.toLowerCase().includes(lowerQuery)) ||
       (ex.offerings && ex.offerings.toLowerCase().includes(lowerQuery)) ||
-      (isDrinkSearch && ex.hasDrinks) ||
       exItems.some(
         (i) =>
           i.name.toLowerCase().includes(lowerQuery) ||
@@ -95,28 +71,13 @@ function MainApp() {
           (i.tags && i.tags.some((t) => t.toLowerCase().includes(lowerQuery)))
       );
 
-    // Category matching (visitor intent)
     const matchesCategory =
       selectedCategory === 'all' ||
       (selectedCategory === 'italok' && (ex.hasDrinks || ex.category === 'italok' || ex.category === 'ital')) ||
       ex.category === selectedCategory ||
       exItems.some((i) => i.category === selectedCategory);
 
-    // Zone matching based on stand number string
-    const standNumMatch = ex.location.match(/\d+/);
-    const standNum = standNumMatch ? parseInt(standNumMatch[0], 10) : 1;
-
-    const matchesZone =
-      selectedZone === 'all' ||
-      (selectedZone === 'zone-1' && standNum <= 15) ||
-      (selectedZone === 'zone-2' && standNum > 15 && standNum <= 30) ||
-      (selectedZone === 'zone-3' && standNum > 30);
-
-    // Filter toggles
-    const matchesCooking = !showOnlyCooking || (ex.notice && ex.notice.length > 0);
-    const matchesFavorites = !showOnlyFavorites || favoriteExhibitorIds.includes(ex.id);
-
-    return matchesSearch && matchesCategory && matchesZone && matchesCooking && matchesFavorites;
+    return matchesSearch && matchesCategory;
   });
 
   const visibleExhibitors = filteredExhibitors.slice(0, visibleCount);
@@ -175,21 +136,21 @@ function MainApp() {
                 </h1>
               </div>
 
-              {/* Chestnut Brown Centered Category Dropdown Menu (Sleek Narrow Width) */}
+              {/* Centered Category Dropdown Menu (Lower height h-10 matching search input) */}
               <div className="flex justify-center pt-1">
                 <div className="relative inline-block text-left w-full sm:w-64">
                   <button
                     onClick={() => setIsCategoryDropdownOpen((prev) => !prev)}
-                    className="w-full flex items-center justify-between gap-3 px-4 py-3 bg-white border-2 border-amber-900/80 rounded-md text-sm font-extrabold text-amber-950 shadow-xs hover:bg-amber-50/60 transition-all focus:outline-none focus:ring-2 focus:ring-amber-800 cursor-pointer"
+                    className="w-full flex items-center justify-between gap-3 px-4 py-2 bg-white border border-stone-300 rounded-md text-xs font-extrabold text-stone-900 shadow-2xs hover:bg-stone-50 transition-all focus:outline-none focus:ring-2 focus:ring-amber-500/40 cursor-pointer h-10"
                   >
-                    <div className="flex items-center gap-3 truncate">
+                    <div className="flex items-center gap-2 truncate">
                       {activeCategoryObj && (
                         <activeCategoryObj.icon className="w-4 h-4 text-amber-700 flex-shrink-0" />
                       )}
                       <span className="truncate">{activeCategoryObj?.label || 'Kategória választás'}</span>
                     </div>
                     <ChevronDown
-                      className={`w-4 h-4 text-amber-900 flex-shrink-0 transition-transform duration-200 ${
+                      className={`w-4 h-4 text-stone-600 flex-shrink-0 transition-transform duration-200 ${
                         isCategoryDropdownOpen ? 'rotate-180' : ''
                       }`}
                     />
@@ -203,7 +164,7 @@ function MainApp() {
                         className="fixed inset-0 z-30"
                         onClick={() => setIsCategoryDropdownOpen(false)}
                       />
-                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border-2 border-amber-900 rounded-md shadow-2xl z-40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 p-1.5 space-y-1">
+                      <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-stone-200 rounded-md shadow-2xl z-40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 p-1 space-y-0.5">
                         {intentCategories.map((cat) => {
                           const isSelected = selectedCategory === cat.id;
                           const IconComp = cat.icon;
@@ -215,13 +176,13 @@ function MainApp() {
                                 setSelectedCategory(cat.id);
                                 setIsCategoryDropdownOpen(false);
                               }}
-                              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-md text-xs font-black transition-all cursor-pointer ${
+                              className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-xs font-bold transition-all cursor-pointer ${
                                 isSelected
                                   ? 'bg-amber-900 text-white shadow-xs'
-                                  : 'text-stone-800 hover:bg-amber-100/60'
+                                  : 'text-stone-800 hover:bg-stone-100'
                               }`}
                             >
-                              <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-2.5">
                                 <IconComp className={`w-4 h-4 ${isSelected ? 'text-amber-200' : 'text-amber-800'}`} />
                                 <span>{cat.label}</span>
                               </div>
@@ -293,8 +254,8 @@ function MainApp() {
               </>
             )}
           </div>
-    )}
-  </main>
+        )}
+      </main>
 
       {/* Detail Modal */}
       {selectedDetailExhibitor && (
@@ -304,36 +265,41 @@ function MainApp() {
         />
       )}
 
+      {/* Floating Back To Top Button */}
+      <BackToTopButton />
+
       {/* Cart & Modals */}
       <CartDrawer />
       <MyOrdersModal />
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-stone-200/80 py-6 sm:py-8 text-xs text-stone-600 mt-8 sm:mt-12">
-        <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-          <a
-            href="https://visitkoszeg.hu"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:opacity-90 transition-opacity"
-          >
-            <VisitKoszegLogo />
-          </a>
-          <div className="flex flex-col sm:flex-row items-center gap-2">
-            <span className="font-extrabold text-amber-950 bg-amber-100/90 px-3 py-1 rounded-full border border-amber-300 uppercase text-[11px] tracking-wider shadow-2xs">
-              ⚡ POWERED BY{' '}
+      {/* Clean Footer (Item 9) */}
+      <footer className="bg-white border-t border-stone-200/80 py-4 text-xs text-stone-600 mt-6 sm:mt-8 pb-20 md:pb-6">
+        <div className="max-w-5xl mx-auto px-4 flex flex-col items-center justify-center gap-1.5 text-center leading-tight">
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <span className="font-extrabold text-amber-950 bg-amber-100/90 px-2.5 py-0.5 rounded-md border border-amber-300 uppercase text-[10px] tracking-wider">
+              POWERED BY{' '}
               <a
                 href="https://visitkoszeg.hu"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline hover:text-amber-800 transition-colors"
               >
-                VISITKOSZEG.HU
+                VISITKOSZEG
               </a>
             </span>
-            <span className="font-medium text-stone-500">
+            <span className="font-medium text-stone-500 text-[11px]">
               © 2026 • Civil Ízek Utcája • Orsolya-Napi Vásár
             </span>
+          </div>
+
+          <div className="text-[10px] text-stone-400 font-medium pt-0.5">
+            developed by:{' '}
+            <a
+              href="mailto:avar.szilveszter@gmail.com"
+              className="underline hover:text-stone-700 transition-colors"
+            >
+              SA software & Network Solutions
+            </a>
           </div>
         </div>
       </footer>

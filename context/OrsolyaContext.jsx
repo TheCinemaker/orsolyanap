@@ -466,10 +466,11 @@ export function OrsolyaProvider({ children }) {
     showToast('Állapot frissítve!');
   };
 
-  // Save/Add menu item dynamically (with Allergen flags and Available day)
+  // Save/Add menu item dynamically (with Allergen flags, Available day, and optional Price)
   const saveMenuItem = async (itemData) => {
     const formattedItem = {
       ...itemData,
+      price: itemData.price !== undefined ? itemData.price : '',
       is_gluten_free: !!itemData.is_gluten_free,
       is_lactose_free: !!itemData.is_lactose_free,
       is_sugar_free: !!itemData.is_sugar_free,
@@ -477,14 +478,17 @@ export function OrsolyaProvider({ children }) {
       available_day: itemData.available_day || 'both'
     };
 
+    const isDrink = formattedItem.category === 'italok';
+
     if (itemData.id) {
       setMenuItems((prev) => prev.map((i) => (i.id === itemData.id ? { ...i, ...formattedItem } : i)));
       try {
         await supabase.from('menu_items').update({
           name: formattedItem.name,
           description: formattedItem.description,
-          initial_stock: Number(formattedItem.initial_stock),
+          initial_stock: Number(formattedItem.initial_stock) || 30,
           category: formattedItem.category,
+          price: formattedItem.price || null,
           tags: formattedItem.tags,
           available_day: formattedItem.available_day,
           is_gluten_free: formattedItem.is_gluten_free,
@@ -495,7 +499,7 @@ export function OrsolyaProvider({ children }) {
       } catch (e) {
         console.warn('Supabase sync warning:', e);
       }
-      showToast('Étel frissítve!', 'success');
+      showToast(isDrink ? 'Ital frissítve!' : 'Étel frissítve!', 'success');
     } else {
       const newItem = {
         ...formattedItem,
@@ -518,6 +522,7 @@ export function OrsolyaProvider({ children }) {
           status: newItem.status,
           votes: 0,
           category: newItem.category || 'meleg_etel',
+          price: newItem.price || null,
           available_day: newItem.available_day || 'both',
           is_gluten_free: newItem.is_gluten_free,
           is_lactose_free: newItem.is_lactose_free,
@@ -532,7 +537,7 @@ export function OrsolyaProvider({ children }) {
       } catch (e) {
         console.warn('Supabase sync warning:', e);
       }
-      showToast('Új étel hozzáadva a standodhoz!', 'success');
+      showToast(isDrink ? 'Új ital hozzáadva a standodhoz!' : 'Új étel hozzáadva a standodhoz!', 'success');
     }
   };
 

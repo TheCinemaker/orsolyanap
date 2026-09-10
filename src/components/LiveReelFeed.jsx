@@ -33,7 +33,7 @@ export default function LiveReelFeed() {
             <span>VALÓS IDEJŰ HÍRFOLYAM & FOTÓK</span>
           </span>
           <h2 className="text-xl sm:text-2xl font-black tracking-tight">
-            📸 Élő Stand Pillanatok & Reels
+            Orsolya REELS
           </h2>
           <p className="text-xs text-amber-100/90 leading-relaxed">
             Kukkants be a rotyogó bográcsok mellé! Az árusok és csapatok valós időben posztolják a frissen kisült ételeket és fotókat.

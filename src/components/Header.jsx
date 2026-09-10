@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import VisitKoszegLogo from './VisitKoszegLogo';
 import OrsolyaInfoModal from './OrsolyaInfoModal';
 import FavoritesModal from './FavoritesModal';
 import QRScannerModal from './QRScannerModal';
 import MobileBottomNav from './MobileBottomNav';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { Utensils, MapPin, Store, Heart, Search, X, Info, QrCode, Calendar, Clock, Menu, ThumbsUp, Flame, CheckCircle2, Tv } from 'lucide-react';
+import { Utensils, MapPin, Store, Heart, Search, X, Info, Calendar, Clock, Menu, ThumbsUp } from 'lucide-react';
 import HamburgerMenuDrawer from './HamburgerMenuDrawer';
 
 export default function Header({
@@ -55,11 +55,11 @@ export default function Header({
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-stone-200/80 shadow-xs">
+      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-stone-200/80 shadow-xs">
         {/* Event Banner */}
         <div className="bg-gradient-to-r from-amber-800 via-amber-900 to-amber-950 text-amber-50 text-[10px] sm:text-[11px] font-bold px-3 py-1 flex items-center justify-between shadow-inner">
           <div className="flex items-center gap-1.5 overflow-hidden">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse flex-shrink-0" />
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />
             <span className="truncate uppercase tracking-wider font-extrabold text-amber-100">ORSOLYA-NAPI VÁSÁR – NATÚRPARK ÍZEI • CIVIL ÍZEK UTCÁJA</span>
           </div>
           <div className="hidden sm:flex items-center gap-3 opacity-90 text-[11px]">
@@ -70,14 +70,14 @@ export default function Header({
 
         {/* Main Navbar */}
         <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 flex items-center justify-between gap-2">
-          {/* Left Group: Hamburger Button & Logo */}
+          {/* Left Group: Clean Hamburger Button & Logo */}
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsHamburgerOpen(true)}
-              className="p-2 rounded-md bg-amber-100 hover:bg-amber-200 text-amber-900 transition-all border border-amber-300/80"
+              className="p-2 rounded-md bg-white hover:bg-stone-100 text-stone-900 transition-all border border-stone-300 shadow-2xs"
               title="Menü megnyitása"
             >
-              <Menu className="w-5 h-5 text-amber-900" />
+              <Menu className="w-5 h-5 text-stone-900" />
             </button>
             <VisitKoszegLogo
               onClick={() => {
@@ -135,8 +135,6 @@ export default function Header({
               <span>Térkép</span>
             </button>
 
-
-
             {/* Info Button */}
             <button
               onClick={() => setIsInfoOpen(true)}
@@ -149,7 +147,7 @@ export default function Header({
 
           {/* Right Actions (Desktop & Tablet) */}
           <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* Kedvencek (Beszkennelt Standok) Button */}
+            {/* Kedvencek Button */}
             <button
               onClick={() => setIsFavoritesOpen(true)}
               className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-semibold transition-all border border-stone-200"
@@ -161,16 +159,6 @@ export default function Header({
                   {favoriteExhibitorIds.length}
                 </span>
               )}
-            </button>
-
-            {/* QR Scan Button */}
-            <button
-              onClick={() => setIsScannerOpen(true)}
-              className="p-1.5 sm:p-2 rounded-md bg-amber-800 text-white hover:bg-amber-700 transition-all shadow-xs flex items-center gap-1.5 text-xs font-bold px-2.5 sm:px-3"
-              title="QR Kód Beolvasása"
-            >
-              <QrCode className="w-4 h-4 text-white flex-shrink-0" />
-              <span className="hidden sm:inline">QR Olvasó</span>
             </button>
 
             {/* If Logged in as Exhibitor */}
@@ -188,7 +176,7 @@ export default function Header({
 
         {/* Filter Bar & Instant Live Food Search (Visitor view) */}
         {activeView === 'visitor' && (
-          <div className="border-t border-stone-200/70 px-3 sm:px-4 py-2 bg-stone-50/80">
+          <div className="border-t border-stone-200/70 px-3 sm:px-4 py-2 bg-stone-50/80 transition-all duration-200">
             <div className="max-w-6xl mx-auto flex items-center justify-between gap-2.5">
               {/* Search Container */}
               <div className="relative w-full sm:w-96">
@@ -314,6 +302,8 @@ export default function Header({
       <MobileBottomNav
         onOpenFavorites={() => setIsFavoritesOpen(true)}
         onOpenHamburger={() => setIsHamburgerOpen(true)}
+        onOpenScanner={() => setIsScannerOpen(true)}
+        setMainTab={setMainTab}
       />
 
       {/* Modals & Drawers */}
