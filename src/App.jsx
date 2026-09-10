@@ -27,15 +27,26 @@ import {
   Cake,
   Cookie,
   CupSoda,
-  Package
+  Package,
+  Loader2
 } from 'lucide-react';
 import './App.css';
 
 function MainApp() {
-  const { activeView, exhibitors, menuItems, favoriteExhibitorIds, toastMessage } = useOrsolya();
+  const {
+    activeView,
+    exhibitors,
+    menuItems,
+    favoriteExhibitorIds,
+    toastMessage,
+    isLoadingData,
+    mainTab,
+    setMainTab,
+    searchQuery,
+    setSearchQuery,
+    navigateToFoodCatalog
+  } = useOrsolya();
 
-  const [mainTab, setMainTab] = useState('tents'); // 'tents' | 'food'
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedZone, setSelectedZone] = useState('all');
   const [selectedDetailExhibitor, setSelectedDetailExhibitor] = useState(null);
@@ -128,73 +139,11 @@ function MainApp() {
             {/* Live Facebook/Instagram Style Reels Bar */}
             <LiveReelBar />
 
-            {/* Top Title & Category Section */}
-            <div className="space-y-2">
-              <div className="text-center">
-                <h1 className="text-xs sm:text-sm font-black text-amber-950 uppercase tracking-widest">
-                  CIVIL ÍZEK UTCÁJA
-                </h1>
-              </div>
-
-              {/* Centered Category Dropdown Menu (Lower height h-10 matching search input) */}
-              <div className="flex justify-center pt-1">
-                <div className="relative inline-block text-left w-full sm:w-64">
-                  <button
-                    onClick={() => setIsCategoryDropdownOpen((prev) => !prev)}
-                    className="w-full flex items-center justify-between gap-3 px-4 py-2 bg-white border border-stone-300 rounded-md text-xs font-extrabold text-stone-900 shadow-2xs hover:bg-stone-50 transition-all focus:outline-none focus:ring-2 focus:ring-amber-500/40 cursor-pointer h-10"
-                  >
-                    <div className="flex items-center gap-2 truncate">
-                      {activeCategoryObj && (
-                        <activeCategoryObj.icon className="w-4 h-4 text-amber-700 flex-shrink-0" />
-                      )}
-                      <span className="truncate">{activeCategoryObj?.label || 'Kategória választás'}</span>
-                    </div>
-                    <ChevronDown
-                      className={`w-4 h-4 text-stone-600 flex-shrink-0 transition-transform duration-200 ${
-                        isCategoryDropdownOpen ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </button>
-
-                  {/* Popover Dropdown Menu */}
-                  {isCategoryDropdownOpen && (
-                    <>
-                      {/* Backdrop for click outside */}
-                      <div
-                        className="fixed inset-0 z-30"
-                        onClick={() => setIsCategoryDropdownOpen(false)}
-                      />
-                      <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-stone-200 rounded-md shadow-2xl z-40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150 p-1 space-y-0.5">
-                        {intentCategories.map((cat) => {
-                          const isSelected = selectedCategory === cat.id;
-                          const IconComp = cat.icon;
-
-                          return (
-                            <button
-                              key={cat.id}
-                              onClick={() => {
-                                setSelectedCategory(cat.id);
-                                setIsCategoryDropdownOpen(false);
-                              }}
-                              className={`w-full flex items-center justify-between px-3 py-2 rounded-md text-xs font-bold transition-all cursor-pointer ${
-                                isSelected
-                                  ? 'bg-amber-900 text-white shadow-xs'
-                                  : 'text-stone-800 hover:bg-stone-100'
-                              }`}
-                            >
-                              <div className="flex items-center gap-2.5">
-                                <IconComp className={`w-4 h-4 ${isSelected ? 'text-amber-200' : 'text-amber-800'}`} />
-                                <span>{cat.label}</span>
-                              </div>
-                              {isSelected && <CheckCircle2 className="w-4 h-4 text-amber-200" />}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
+            {/* Top Title Section */}
+            <div className="text-center py-1">
+              <h1 className="text-xs sm:text-sm font-black text-amber-950 uppercase tracking-widest">
+                CIVIL ÍZEK UTCÁJA
+              </h1>
             </div>
 
             {/* Main Content Area */}
@@ -216,7 +165,35 @@ function MainApp() {
                     </h2>
                   </div>
 
-                  {filteredExhibitors.length === 0 ? (
+                  {isLoadingData ? (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-center gap-2 text-xs font-extrabold text-amber-900 py-3 bg-amber-50 rounded-md border border-amber-200/80 shadow-2xs">
+                        <Loader2 className="w-4 h-4 text-amber-800 animate-spin" />
+                        <span>Adatok betöltése a Supabase adatbázisból...</span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {[1, 2, 3, 4, 5, 6].map((sk) => (
+                          <div key={sk} className="bg-white border border-stone-200 rounded-md p-4 space-y-3 animate-pulse shadow-xs">
+                            <div className="flex justify-between items-center">
+                              <div className="h-4 bg-stone-200 rounded-md w-1/3" />
+                              <div className="h-4 bg-stone-100 rounded-full w-1/4" />
+                            </div>
+                            <div className="h-6 bg-stone-300 rounded-md w-3/4" />
+                            <div className="h-4 bg-stone-200 rounded-md w-1/2" />
+                            <div className="space-y-1.5 pt-2 border-t border-stone-100">
+                              <div className="h-3 bg-stone-150 rounded-md w-full" />
+                              <div className="h-3 bg-stone-150 rounded-md w-4/5" />
+                            </div>
+                            <div className="grid grid-cols-3 gap-1.5 pt-2">
+                              <div className="h-8 bg-stone-200 rounded-md" />
+                              <div className="h-8 bg-stone-200 rounded-md" />
+                              <div className="h-8 bg-stone-200 rounded-md" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : filteredExhibitors.length === 0 ? (
                     <div className="bg-white border border-stone-200 rounded-md p-8 sm:p-12 text-center text-stone-400">
                       <Info className="w-8 h-8 mx-auto mb-2 opacity-40" />
                       <p className="text-sm font-bold text-stone-700">Nincs a keresésnek megfelelő stand.</p>
@@ -262,6 +239,10 @@ function MainApp() {
         <ExhibitorDetailModal
           exhibitor={selectedDetailExhibitor}
           onClose={() => setSelectedDetailExhibitor(null)}
+          onSelectDish={(item) => {
+            setSelectedDetailExhibitor(null);
+            navigateToFoodCatalog(item ? item.name : '');
+          }}
         />
       )}
 

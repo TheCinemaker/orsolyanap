@@ -13,6 +13,9 @@ export function OrsolyaProvider({ children }) {
     return localStorage.getItem('orsolya_logged_exhibitor_id') || null;
   });
 
+  // Loading State for Supabase Initial Fetch
+  const [isLoadingData, setIsLoadingData] = useState(true);
+
   // State: Exhibitors, Menu Items, Orders, Reels (Default strictly to empty arrays; all data comes from Supabase)
   const [exhibitors, setExhibitors] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
@@ -40,6 +43,21 @@ export function OrsolyaProvider({ children }) {
   // Global Visitor Filter States (Day & Dietary Preferences)
   const [selectedDay, setSelectedDay] = useState('all'); // 'all' | 'saturday' | 'sunday'
   const [selectedDietary, setSelectedDietary] = useState('all'); // 'all' | 'gluten_free' | 'lactose_free' | 'sugar_free' | 'vegan'
+
+  // Main tab state: 'tents' | 'food'
+  const [mainTab, setMainTab] = useState('tents');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const navigateToFoodCatalog = (query = '') => {
+    setActiveView('visitor');
+    setMainTab('food');
+    if (typeof query === 'string' && query.trim() !== '') {
+      setSearchQuery(query.trim());
+    } else if (query && query.name) {
+      setSearchQuery(query.name);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Toast message
   const [toastMessage, setToastMessage] = useState(null);
@@ -69,6 +87,7 @@ export function OrsolyaProvider({ children }) {
     let channel;
 
     const fetchSupabaseData = async () => {
+      setIsLoadingData(true);
       try {
         const { data: exData, error: exErr } = await supabase.from('exhibitors').select('*');
         if (exErr) {
@@ -100,6 +119,8 @@ export function OrsolyaProvider({ children }) {
         setExhibitors([]);
         setMenuItems([]);
         setReels([]);
+      } finally {
+        setIsLoadingData(false);
       }
     };
 
@@ -653,12 +674,36 @@ export function OrsolyaProvider({ children }) {
     showToast(`Foglalás #${orderId} frissítve!`);
   };
 
-  // File to Base64 Image Conversion Helper
+  // File to Base64 Image Conversion Helper with automatic Canvas compression (max 800px JPEG)
   const convertFileToBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
+      reader.onload = (e) => {
+        const img = new Image();
+        img.src = e.target.result;
+        img.onload = () => {
+          const maxDim = 800;
+          let w = img.width;
+          let h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', 0.82));
+        };
+        img.onerror = () => resolve(e.target.result);
+      };
       reader.onerror = (error) => reject(error);
     });
   };
@@ -733,6 +778,7 @@ export function OrsolyaProvider({ children }) {
         setActiveView,
         activeExhibitorId,
         activeExhibitor,
+        isLoadingData,
         loginExhibitor,
         logoutExhibitor,
         exhibitors,
@@ -774,6 +820,11 @@ export function OrsolyaProvider({ children }) {
         setSelectedDay,
         selectedDietary,
         setSelectedDietary,
+        mainTab,
+        setMainTab,
+        searchQuery,
+        setSearchQuery,
+        navigateToFoodCatalog,
         toastMessage,
         showToast
       }}
@@ -782,6 +833,17 @@ export function OrsolyaProvider({ children }) {
     </OrsolyaContext.Provider>
   );
 }
+
+export const formatPrice = (price) => {
+  if (price === undefined || price === null || String(price).trim() === '') {
+    return 'Adományos';
+  }
+  const pStr = String(price).trim();
+  if (pStr === '0' || pStr.toLowerCase() === 'ingyenes') return 'Ingyenes / Adományos';
+  if (!isNaN(Number(pStr))) return `${Number(pStr).toLocaleString('hu-HU')} Ft`;
+  if (pStr.toLowerCase().includes('ft')) return pStr;
+  return `${pStr} Ft`;
+};
 
 export function useOrsolya() {
   const context = useContext(OrsolyaContext);

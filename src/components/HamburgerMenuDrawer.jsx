@@ -109,7 +109,7 @@ export default function HamburgerMenuDrawer({
             >
               <div className="flex items-center gap-2.5">
                 <Utensils className="w-4 h-4" />
-                <span>Ételek</span>
+                <span>Ételek / Italok</span>
               </div>
               <ChevronRight className="w-4 h-4 opacity-70" />
             </button>

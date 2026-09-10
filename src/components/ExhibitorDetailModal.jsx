@@ -1,8 +1,8 @@
 import React from 'react';
-import { useOrsolya } from '../context/OrsolyaContext';
-import { X, MapPin, Phone, Mail, Heart, Utensils, Map, ThumbsUp, CupSoda, Calendar, Share2 } from 'lucide-react';
+import { useOrsolya, formatPrice } from '../context/OrsolyaContext';
+import { X, MapPin, Phone, Mail, Heart, Utensils, Map, ThumbsUp, CupSoda, Calendar, Share2, Tag } from 'lucide-react';
 
-export default function ExhibitorDetailModal({ exhibitor, onClose }) {
+export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish }) {
   const {
     menuItems,
     favoriteExhibitorIds,
@@ -12,7 +12,8 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
     voteForItem,
     votedItemIds,
     focusExhibitorOnMap,
-    setActiveView
+    setActiveView,
+    navigateToFoodCatalog
   } = useOrsolya();
 
   if (!exhibitor) return null;
@@ -21,6 +22,15 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
   const isFavorite = favoriteExhibitorIds.includes(exhibitor.id);
 
   const dayText = exhibitor.days === 'saturday' ? 'Csak Szombat' : exhibitor.days === 'sunday' ? 'Csak Vasárnap' : 'Mindkét nap (Szombat & Vasárnap)';
+
+  const handleDishClick = (item) => {
+    onClose();
+    if (onSelectDish) {
+      onSelectDish(item);
+    } else {
+      navigateToFoodCatalog(item ? item.name : '');
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-150">
@@ -190,14 +200,12 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
                 const isFavItem = favoriteItemIds?.includes(item.id);
                 const isVoted = votedItemIds.includes(item.id);
                 const isSoldOut = item.status === 'sold_out';
+                const formattedP = formatPrice(item.price);
 
                 return (
                   <div
                     key={item.id}
-                    onClick={() => {
-                      onClose();
-                      setActiveView('visitor');
-                    }}
+                    onClick={() => handleDishClick(item)}
                     className={`border p-3 rounded-md flex items-center justify-between gap-3 shadow-2xs transition-all cursor-pointer hover:border-amber-400 ${
                       isSoldOut ? 'border-stone-300 bg-stone-100 opacity-80 grayscale' : 'bg-white border-stone-200'
                     }`}
@@ -223,6 +231,12 @@ export default function ExhibitorDetailModal({ exhibitor, onClose }) {
                             LM
                           </span>
                         )}
+                      </div>
+
+                      {/* Display Price Badge */}
+                      <div className="flex items-center gap-1 text-[11px] font-bold text-amber-900">
+                        <Tag className="w-3 h-3 text-amber-700" />
+                        <span>{formattedP}</span>
                       </div>
 
                       {item.description && (

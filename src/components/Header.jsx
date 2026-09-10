@@ -120,7 +120,7 @@ export default function Header({
               }`}
             >
               <Utensils className={`w-3.5 h-3.5 ${activeView === 'visitor' && mainTab === 'food' ? 'text-amber-200' : 'text-amber-700'}`} />
-              <span>Ételek</span>
+              <span>Ételek / Italok</span>
             </button>
 
             <button

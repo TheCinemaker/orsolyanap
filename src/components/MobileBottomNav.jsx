@@ -51,7 +51,7 @@ export default function MobileBottomNav({ onOpenFavorites, onOpenScanner, setMai
           <div className="w-12 h-12 rounded-full bg-amber-800 text-white flex items-center justify-center shadow-lg border-2 border-white">
             <Utensils className="w-6 h-6 text-amber-200" />
           </div>
-          <span className="text-[10px] font-black text-amber-950 mt-0.5">Ételek</span>
+          <span className="text-[10px] font-black text-amber-950 mt-0.5">Ételek/Italok</span>
         </button>
 
         {/* 10.3 Right 1: Kedvencek */}
