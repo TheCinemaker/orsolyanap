@@ -16,7 +16,8 @@ export default function Header({
   mainTab,
   setMainTab,
   selectedZone,
-  setSelectedZone
+  setSelectedZone,
+  onSelectStandFeed
 }) {
   const {
     activeView,
@@ -26,8 +27,17 @@ export default function Header({
     menuItems,
     exhibitors,
     votedItemIds,
-    voteForItem
+    voteForItem,
+    navigateToStandFeed
   } = useOrsolya();
+
+  const handleStandClick = () => {
+    if (onSelectStandFeed) {
+      onSelectStandFeed();
+    } else if (navigateToStandFeed) {
+      navigateToStandFeed();
+    }
+  };
 
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
@@ -80,13 +90,7 @@ export default function Header({
               <Menu className="w-5 h-5 text-stone-900" />
             </button>
             <VisitKoszegLogo
-              onClick={() => {
-                setActiveView('visitor');
-                setMainTab('tents');
-                setSearchQuery('');
-                setSelectedCategory('all');
-                setSelectedZone('all');
-              }}
+              onClick={handleStandClick}
               onLongPress5s={() => setActiveView('login')}
             />
           </div>
@@ -94,11 +98,7 @@ export default function Header({
           {/* Navigation Tabs (Desktop Apple Segmented Style) */}
           <div className="hidden md:flex items-center gap-1 bg-stone-100 p-1 rounded-md border border-stone-200/80">
             <button
-              onClick={() => {
-                setActiveView('visitor');
-                setMainTab('tents');
-                if (setSearchQuery) setSearchQuery('');
-              }}
+              onClick={handleStandClick}
               className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-xs transition-all ${
                 activeView === 'visitor' && mainTab === 'tents'
                   ? 'bg-amber-900 text-white shadow-sm font-extrabold'

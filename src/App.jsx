@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { OrsolyaProvider, useOrsolya } from './context/OrsolyaContext';
 import Header from './components/Header';
 import ExhibitorCard from './components/ExhibitorCard';
@@ -28,7 +28,9 @@ import {
   Cookie,
   CupSoda,
   Package,
-  Loader2
+  Loader2,
+  Shuffle,
+  ArrowDownAZ
 } from 'lucide-react';
 import './App.css';
 
@@ -44,13 +46,27 @@ function MainApp() {
     setMainTab,
     searchQuery,
     setSearchQuery,
-    navigateToFoodCatalog
+    navigateToFoodCatalog,
+    navigateToStandFeed
   } = useOrsolya();
 
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedZone, setSelectedZone] = useState('all');
   const [selectedDetailExhibitor, setSelectedDetailExhibitor] = useState(null);
   const [visibleCount, setVisibleCount] = useState(12);
+
+  // Stand Feed Sorting & Shuffle mode ('random' | 'alphabetical')
+  const [standSortMode, setStandSortMode] = useState('random');
+  const [shuffleSeed, setShuffleSeed] = useState(1);
+
+  const handleSelectStandFeed = () => {
+    setSelectedCategory('all');
+    setSelectedZone('all');
+    setShuffleSeed((prev) => prev + 1);
+    if (navigateToStandFeed) {
+      navigateToStandFeed();
+    }
+  };
 
   const intentCategories = [
     { id: 'all', label: 'Összes kínálat', icon: Sparkles },
@@ -91,7 +107,25 @@ function MainApp() {
     return matchesSearch && matchesCategory;
   });
 
-  const visibleExhibitors = filteredExhibitors.slice(0, visibleCount);
+  const sortedExhibitors = useMemo(() => {
+    let list = [...filteredExhibitors];
+    if (standSortMode === 'alphabetical') {
+      return list.sort((a, b) => a.name.localeCompare(b.name, 'hu'));
+    } else {
+      const getRank = (id) => {
+        let str = String(id) + '_' + shuffleSeed;
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+          hash = (hash << 5) - hash + str.charCodeAt(i);
+          hash |= 0;
+        }
+        return hash;
+      };
+      return list.sort((a, b) => getRank(a.id) - getRank(b.id));
+    }
+  }, [filteredExhibitors, standSortMode, shuffleSeed]);
+
+  const visibleExhibitors = sortedExhibitors.slice(0, visibleCount);
 
   return (
     <div className="min-h-screen bg-[#fdfbf7] text-stone-900 flex flex-col justify-between font-sans selection:bg-amber-800 selection:text-white pb-20 md:pb-0">
@@ -121,6 +155,7 @@ function MainApp() {
         setMainTab={setMainTab}
         selectedZone={selectedZone}
         setSelectedZone={setSelectedZone}
+        onSelectStandFeed={handleSelectStandFeed}
       />
 
       {/* Main View Switcher */}
@@ -158,11 +193,43 @@ function MainApp() {
               <>
                 {/* Exhibitors Feed */}
                 <div className="space-y-4 pt-2">
-                  <div className="flex items-center justify-between border-b border-stone-200 pb-2">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-stone-200 pb-2.5">
                     <h2 className="text-xs font-black text-stone-950 uppercase tracking-widest flex items-center gap-2">
                       <Store className="w-4 h-4 text-amber-800" />
                       <span>Standok a Diáksétányon ({filteredExhibitors.length})</span>
                     </h2>
+
+                    {/* Stand Sorting & Shuffle Controls */}
+                    <div className="flex items-center gap-1 bg-stone-100 p-1 rounded-md border border-stone-200 text-xs font-bold w-full sm:w-auto justify-between sm:justify-start">
+                      <span className="text-[10px] uppercase font-extrabold text-stone-500 px-2 sm:hidden">Rendezés:</span>
+                      <button
+                        onClick={() => {
+                          setStandSortMode('random');
+                          setShuffleSeed((prev) => prev + 1);
+                        }}
+                        className={`flex items-center gap-1.5 px-3 py-1 rounded-md transition-all cursor-pointer ${
+                          standSortMode === 'random'
+                            ? 'bg-amber-900 text-white shadow-xs font-black'
+                            : 'text-stone-700 hover:text-stone-950 hover:bg-stone-200/60'
+                        }`}
+                        title="Véletlenszerű sorrend keverése"
+                      >
+                        <Shuffle className="w-3.5 h-3.5" />
+                        <span>Véletlenszerű (Keverve)</span>
+                      </button>
+                      <button
+                        onClick={() => setStandSortMode('alphabetical')}
+                        className={`flex items-center gap-1.5 px-3 py-1 rounded-md transition-all cursor-pointer ${
+                          standSortMode === 'alphabetical'
+                            ? 'bg-amber-900 text-white shadow-xs font-black'
+                            : 'text-stone-700 hover:text-stone-950 hover:bg-stone-200/60'
+                        }`}
+                        title="Névsor szerinti rendezés"
+                      >
+                        <ArrowDownAZ className="w-3.5 h-3.5" />
+                        <span>Névsor szerint (A-Z)</span>
+                      </button>
+                    </div>
                   </div>
 
                   {isLoadingData ? (

@@ -35,15 +35,21 @@ export default function HamburgerMenuDrawer({
     menuItems,
     setActiveView,
     navigateToFoodCatalog,
+    navigateToStandFeed,
     setSearchQuery
   } = useOrsolya();
 
   if (!isOpen) return null;
 
   const handleSelectTab = (tab) => {
-    setMainTab(tab);
-    setActiveView('visitor');
-    if (tab === 'tents' && setSearchQuery) setSearchQuery('');
+    if (tab === 'tents') {
+      if (navigateToStandFeed) navigateToStandFeed();
+      if (setSelectedCategory) setSelectedCategory('all');
+      if (setSelectedZone) setSelectedZone('all');
+    } else {
+      setMainTab(tab);
+      setActiveView('visitor');
+    }
     onClose();
   };
 

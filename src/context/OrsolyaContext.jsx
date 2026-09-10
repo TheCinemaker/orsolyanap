@@ -59,6 +59,15 @@ export function OrsolyaProvider({ children }) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const navigateToStandFeed = () => {
+    setActiveView('visitor');
+    setMainTab('tents');
+    setSearchQuery('');
+    setSelectedDay('all');
+    setSelectedDietary('all');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // Toast message
   const [toastMessage, setToastMessage] = useState(null);
 
@@ -847,6 +856,7 @@ export function OrsolyaProvider({ children }) {
         searchQuery,
         setSearchQuery,
         navigateToFoodCatalog,
+        navigateToStandFeed,
         toastMessage,
         showToast
       }}
