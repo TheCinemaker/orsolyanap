@@ -1,0 +1,20 @@
+========================================================================
+          ORSOLYA-NAPI VÁSÁR - KIÁLLÍTÓI BELÉPÉSI PIN KÓDOK           
+                 CIVIL ÍZEK UTCÁJA • VISITKOSZEG                       
+========================================================================
+
+Belépés a Stand Kezelő felületre:
+1. Nyisd meg az appot mobilon / gépen.
+2. Kattints a fejlécben a VISITKOSZEG logóra hosszan (5 mp), vagy az Admin gombra.
+3. Írd be a csapatod alábbi 4 jegyű PIN kódját!
+
+------------------------------------------------------------------------
+   Ssz. | Kiállító / Egyesület Neve                   | PIN Kód  | Helyszín
+------------------------------------------------------------------------
+    1. | Fitt-Box Egyesület                          |     5555 | Diáksétány
+    2. | Kőszegi Turisztikai Szövetség               |     0169 | Diáksétány 9
+    3. | sutiarcok (teszt user)                      |     0168 | Diáksétány 1.
+------------------------------------------------------------------------
+
+Szuper Admin belépési PIN kód (Szervezői Összesített Admin): 9999
+Generálva: 2026. 09. 10. 12:50:29
