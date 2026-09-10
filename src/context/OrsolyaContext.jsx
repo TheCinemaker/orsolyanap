@@ -247,23 +247,45 @@ export function OrsolyaProvider({ children }) {
     setActiveView('map');
   };
 
-  // Vote for a dish / item
-  const voteForItem = (itemId) => {
+  // Vote for a dish / item with Supabase Realtime persistence
+  const voteForItem = async (itemId) => {
     if (votedItemIds.includes(itemId)) {
       showToast('Erre az ételre már leadtad a közönségszavazatodat!', 'error');
       return false;
     }
 
+    // 1. Mark device as voted in LocalStorage
     setVotedItemIds((prev) => [...prev, itemId]);
+
+    // 2. Optimistic UI update
+    const targetItem = menuItems.find((i) => i.id === itemId);
+    const newVotes = (targetItem?.votes || 0) + 1;
+
     setMenuItems((prevItems) =>
       prevItems.map((item) => {
         if (item.id === itemId) {
-          return { ...item, votes: (item.votes || 0) + 1 };
+          return { ...item, votes: newVotes };
         }
         return item;
       })
     );
+
     showToast('Köszönjük a közönségszavazatot!', 'success');
+
+    // 3. Write vote to Supabase (broadcasts REALTIME to all devices via Postgres changes)
+    try {
+      const { error } = await supabase
+        .from('menu_items')
+        .update({ votes: newVotes })
+        .eq('id', itemId);
+
+      if (error) {
+        console.error('Supabase vote update error:', error.message);
+      }
+    } catch (err) {
+      console.error('Supabase vote exception:', err);
+    }
+
     return true;
   };
 
