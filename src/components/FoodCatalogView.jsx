@@ -37,7 +37,8 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
     toggleFavoriteItem,
     selectedDay,
     setSelectedDay,
-    isLoadingData
+    isLoadingData,
+    isItemVisibleToVisitors
   } = useOrsolya();
 
   // Collapsible section open/closed state (default: all open)
@@ -50,12 +51,14 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
     }));
   };
 
-  // Filter items matching search & day
+  // Filter items matching search & day & visibility (hidden mode)
   const filteredItems = useMemo(() => {
     return menuItems.filter((item) => {
       const exhibitor = exhibitors.find((ex) => ex.id === item.exhibitor_id);
       const exName = exhibitor ? exhibitor.name.toLowerCase() : '';
       const exLoc = exhibitor ? exhibitor.location.toLowerCase() : '';
+
+      const matchesVisibility = isItemVisibleToVisitors ? isItemVisibleToVisitors(item) : !item.is_hidden;
 
       const matchesSearch =
         !searchQuery ||
@@ -73,9 +76,9 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
         itemDay === selectedDay ||
         (exDay !== 'both' && exDay === selectedDay);
 
-      return matchesSearch && matchesDay;
+      return matchesVisibility && matchesSearch && matchesDay;
     });
-  }, [menuItems, exhibitors, searchQuery, selectedDay]);
+  }, [menuItems, exhibitors, searchQuery, selectedDay, isItemVisibleToVisitors]);
 
   // Fair Randomized Shuffle of items on each load so exhibitors get equal top exposure
   const randomizedItems = useMemo(() => {

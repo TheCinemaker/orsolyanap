@@ -26,7 +26,9 @@ import {
   Sparkles,
   Leaf,
   CupSoda,
-  Tag
+  Tag,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import ExhibitorQRCard from '../ExhibitorQRCard';
 
@@ -41,7 +43,11 @@ export default function ExhibitorDashboard() {
     updateExhibitorProfile,
     addExhibitorTeam,
     postReel,
-    convertFileToBase64
+    convertFileToBase64,
+    isSaturdayActive,
+    toggleSaturdayActivation,
+    toggleItemHiddenStatus,
+    isItemVisibleToVisitors
   } = useOrsolya();
 
   // Reel post state
@@ -124,6 +130,7 @@ export default function ExhibitorDashboard() {
     is_lactose_free: false,
     is_sugar_free: false,
     is_vegan: false,
+    is_hidden: false,
     image: ''
   });
 
@@ -181,6 +188,7 @@ export default function ExhibitorDashboard() {
       is_lactose_free: !!dish.is_lactose_free,
       is_sugar_free: !!dish.is_sugar_free,
       is_vegan: !!dish.is_vegan,
+      is_hidden: !!dish.is_hidden,
       image: dish.image || ''
     });
     setIsDishModalOpen(true);
@@ -199,6 +207,7 @@ export default function ExhibitorDashboard() {
       is_lactose_free: false,
       is_sugar_free: false,
       is_vegan: false,
+      is_hidden: false,
       image: ''
     });
     setIsDishModalOpen(true);
@@ -467,6 +476,33 @@ export default function ExhibitorDashboard() {
         </form>
       </div>
 
+      {/* Pre-Event Hidden Mode Banner */}
+      <div className="bg-amber-50/90 border border-amber-300/80 rounded-md p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-2xs">
+        <div className="flex items-start gap-3">
+          <EyeOff className="w-5 h-5 text-amber-800 flex-shrink-0 mt-0.5" />
+          <div>
+            <span className="font-extrabold text-amber-950 text-xs block">🙈 Előzetes Menüfeltöltés (Rejtett Mód)</span>
+            <p className="text-amber-900 font-medium mt-0.5 text-[11px] leading-relaxed">
+              Nyugodtan töltsétek fel az ételeiteket előre! Ha bepipáljátok a <strong>"Rejtett mód"</strong> opciót, az ételeteket szombat reggelig csak ti látjátok az admin felületen. <strong>Szombat reggel automatikusan mindenki előtt nyilvánossá válik a teljes menüsor!</strong>
+            </p>
+          </div>
+        </div>
+
+        {/* Super-Admin Saturday Force Activation Toggle */}
+        {activeExhibitor?.pin === '9999' || activeExhibitor?.id === 'ex-admin' ? (
+          <button
+            onClick={toggleSaturdayActivation}
+            className={`px-3 py-1.5 rounded-md font-extrabold text-[11px] flex-shrink-0 transition-all border shadow-xs ${
+              isSaturdayActive
+                ? 'bg-emerald-800 text-white border-emerald-900'
+                : 'bg-stone-900 text-amber-300 border-stone-800 hover:bg-stone-800'
+            }`}
+          >
+            {isSaturdayActive ? '⚡ Szombati élesítés: AKTÍV' : '⚡ Teszt: Szombati élesítés (Admin)'}
+          </button>
+        ) : null}
+      </div>
+
       {/* Dishes List & Stock Counter */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -571,10 +607,38 @@ export default function ExhibitorDashboard() {
                             Vegán
                           </span>
                         )}
+                        {/* Hidden Mode Badge & Quick Toggle */}
+                        <button
+                          type="button"
+                          onClick={() => toggleItemHiddenStatus(item.id)}
+                          className={`text-[10px] font-black px-2 py-0.5 rounded-md border flex items-center gap-1 transition-all cursor-pointer ${
+                            item.is_hidden
+                              ? 'bg-amber-100 text-amber-950 border-amber-300 hover:bg-amber-200'
+                              : 'bg-emerald-100 text-emerald-950 border-emerald-300 hover:bg-emerald-200'
+                          }`}
+                          title={item.is_hidden ? 'Étel élesítése (Nyilvánossá tétel)' : 'Étel elrejtése szombat reggelig'}
+                        >
+                          {item.is_hidden ? (
+                            <>
+                              <EyeOff className="w-3 h-3 text-amber-800" />
+                              <span>🙈 Rejtett (Szombatig)</span>
+                            </>
+                          ) : (
+                            <>
+                              <Eye className="w-3 h-3 text-emerald-700" />
+                              <span>👁️ Nyilvános</span>
+                            </>
+                          )}
+                        </button>
                       </div>
 
-                      <h4 className="text-base font-bold text-stone-900">
-                        {item.name}
+                      <h4 className="text-base font-bold text-stone-900 flex items-center gap-2">
+                        <span>{item.name}</span>
+                        {item.is_hidden && (
+                          <span className="text-[10px] font-extrabold text-amber-900 bg-amber-100 border border-amber-300 px-1.5 py-0.5 rounded uppercase">
+                            Rejtett
+                          </span>
+                        )}
                       </h4>
                       <p className="text-xs text-stone-500 mt-0.5 line-clamp-2">
                         {item.description}
@@ -944,6 +1008,27 @@ export default function ExhibitorDashboard() {
                   <option value="saturday">Szombat</option>
                   <option value="sunday">Vasárnap</option>
                 </select>
+              </div>
+
+              {/* Pre-Event Hidden Mode Option */}
+              <div className="bg-amber-50/90 p-3.5 rounded-md border border-amber-300/80">
+                <label className="flex items-start gap-2.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={dishForm.is_hidden}
+                    onChange={(e) => setDishForm({ ...dishForm, is_hidden: e.target.checked })}
+                    className="mt-0.5 rounded text-amber-800 focus:ring-amber-500 w-4 h-4"
+                  />
+                  <div>
+                    <span className="text-xs font-extrabold text-amber-950 flex items-center gap-1">
+                      <EyeOff className="w-3.5 h-3.5 text-amber-800" />
+                      <span>🙈 Rejtett mód (Szombat reggelig csapattagsági titok)</span>
+                    </span>
+                    <span className="text-[10px] font-semibold text-amber-850 block mt-0.5 leading-tight">
+                      Ha bepipálod, ezt az ételt a látogatók nem látják a vásári katalógusban szombat reggelig. Szombaton automatikusan mindenki előtt nyilvánossá válik!
+                    </span>
+                  </div>
+                </label>
               </div>
 
               {/* Allergen & Dietary Checkboxes */}

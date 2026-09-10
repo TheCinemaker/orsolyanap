@@ -55,6 +55,10 @@ export function OrsolyaProvider({ children }) {
       setSearchQuery(query.trim());
     } else if (query && query.name) {
       setSearchQuery(query.name);
+    } else {
+      setSearchQuery('');
+      setSelectedDay('all');
+      setSelectedDietary('all');
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -546,7 +550,71 @@ export function OrsolyaProvider({ children }) {
     showToast('Állapot frissítve!');
   };
 
-  // Save/Add menu item dynamically (with Allergen flags, Available day, and optional Price)
+  // Automatic Saturday morning activation state (Persisted in LocalStorage)
+  const [isSaturdayActive, setIsSaturdayActive] = useState(() => {
+    return localStorage.getItem('orsolya_force_saturday_active') === 'true';
+  });
+
+  const toggleSaturdayActivation = () => {
+    setIsSaturdayActive((prev) => {
+      const next = !prev;
+      localStorage.setItem('orsolya_force_saturday_active', String(next));
+      showToast(
+        next
+          ? '⚡ Szombati menüsor aktiválva! Minden rejtett étel nyilvánossá vált.'
+          : '🙈 Szombati élesítés kikapcsolva. A rejtett ételek újra rejtve vannak.',
+        'info'
+      );
+      return next;
+    });
+  };
+
+  // Helper: Is today Saturday or Sunday of the festival?
+  const isSaturdayOrLater = () => {
+    if (isSaturdayActive) return true;
+    const now = new Date();
+    const day = now.getDay();
+    // 6 = Saturday, 0 = Sunday
+    return day === 6 || day === 0;
+  };
+
+  // Visitor visibility filter helper
+  const isItemVisibleToVisitors = (item) => {
+    if (!item) return false;
+    if (!item.is_hidden) return true;
+    return isSaturdayOrLater();
+  };
+
+  // Toggle item hidden status (Rejtett / Nyilvános) by exhibitor in admin panel
+  const toggleItemHiddenStatus = async (itemId) => {
+    let newHiddenState = false;
+    setMenuItems((prev) =>
+      prev.map((item) => {
+        if (item.id === itemId) {
+          newHiddenState = !item.is_hidden;
+          return { ...item, is_hidden: newHiddenState };
+        }
+        return item;
+      })
+    );
+
+    if (isSupabaseConfigured) {
+      try {
+        await supabase.from('menu_items').update({ is_hidden: newHiddenState }).eq('id', itemId);
+      } catch (e) {
+        console.warn('Supabase sync warning:', e);
+      }
+    }
+
+    showToast(
+      newHiddenState
+        ? '🙈 Étel rejtett módba állítva (szombat reggelig rátok tartozik).'
+        : '👁️ Étel mostantól nyilvános a látogatóknak!',
+      'info'
+    );
+  };
+
+  // Save/Add menu item dynamically (with Allergen flags, Available day, Hidden mode, and optional Price)
   const saveMenuItem = async (itemData) => {
     const formattedItem = {
       ...itemData,
@@ -555,6 +623,7 @@ export function OrsolyaProvider({ children }) {
       is_lactose_free: !!itemData.is_lactose_free,
       is_sugar_free: !!itemData.is_sugar_free,
       is_vegan: !!itemData.is_vegan,
+      is_hidden: !!itemData.is_hidden,
       available_day: itemData.available_day || 'both'
     };
 
@@ -576,6 +645,7 @@ export function OrsolyaProvider({ children }) {
             is_lactose_free: formattedItem.is_lactose_free,
             is_sugar_free: formattedItem.is_sugar_free,
             is_vegan: formattedItem.is_vegan,
+            is_hidden: formattedItem.is_hidden,
             image: formattedItem.image || null
           }).eq('id', itemData.id);
         } catch (e) {
@@ -612,6 +682,7 @@ export function OrsolyaProvider({ children }) {
             is_lactose_free: newItem.is_lactose_free,
             is_sugar_free: newItem.is_sugar_free,
             is_vegan: newItem.is_vegan,
+            is_hidden: newItem.is_hidden,
             tags: newItem.tags || [],
             image: newItem.image || null
           };
@@ -623,7 +694,14 @@ export function OrsolyaProvider({ children }) {
           console.warn('Supabase sync warning:', e);
         }
       }
-      showToast(isDrink ? 'Új ital hozzáadva a standodhoz!' : 'Új étel hozzáadva a standodhoz!', 'success');
+      showToast(
+        newItem.is_hidden
+          ? '🙈 Új rejtett étel hozzáadva (szombat reggel aktiválódik)!'
+          : isDrink
+          ? 'Új ital hozzáadva a standodhoz!'
+          : 'Új étel hozzáadva a standodhoz!',
+        'success'
+      );
     }
   };
 
@@ -843,6 +921,10 @@ export function OrsolyaProvider({ children }) {
         updateItemStatus,
         saveMenuItem,
         deleteMenuItem,
+        isSaturdayActive,
+        toggleSaturdayActivation,
+        isItemVisibleToVisitors,
+        toggleItemHiddenStatus,
         addExhibitorTeam,
         updateExhibitorPin,
         updateExhibitorProfile,

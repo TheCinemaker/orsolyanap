@@ -3,7 +3,14 @@ import { useOrsolya } from '../context/OrsolyaContext';
 import { Utensils, MapPin, Heart, Store, QrCode } from 'lucide-react';
 
 export default function MobileBottomNav({ onOpenFavorites, onOpenScanner, setMainTab }) {
-  const { activeView, setActiveView, favoriteExhibitorIds, favoriteItemIds, navigateToStandFeed } = useOrsolya();
+  const {
+    activeView,
+    setActiveView,
+    favoriteExhibitorIds,
+    favoriteItemIds,
+    navigateToStandFeed,
+    navigateToFoodCatalog
+  } = useOrsolya();
   const totalFavs = favoriteExhibitorIds.length + (favoriteItemIds?.length || 0);
 
   return (
@@ -41,16 +48,15 @@ export default function MobileBottomNav({ onOpenFavorites, onOpenScanner, setMai
         {/* 10.1 Center Prominent Cutlery Icon (Ételek / Katalógus) */}
         <button
           onClick={() => {
-            setActiveView('visitor');
-            if (setMainTab) setMainTab('food');
+            if (navigateToFoodCatalog) navigateToFoodCatalog();
           }}
           className="flex flex-col items-center -mt-5 transition-transform active:scale-95"
-          title="Ételek & Kínálat Katalógus"
+          title="Összes Étel & Katalógus"
         >
           <div className="w-12 h-12 rounded-full bg-amber-800 text-white flex items-center justify-center shadow-lg border-2 border-white">
             <Utensils className="w-6 h-6 text-amber-200" />
           </div>
-          <span className="text-[10px] font-black text-amber-950 mt-0.5">Ételek/Italok</span>
+          <span className="text-[10px] font-black text-amber-950 mt-0.5 uppercase tracking-wider">ÉTELEK</span>
         </button>
 
         {/* 10.3 Right 1: Kedvencek */}
