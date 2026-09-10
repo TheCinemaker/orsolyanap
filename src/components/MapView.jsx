@@ -88,8 +88,8 @@ export default function MapView() {
 
       const customHtml = `
         <div class="relative group cursor-pointer transition-transform duration-200 hover:scale-110">
-          <div style="background-color: ${pinColor};" class="px-2.5 py-1 rounded-full text-white font-extrabold text-[11px] shadow-lg flex items-center gap-1 border-2 border-white">
-            <span>${ex.name.split(' ')[0]} ${drinkBadge}</span>
+          <div style="background-color: ${pinColor};" class="px-3 py-1.5 rounded-full text-white font-black text-[11px] shadow-md flex items-center justify-center border-2 border-white whitespace-nowrap tracking-wide">
+            <span>${ex.name}</span>
           </div>
         </div>
       `;
