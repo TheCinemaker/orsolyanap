@@ -109,7 +109,8 @@ export function OrsolyaProvider({ children }) {
         } else if (exData) {
           const formattedEx = exData.map((e) => ({
             ...e,
-            hasDrinks: e.has_drinks !== undefined ? e.has_drinks : e.hasDrinks
+            hasDrinks: e.has_drinks !== undefined ? e.has_drinks : e.hasDrinks,
+            coordinates: e.coordinates || (e.latitude && e.longitude ? [Number(e.latitude), Number(e.longitude)] : null)
           }));
           setExhibitors(formattedEx);
         }
