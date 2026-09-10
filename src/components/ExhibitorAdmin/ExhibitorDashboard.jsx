@@ -483,12 +483,12 @@ export default function ExhibitorDashboard() {
           <div>
             <span className="font-extrabold text-amber-950 text-xs block">🙈 Előzetes Menüfeltöltés (Rejtett Mód)</span>
             <p className="text-amber-900 font-medium mt-0.5 text-[11px] leading-relaxed">
-              Nyugodtan töltsétek fel az ételeiteket előre! Ha bepipáljátok a <strong>"Rejtett mód"</strong> opciót, az ételeteket szombat reggelig csak ti látjátok az admin felületen. <strong>Szombat reggel automatikusan mindenki előtt nyilvánossá válik a teljes menüsor!</strong>
+              Nyugodtan töltsétek fel az ételeiteket előre! Ha bepipáljátok a <strong>"Rejtett mód"</strong> opciót, az ételeteket péntek délig csak ti látjátok az admin felületen. <strong>Pénteken délben (12:00-kor) automatikusan mindenki előtt nyilvánossá válik a teljes menüsor!</strong>
             </p>
           </div>
         </div>
 
-        {/* Super-Admin Saturday Force Activation Toggle */}
+        {/* Super-Admin Friday Force Activation Toggle */}
         {activeExhibitor?.pin === '9999' || activeExhibitor?.id === 'ex-admin' ? (
           <button
             onClick={toggleSaturdayActivation}
@@ -498,7 +498,7 @@ export default function ExhibitorDashboard() {
                 : 'bg-stone-900 text-amber-300 border-stone-800 hover:bg-stone-800'
             }`}
           >
-            {isSaturdayActive ? '⚡ Szombati élesítés: AKTÍV' : '⚡ Teszt: Szombati élesítés (Admin)'}
+            {isSaturdayActive ? '⚡ Péntek déli élesítés: AKTÍV' : '⚡ Teszt: Élesítés Most (Admin)'}
           </button>
         ) : null}
       </div>
@@ -616,12 +616,12 @@ export default function ExhibitorDashboard() {
                               ? 'bg-amber-100 text-amber-950 border-amber-300 hover:bg-amber-200'
                               : 'bg-emerald-100 text-emerald-950 border-emerald-300 hover:bg-emerald-200'
                           }`}
-                          title={item.is_hidden ? 'Étel élesítése (Nyilvánossá tétel)' : 'Étel elrejtése szombat reggelig'}
+                          title={item.is_hidden ? 'Étel élesítése (Nyilvánossá tétel)' : 'Étel elrejtése péntek délig'}
                         >
                           {item.is_hidden ? (
                             <>
                               <EyeOff className="w-3 h-3 text-amber-800" />
-                              <span>🙈 Rejtett (Szombatig)</span>
+                              <span>🙈 Rejtett (Péntek délig)</span>
                             </>
                           ) : (
                             <>
@@ -1022,10 +1022,10 @@ export default function ExhibitorDashboard() {
                   <div>
                     <span className="text-xs font-extrabold text-amber-950 flex items-center gap-1">
                       <EyeOff className="w-3.5 h-3.5 text-amber-800" />
-                      <span>🙈 Rejtett mód (Szombat reggelig csapattagsági titok)</span>
+                      <span>🙈 Rejtett mód (Péntek délig csapattagsági titok)</span>
                     </span>
                     <span className="text-[10px] font-semibold text-amber-850 block mt-0.5 leading-tight">
-                      Ha bepipálod, ezt az ételt a látogatók nem látják a vásári katalógusban szombat reggelig. Szombaton automatikusan mindenki előtt nyilvánossá válik!
+                      Ha bepipálod, ezt az ételt a látogatók nem látják a vásári katalógusban péntek délig. Pénteken délben (12:00-kor) automatikusan mindenki előtt nyilvánossá válik!
                     </span>
                   </div>
                 </label>

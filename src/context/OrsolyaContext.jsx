@@ -550,7 +550,7 @@ export function OrsolyaProvider({ children }) {
     showToast('Állapot frissítve!');
   };
 
-  // Automatic Saturday morning activation state (Persisted in LocalStorage)
+  // Automatic Friday noon (12:00) activation state (Persisted in LocalStorage)
   const [isSaturdayActive, setIsSaturdayActive] = useState(() => {
     return localStorage.getItem('orsolya_force_saturday_active') === 'true';
   });
@@ -561,28 +561,31 @@ export function OrsolyaProvider({ children }) {
       localStorage.setItem('orsolya_force_saturday_active', String(next));
       showToast(
         next
-          ? '⚡ Szombati menüsor aktiválva! Minden rejtett étel nyilvánossá vált.'
-          : '🙈 Szombati élesítés kikapcsolva. A rejtett ételek újra rejtve vannak.',
+          ? '⚡ Péntek déli élesítés aktiválva! Minden rejtett étel nyilvánossá vált.'
+          : '🙈 Péntek déli élesítés kikapcsolva. A rejtett ételek péntek délig rejtve maradnak.',
         'info'
       );
       return next;
     });
   };
 
-  // Helper: Is today Saturday or Sunday of the festival?
-  const isSaturdayOrLater = () => {
+  // Helper: Is today Friday 12:00 (noon) or later in festival week?
+  const isAutoActivatedForVisitors = () => {
     if (isSaturdayActive) return true;
     const now = new Date();
-    const day = now.getDay();
-    // 6 = Saturday, 0 = Sunday
-    return day === 6 || day === 0;
+    const day = now.getDay(); // 5 = Friday, 6 = Saturday, 0 = Sunday
+    const hours = now.getHours();
+
+    if (day === 5 && hours >= 12) return true;
+    if (day === 6 || day === 0) return true;
+    return false;
   };
 
   // Visitor visibility filter helper
   const isItemVisibleToVisitors = (item) => {
     if (!item) return false;
     if (!item.is_hidden) return true;
-    return isSaturdayOrLater();
+    return isAutoActivatedForVisitors();
   };
 
   // Toggle item hidden status (Rejtett / Nyilvános) by exhibitor in admin panel
@@ -608,7 +611,7 @@ export function OrsolyaProvider({ children }) {
 
     showToast(
       newHiddenState
-        ? '🙈 Étel rejtett módba állítva (szombat reggelig rátok tartozik).'
+        ? '🙈 Étel rejtett módba állítva (péntek délig rátok tartozik).'
         : '👁️ Étel mostantól nyilvános a látogatóknak!',
       'info'
     );
@@ -696,7 +699,7 @@ export function OrsolyaProvider({ children }) {
       }
       showToast(
         newItem.is_hidden
-          ? '🙈 Új rejtett étel hozzáadva (szombat reggel aktiválódik)!'
+          ? '🙈 Új rejtett étel hozzáadva (péntek délben aktiválódik)!'
           : isDrink
           ? 'Új ital hozzáadva a standodhoz!'
           : 'Új étel hozzáadva a standodhoz!',
