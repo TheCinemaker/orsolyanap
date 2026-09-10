@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 
 /**
- * VisitKőszeg Clean Apple Light-Mode Logo with 5-Second Long Press Admin Trigger
+ * VISITKOSZEG Clean Logo with 5-Second Long Press Admin Trigger
  */
 export function VisitKoszegIcon({ className = "w-7 h-8", color = "#d97706" }) {
   return (
@@ -35,36 +35,52 @@ export default function VisitKoszegLogo({ onClick, onLongPress5s, className = ""
   const intervalRef = useRef(null);
   const startTimeRef = useRef(null);
   const isLongPressTriggeredRef = useRef(false);
+  const isPressingRef = useRef(false);
 
-  const startPress = () => {
+  const startPress = (e) => {
+    isPressingRef.current = true;
     setPressProgress(0);
     isLongPressTriggeredRef.current = false;
     startTimeRef.current = Date.now();
     const duration = 5000; // 5 seconds
 
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    if (timerRef.current) clearTimeout(timerRef.current);
+
     intervalRef.current = setInterval(() => {
+      if (!isPressingRef.current) return;
       const elapsed = Date.now() - (startTimeRef.current || Date.now());
       const progress = Math.min(100, (elapsed / duration) * 100);
       setPressProgress(progress);
     }, 50);
 
     timerRef.current = setTimeout(() => {
+      if (!isPressingRef.current) return;
       clearInterval(intervalRef.current);
       setPressProgress(0);
       isLongPressTriggeredRef.current = true;
+      isPressingRef.current = false;
       if (onLongPress5s) {
         onLongPress5s();
       }
     }, duration);
   };
 
-  const endPress = () => {
-    const elapsed = Date.now() - (startTimeRef.current || Date.now());
+  const cancelPress = () => {
     if (timerRef.current) clearTimeout(timerRef.current);
     if (intervalRef.current) clearInterval(intervalRef.current);
     setPressProgress(0);
+    isPressingRef.current = false;
+  };
 
-    if (!isLongPressTriggeredRef.current && elapsed < 4000 && onClick) {
+  const endPress = (e) => {
+    if (!isPressingRef.current) return;
+
+    const elapsed = Date.now() - (startTimeRef.current || Date.now());
+    cancelPress();
+
+    // Only trigger normal onClick if user actually pressed down and released quickly (<4.5s)
+    if (!isLongPressTriggeredRef.current && elapsed < 4500 && onClick) {
       onClick();
     }
   };
@@ -73,11 +89,12 @@ export default function VisitKoszegLogo({ onClick, onLongPress5s, className = ""
     <div
       onMouseDown={startPress}
       onMouseUp={endPress}
-      onMouseLeave={endPress}
+      onMouseLeave={cancelPress}
       onTouchStart={startPress}
       onTouchEnd={endPress}
+      onTouchCancel={cancelPress}
       className={`inline-flex items-center gap-2 select-none cursor-pointer relative py-1 px-1.5 rounded-md hover:opacity-85 transition-all ${className}`}
-      title="VisitKőszeg - Vissza a főoldalra"
+      title="VISITKOSZEG - Vissza a főoldalra (5 mp nyomva tartás: Admin belépés)"
     >
       {/* 5-second long press progress bar indicator */}
       {pressProgress > 0 && (

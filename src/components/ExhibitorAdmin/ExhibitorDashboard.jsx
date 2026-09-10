@@ -877,14 +877,22 @@ export default function ExhibitorDashboard() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
-                  {dishForm.category === 'italok' ? 'Leírás / Kiszerelés (opcionális)' : 'Leírás & Összetevők'}
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider">
+                    {dishForm.category === 'italok' ? 'Leírás / Kiszerelés (opcionális)' : 'Leírás & Összetevők'}
+                  </label>
+                  <span className={`text-[10px] font-extrabold ${
+                    (dishForm.description?.length || 0) >= 120 ? 'text-rose-600' : 'text-stone-400'
+                  }`}>
+                    {dishForm.description?.length || 0} / 120
+                  </span>
+                </div>
                 <textarea
                   rows={2}
+                  maxLength={120}
                   placeholder={dishForm.category === 'italok' ? 'Pl. 3 dl frissen préselt almalé...' : 'Pl. Szabad tűzön főzött marhapörkölt házi tarhonyával...'}
                   value={dishForm.description}
-                  onChange={(e) => setDishForm({ ...dishForm, description: e.target.value })}
+                  onChange={(e) => setDishForm({ ...dishForm, description: e.target.value.slice(0, 120) })}
                   className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
                 />
               </div>
@@ -899,7 +907,7 @@ export default function ExhibitorDashboard() {
                     onChange={(e) => setDishForm({ ...dishForm, category: e.target.value })}
                     className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 font-bold focus:outline-none focus:ring-2 focus:ring-amber-500/40 cursor-pointer"
                   >
-                    <option value="italok">🥤 Italok (Alkoholos / Mentes)</option>
+                    <option value="italok">🥤 Italok</option>
                     <option value="meleg_etel">🍲 Meleg ételek</option>
                     <option value="hideg_etel">🥗 Hideg ételek</option>
                     <option value="sutemeny">🍰 Sütemény / Édesség</option>

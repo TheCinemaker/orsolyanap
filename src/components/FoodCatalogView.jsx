@@ -22,7 +22,7 @@ const CATEGORY_SECTIONS = [
   { id: 'hideg_etel', title: 'Hideg ételek', icon: Utensils },
   { id: 'sutemeny', title: 'Sütemény / Édesség', icon: Cake },
   { id: 'street_food', title: 'Street Food', icon: Cookie },
-  { id: 'italok', title: 'Italok (Alkoholos / Mentes)', icon: CupSoda },
+  { id: 'italok', title: 'Italok', icon: CupSoda },
   { id: 'egyeb', title: 'Egyéb', icon: Package }
 ];
 
