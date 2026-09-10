@@ -14,7 +14,8 @@ import {
   Cookie,
   CupSoda,
   Package,
-  Sparkles
+  Sparkles,
+  Heart
 } from 'lucide-react';
 
 const CATEGORY_SECTIONS = [
@@ -32,6 +33,8 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
     exhibitors,
     votedItemIds,
     voteForItem,
+    favoriteItemIds,
+    toggleFavoriteItem,
     selectedDay,
     setSelectedDay,
     isLoadingData
@@ -87,6 +90,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
   const renderDishCard = (item) => {
     const exhibitor = exhibitors.find((ex) => ex.id === item.exhibitor_id);
     const isVoted = votedItemIds.includes(item.id);
+    const isFavItem = favoriteItemIds?.includes(item.id);
     const isTopVoted = (item.votes || 0) >= 40;
 
     return (
@@ -176,15 +180,31 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
           </div>
         )}
 
-        {/* Footer Action Bar: Vote Button */}
-        <div className="pt-2 border-t border-stone-100 flex items-center justify-end gap-2">
+        {/* Footer Action Bar: Heart Favorite Button & Vote Button */}
+        <div className="pt-2 border-t border-stone-100 flex items-center justify-between gap-2">
+          {/* Heart / Favorite Button */}
+          <button
+            onClick={() => toggleFavoriteItem(item.id)}
+            className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-extrabold transition-all border shadow-2xs cursor-pointer ${
+              isFavItem
+                ? 'bg-rose-100 text-rose-800 border-rose-300'
+                : 'bg-stone-50 hover:bg-rose-50 text-stone-600 hover:text-rose-700 border-stone-200'
+            }`}
+            title={isFavItem ? 'Eltávolítás a kedvencekből' : 'Étel hozzáadása a kedvencekhez'}
+          >
+            <Heart className={`w-3.5 h-3.5 ${isFavItem ? 'fill-rose-700 text-rose-700' : 'text-stone-400'}`} />
+            <span>{isFavItem ? 'Kedvenc' : 'Kedvenchez'}</span>
+          </button>
+
+          {/* Vote Button */}
           <button
             onClick={() => voteForItem(item.id)}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-extrabold transition-all border shadow-2xs cursor-pointer ${
+            className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-extrabold transition-all border shadow-2xs cursor-pointer ${
               isVoted
                 ? 'bg-emerald-800 text-white border-emerald-800'
                 : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-300/80'
             }`}
+            title="Szavazok erre az ételre"
           >
             <ThumbsUp className={`w-3.5 h-3.5 ${isVoted ? 'fill-white' : 'text-amber-800'}`} />
             <span>{isVoted ? `Szavazva (${item.votes || 1})` : `Szavazok (${item.votes || 0})`}</span>

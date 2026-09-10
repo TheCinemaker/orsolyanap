@@ -3,7 +3,7 @@ import { useOrsolya } from '../context/OrsolyaContext';
 import { Utensils, MapPin, Heart, Store, QrCode } from 'lucide-react';
 
 export default function MobileBottomNav({ onOpenFavorites, onOpenScanner, setMainTab }) {
-  const { activeView, setActiveView, favoriteExhibitorIds, favoriteItemIds } = useOrsolya();
+  const { activeView, setActiveView, favoriteExhibitorIds, favoriteItemIds, setSearchQuery } = useOrsolya();
   const totalFavs = favoriteExhibitorIds.length + (favoriteItemIds?.length || 0);
 
   return (
@@ -15,6 +15,7 @@ export default function MobileBottomNav({ onOpenFavorites, onOpenScanner, setMai
           onClick={() => {
             setActiveView('visitor');
             if (setMainTab) setMainTab('tents');
+            if (setSearchQuery) setSearchQuery('');
           }}
           className={`flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-md transition-all ${
             activeView === 'visitor'

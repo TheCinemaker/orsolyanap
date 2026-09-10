@@ -34,7 +34,8 @@ export default function HamburgerMenuDrawer({
     exhibitors,
     menuItems,
     setActiveView,
-    navigateToFoodCatalog
+    navigateToFoodCatalog,
+    setSearchQuery
   } = useOrsolya();
 
   if (!isOpen) return null;
@@ -42,6 +43,7 @@ export default function HamburgerMenuDrawer({
   const handleSelectTab = (tab) => {
     setMainTab(tab);
     setActiveView('visitor');
+    if (tab === 'tents' && setSearchQuery) setSearchQuery('');
     onClose();
   };
 

@@ -97,6 +97,7 @@ export default function Header({
               onClick={() => {
                 setActiveView('visitor');
                 setMainTab('tents');
+                if (setSearchQuery) setSearchQuery('');
               }}
               className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-xs transition-all ${
                 activeView === 'visitor' && mainTab === 'tents'
