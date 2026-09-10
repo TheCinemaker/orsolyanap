@@ -17,4 +17,4 @@ Belépés a Stand Kezelő felületre:
 ------------------------------------------------------------------------
 
 Szuper Admin belépési PIN kód (Szervezői Összesített Admin): 9999
-Generálva: 2026. 09. 10. 12:50:29
+Generálva: 2026. 09. 10. 12:54:00
