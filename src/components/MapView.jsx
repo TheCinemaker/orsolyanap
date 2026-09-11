@@ -114,10 +114,10 @@ export default function MapView() {
       const isFav = favoriteExhibitorIds.includes(ex.id);
 
       const pinBg = isSelected
-        ? 'bg-amber-900 text-white font-black border-amber-950 shadow-md scale-105'
+        ? 'bg-amber-900 text-amber-50 font-black border-amber-950 shadow-md scale-105 ring-2 ring-amber-400'
         : isFav
-        ? 'bg-rose-800 text-white font-extrabold border-rose-900 shadow-2xs'
-        : 'bg-stone-900 text-white font-bold border-stone-950 shadow-2xs hover:bg-amber-900';
+        ? 'bg-rose-800 text-white font-extrabold border-rose-900 shadow-2xs hover:bg-rose-700'
+        : 'bg-amber-800 text-amber-50 font-bold border-amber-900 shadow-2xs hover:bg-amber-700';
 
       const shortName = getShortExhibitorName(ex);
 
