@@ -39,15 +39,17 @@ export default function MapView() {
     if (!leafletMapRef.current) {
       // Center of festival polygon
       const map = L.map(mapContainerRef.current, {
-        center: [47.38952, 16.53894],
-        zoom: 18,
+        center: [47.38936, 16.53894],
+        zoom: 19,
+        maxZoom: 22,
         zoomControl: true,
         scrollWheelZoom: true
       });
 
       // OpenStreetMap Standard Free Tiles (100% Free, NO API KEY Required)
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
+        maxZoom: 22,
+        maxNativeZoom: 19,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
       }).addTo(map);
 
@@ -69,13 +71,23 @@ export default function MapView() {
 
       const isSelected = ex.id === selectedExhibitorId;
       const isFav = favoriteExhibitorIds.includes(ex.id);
-      const drinkBadge = ex.hasDrinks ? '(Ital)' : '';
+      
+      let emoji = '🍲';
+      if (ex.category === 'sutemeny') emoji = '🍰';
+      else if (ex.category === 'italok' || ex.hasDrinks) emoji = '🥤';
+      else if (ex.category === 'street_food') emoji = '🍔';
+      else if (ex.category === 'hideg_etel') emoji = '🥗';
 
-      const pinColor = isSelected ? '#78350f' : isFav ? '#be123c' : '#b45309';
+      const pinBg = isSelected
+        ? 'bg-amber-900 text-white ring-4 ring-amber-400 scale-110'
+        : isFav
+        ? 'bg-rose-800 text-white ring-2 ring-rose-300'
+        : 'bg-stone-900 text-white hover:bg-amber-900';
 
       const customHtml = `
-        <div class="relative group cursor-pointer transition-transform duration-200 hover:scale-110">
-          <div style="background-color: ${pinColor};" class="px-3 py-1.5 rounded-full text-white font-black text-[11px] shadow-md flex items-center justify-center border-2 border-white whitespace-nowrap tracking-wide">
+        <div class="relative group cursor-pointer transition-transform duration-200">
+          <div class="px-2.5 py-1 rounded-full ${pinBg} font-extrabold text-[11px] shadow-lg flex items-center gap-1.5 border-2 border-white whitespace-nowrap">
+            <span class="text-xs">${emoji}</span>
             <span>${ex.name}</span>
           </div>
         </div>
@@ -84,8 +96,8 @@ export default function MapView() {
       const icon = L.divIcon({
         html: customHtml,
         className: 'custom-leaflet-pin',
-        iconSize: [120, 36],
-        iconAnchor: [60, 18]
+        iconSize: [140, 36],
+        iconAnchor: [70, 18]
       });
 
       const marker = L.marker(ex.coordinates, { icon }).addTo(map);

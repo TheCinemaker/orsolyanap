@@ -13,8 +13,9 @@ Belépés a Stand Kezelő felületre:
 ------------------------------------------------------------------------
     1. | Fitt-Box Egyesület                          |     5555 | Diáksétány
     2. | Kőszegi Turisztikai Szövetség               |     0169 | Diáksétány 9
-    3. | sutiarcok (teszt user)                      |     0168 | Diáksétány 1.
+    3. | Kovács Miklós                               |     7777 | Diáksétány
+    4. | sutiarcok (teszt user)                      |     0168 | Diáksétány 1.
 ------------------------------------------------------------------------
 
 Szuper Admin belépési PIN kód (Szervezői Összesített Admin): 9999
-Generálva: 2026. 09. 10. 12:54:00
+Generálva: 2026. 09. 11. 8:17:10
