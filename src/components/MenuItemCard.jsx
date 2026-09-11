@@ -1,8 +1,8 @@
 import React from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { ThumbsUp, Trophy, Tag, CupSoda } from 'lucide-react';
+import { ThumbsUp, Trophy, Tag, CupSoda, MapPin } from 'lucide-react';
 
-export default function MenuItemCard({ item, exhibitor }) {
+export default function MenuItemCard({ item, exhibitor, onOpenLocationModal }) {
   const { votedItemIds, voteForItem } = useOrsolya();
 
   const isVoted = votedItemIds.includes(item.id);
@@ -75,7 +75,10 @@ export default function MenuItemCard({ item, exhibitor }) {
 
         {/* Item Image */}
         {item.image && (
-          <div className={`w-full aspect-video rounded-md overflow-hidden mb-3 border border-stone-200 bg-stone-950 flex items-center justify-center ${isCooking ? 'saturate-50' : ''}`}>
+          <div
+            onClick={() => onOpenLocationModal && onOpenLocationModal(item, exhibitor)}
+            className={`w-full aspect-video rounded-md overflow-hidden mb-3 border border-stone-200 bg-stone-950 flex items-center justify-center cursor-pointer ${isCooking ? 'saturate-50' : ''}`}
+          >
             <img
               src={item.image}
               alt={item.name}
@@ -86,7 +89,10 @@ export default function MenuItemCard({ item, exhibitor }) {
 
         {/* Title and Optional Price */}
         <div className="flex items-start justify-between gap-2">
-          <h3 className="text-sm sm:text-base font-extrabold text-stone-900 group-hover:text-amber-800 transition-colors leading-snug">
+          <h3
+            onClick={() => onOpenLocationModal && onOpenLocationModal(item, exhibitor)}
+            className="text-sm sm:text-base font-extrabold text-stone-900 group-hover:text-amber-800 transition-colors leading-snug cursor-pointer"
+          >
             {item.name}
           </h3>
 
@@ -126,13 +132,31 @@ export default function MenuItemCard({ item, exhibitor }) {
         )}
       </div>
 
-      {/* Footer / Voting Action Button */}
-      <div className="pt-3 border-t border-stone-100 flex items-center justify-end gap-2">
+      {/* Footer / Action Buttons */}
+      <div className="pt-3 border-t border-stone-100 flex items-center justify-between gap-2">
+        {/* Hol találom? Button */}
+        {exhibitor ? (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onOpenLocationModal) onOpenLocationModal(item, exhibitor);
+            }}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-bold bg-stone-100 hover:bg-amber-100 text-stone-800 hover:text-amber-950 border border-stone-200 hover:border-amber-300 transition-all cursor-pointer"
+            title="Stand helyszínének megjelenítése kis térképen"
+          >
+            <MapPin className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+            <span>Hol találom?</span>
+          </button>
+        ) : <div />}
+
         {/* Public Vote Button */}
         <button
           disabled={isCooking || isSoldOut}
-          onClick={() => voteForItem(item.id)}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-extrabold transition-all border shadow-2xs ${
+          onClick={(e) => {
+            e.stopPropagation();
+            voteForItem(item.id);
+          }}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-extrabold transition-all border shadow-2xs cursor-pointer ${
             isSoldOut || isCooking
               ? 'bg-stone-100 text-stone-400 border-stone-200 cursor-not-allowed pointer-events-none'
               : isVoted

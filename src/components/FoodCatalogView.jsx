@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useOrsolya, formatPrice } from '../context/OrsolyaContext';
+import DishLocationModal from './DishLocationModal';
 import {
   Utensils,
   MapPin,
@@ -43,6 +44,9 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
 
   // Collapsible section open/closed state (default: all open)
   const [closedSections, setClosedSections] = useState({});
+
+  // Location modal state ({ item, exhibitor })
+  const [selectedLocationModalData, setSelectedLocationModalData] = useState(null);
 
   const toggleSection = (catId) => {
     setClosedSections((prev) => ({
@@ -183,21 +187,33 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
           </div>
         )}
 
-        {/* Footer Action Bar: Heart Favorite Button & Vote Button */}
-        <div className="pt-2 border-t border-stone-100 flex items-center justify-between gap-2">
-          {/* Heart / Favorite Button */}
-          <button
-            onClick={() => toggleFavoriteItem(item.id)}
-            className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-extrabold transition-all border shadow-2xs cursor-pointer ${
-              isFavItem
-                ? 'bg-rose-100 text-rose-800 border-rose-300'
-                : 'bg-stone-50 hover:bg-rose-50 text-stone-600 hover:text-rose-700 border-stone-200'
-            }`}
-            title={isFavItem ? 'Eltávolítás a kedvencekből' : 'Étel hozzáadása a kedvencekhez'}
-          >
-            <Heart className={`w-3.5 h-3.5 ${isFavItem ? 'fill-rose-700 text-rose-700' : 'text-stone-400'}`} />
-            <span>{isFavItem ? 'Kedvenc' : 'Kedvenchez'}</span>
-          </button>
+        {/* Footer Action Bar: Hol találom, Heart Favorite & Vote Buttons */}
+        <div className="pt-2 border-t border-stone-100 flex items-center justify-between gap-1.5 flex-wrap">
+          <div className="flex items-center gap-1.5">
+            {/* Hol találom? Button */}
+            <button
+              onClick={() => setSelectedLocationModalData({ item, exhibitor })}
+              className="flex items-center gap-1 px-2 py-1 rounded text-xs font-extrabold bg-stone-100 hover:bg-amber-100 text-stone-800 hover:text-amber-950 border border-stone-200 hover:border-amber-300 transition-all cursor-pointer"
+              title="Stand helyszínének megjelenítése kis térképen"
+            >
+              <MapPin className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+              <span>Hol találom?</span>
+            </button>
+
+            {/* Heart / Favorite Button */}
+            <button
+              onClick={() => toggleFavoriteItem(item.id)}
+              className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-extrabold transition-all border shadow-2xs cursor-pointer ${
+                isFavItem
+                  ? 'bg-rose-100 text-rose-800 border-rose-300'
+                  : 'bg-stone-50 hover:bg-rose-50 text-stone-600 hover:text-rose-700 border-stone-200'
+              }`}
+              title={isFavItem ? 'Eltávolítás a kedvencekből' : 'Étel hozzáadása a kedvencekhez'}
+            >
+              <Heart className={`w-3.5 h-3.5 ${isFavItem ? 'fill-rose-700 text-rose-700' : 'text-stone-400'}`} />
+              <span>{isFavItem ? 'Kedvenc' : 'Kedvenchez'}</span>
+            </button>
+          </div>
 
           {/* Vote Button */}
           <button
@@ -370,6 +386,15 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
             );
           })()}
         </div>
+      )}
+
+      {/* Dish Location Modal */}
+      {selectedLocationModalData && (
+        <DishLocationModal
+          item={selectedLocationModalData.item}
+          exhibitor={selectedLocationModalData.exhibitor}
+          onClose={() => setSelectedLocationModalData(null)}
+        />
       )}
     </div>
   );
