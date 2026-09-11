@@ -171,9 +171,6 @@ function MainApp() {
         ) : (
           /* Visitor Main View */
           <div className="max-w-5xl mx-auto px-3 sm:px-4 pt-2 pb-4 space-y-4">
-            {/* Live Facebook/Instagram Style Reels Bar */}
-            <LiveReelBar />
-
             {/* Top Title Section */}
             <div className="text-center py-1">
               <h1 className="text-xs sm:text-sm font-black text-amber-950 uppercase tracking-widest">
@@ -191,6 +188,9 @@ function MainApp() {
               />
             ) : (
               <>
+                {/* Live Facebook/Instagram Style Reels Bar - Only on Main Tents Feed */}
+                <LiveReelBar />
+
                 {/* Exhibitors Feed */}
                 <div className="space-y-4 pt-2">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-stone-200 pb-2.5">
