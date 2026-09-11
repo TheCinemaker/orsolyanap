@@ -618,7 +618,10 @@ export function OrsolyaProvider({ children }) {
 
     if (isSupabaseConfigured) {
       try {
-        await supabase.from('menu_items').update({ is_hidden: newHiddenState }).eq('id', itemId);
+        const { error } = await supabase.from('menu_items').update({ is_hidden: newHiddenState }).eq('id', itemId);
+        if (error && (error.message?.includes('is_hidden') || error.code === 'PGRST204')) {
+          console.warn('is_hidden column missing in Supabase menu_items table');
+        }
       } catch (e) {
         console.warn('Supabase sync warning:', e);
       }
@@ -649,23 +652,42 @@ export function OrsolyaProvider({ children }) {
 
     if (itemData.id) {
       setMenuItems((prev) => prev.map((i) => (i.id === itemData.id ? { ...i, ...formattedItem } : i)));
+
       if (isSupabaseConfigured) {
+        const updatePayload = {
+          name: formattedItem.name,
+          description: formattedItem.description || '',
+          initial_stock: Number(formattedItem.initial_stock) || 30,
+          category: formattedItem.category,
+          price: formattedItem.price || null,
+          tags: formattedItem.tags || [],
+          available_day: formattedItem.available_day,
+          is_gluten_free: formattedItem.is_gluten_free,
+          is_lactose_free: formattedItem.is_lactose_free,
+          is_sugar_free: formattedItem.is_sugar_free,
+          is_vegan: formattedItem.is_vegan,
+          image: formattedItem.image || null
+        };
+
         try {
-          await supabase.from('menu_items').update({
-            name: formattedItem.name,
-            description: formattedItem.description,
-            initial_stock: Number(formattedItem.initial_stock) || 30,
-            category: formattedItem.category,
-            price: formattedItem.price || null,
-            tags: formattedItem.tags,
-            available_day: formattedItem.available_day,
-            is_gluten_free: formattedItem.is_gluten_free,
-            is_lactose_free: formattedItem.is_lactose_free,
-            is_sugar_free: formattedItem.is_sugar_free,
-            is_vegan: formattedItem.is_vegan,
-            is_hidden: formattedItem.is_hidden,
-            image: formattedItem.image || null
-          }).eq('id', itemData.id);
+          let { error: updErr } = await supabase
+            .from('menu_items')
+            .update({ ...updatePayload, is_hidden: formattedItem.is_hidden })
+            .eq('id', itemData.id);
+
+          if (updErr && (updErr.message?.includes('is_hidden') || updErr.code === 'PGRST204')) {
+            const { error: retryErr } = await supabase
+              .from('menu_items')
+              .update(updatePayload)
+              .eq('id', itemData.id);
+            if (retryErr) {
+              console.error('Supabase menu_items update error:', retryErr.message);
+              showToast('Hiba az étel Supabase mentésekor!', 'error');
+            }
+          } else if (updErr) {
+            console.error('Supabase menu_items update error:', updErr.message);
+            showToast('Hiba az étel Supabase mentésekor!', 'error');
+          }
         } catch (e) {
           console.warn('Supabase sync warning:', e);
         }
@@ -681,37 +703,54 @@ export function OrsolyaProvider({ children }) {
         status: 'ready',
         votes: 0
       };
+
       setMenuItems((prev) => [...prev, newItem]);
+
       if (isSupabaseConfigured) {
+        const dbPayload = {
+          id: newItem.id,
+          exhibitor_id: newItem.exhibitor_id,
+          name: newItem.name,
+          description: newItem.description || '',
+          initial_stock: newItem.initial_stock,
+          stock: newItem.stock,
+          status: newItem.status,
+          votes: 0,
+          category: newItem.category || 'meleg_etel',
+          price: newItem.price || null,
+          available_day: newItem.available_day || 'both',
+          is_gluten_free: newItem.is_gluten_free,
+          is_lactose_free: newItem.is_lactose_free,
+          is_sugar_free: newItem.is_sugar_free,
+          is_vegan: newItem.is_vegan,
+          tags: newItem.tags || [],
+          image: newItem.image || null
+        };
+
         try {
-          const dbPayload = {
-            id: newItem.id,
-            exhibitor_id: newItem.exhibitor_id,
-            name: newItem.name,
-            description: newItem.description || '',
-            initial_stock: newItem.initial_stock,
-            stock: newItem.stock,
-            status: newItem.status,
-            votes: 0,
-            category: newItem.category || 'meleg_etel',
-            price: newItem.price || null,
-            available_day: newItem.available_day || 'both',
-            is_gluten_free: newItem.is_gluten_free,
-            is_lactose_free: newItem.is_lactose_free,
-            is_sugar_free: newItem.is_sugar_free,
-            is_vegan: newItem.is_vegan,
-            is_hidden: newItem.is_hidden,
-            tags: newItem.tags || [],
-            image: newItem.image || null
-          };
-          const { error: insErr } = await supabase.from('menu_items').insert([dbPayload]);
-          if (insErr) {
+          let { error: insErr } = await supabase
+            .from('menu_items')
+            .insert([{ ...dbPayload, is_hidden: newItem.is_hidden }]);
+
+          if (insErr && (insErr.message?.includes('is_hidden') || insErr.code === 'PGRST204')) {
+            const { error: retryErr } = await supabase.from('menu_items').insert([dbPayload]);
+            if (retryErr) {
+              console.error('Supabase menu_items insert retry error:', retryErr.message);
+              showToast('Hiba az étel Supabase mentésekor!', 'error');
+            } else {
+              console.log('Supabase insert succeeded without is_hidden column!');
+            }
+          } else if (insErr) {
             console.error('Supabase menu_items insert error:', insErr.message);
+            showToast('Hiba az étel Supabase mentésekor!', 'error');
+          } else {
+            console.log('Supabase insert succeeded!');
           }
         } catch (e) {
           console.warn('Supabase sync warning:', e);
         }
       }
+
       showToast(
         newItem.is_hidden
           ? '🙈 Új rejtett étel hozzáadva (péntek délben aktiválódik)!'
