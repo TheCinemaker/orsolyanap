@@ -72,6 +72,20 @@ export function OrsolyaProvider({ children }) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const navigateToStand = (exhibitor) => {
+    setActiveView('visitor');
+    setMainTab('tents');
+    if (exhibitor) {
+      const name = typeof exhibitor === 'string' ? exhibitor : exhibitor.name;
+      setSearchQuery(name || '');
+    } else {
+      setSearchQuery('');
+    }
+    setSelectedDay('all');
+    setSelectedDietary('all');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // Toast message
   const [toastMessage, setToastMessage] = useState(null);
 
@@ -943,6 +957,7 @@ export function OrsolyaProvider({ children }) {
         setSearchQuery,
         navigateToFoodCatalog,
         navigateToStandFeed,
+        navigateToStand,
         toastMessage,
         showToast
       }}

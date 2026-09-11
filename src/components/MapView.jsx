@@ -27,7 +27,7 @@ const getShortExhibitorName = (exhibitor) => {
 };
 
 export default function MapView() {
-  const { exhibitors, menuItems, favoriteExhibitorIds, setActiveView, addToCart, showToast, focusedExhibitorIdOnMap } = useOrsolya();
+  const { exhibitors, menuItems, favoriteExhibitorIds, navigateToStand, showToast, focusedExhibitorIdOnMap } = useOrsolya();
   const [selectedExhibitorId, setSelectedExhibitorId] = useState(focusedExhibitorIdOnMap || exhibitors[0]?.id || null);
   const [mapMode, setMapMode] = useState('gps'); // 'gps' | 'schematic'
   const [userLocation, setUserLocation] = useState(null);
@@ -196,21 +196,7 @@ export default function MapView() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-8 space-y-6 sm:space-y-8">
-      {/* Page Header */}
-      <div className="text-center max-w-xl mx-auto space-y-2">
-        <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-800 bg-amber-100/80 px-3 py-1 rounded-full border border-amber-300/60 inline-flex items-center gap-1.5">
-          <MapPin className="w-3 h-3 text-amber-700" />
-          <span>CIVIL ÍZEK UTCÁJA • GPS TÉRKÉP</span>
-        </span>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-stone-900 tracking-tight">
-          Civil Ízek Utcája Interaktív Térkép
-        </h1>
-        <p className="text-xs sm:text-sm text-stone-600 font-medium">
-          A Natúrpark Ízei Gasztronómiai Fesztivál diáksétányi szakaszának GPS lehatárolása a Gyöngyös-patak mentén.
-        </p>
-      </div>
-
+    <div className="max-w-5xl mx-auto px-3 sm:px-4 py-4 space-y-4">
       {/* Map Dropdown & Location Control Bar */}
       <div className="bg-white border border-stone-200/90 rounded-md p-4 sm:p-5 shadow-xs space-y-4">
         {/* Exhibitor Dropdown Menu & GPS Button Row */}
@@ -322,8 +308,6 @@ export default function MapView() {
             {/* Stand Pills */}
             <div className="relative z-10 my-6 flex items-center justify-between gap-2 overflow-x-auto py-3 px-1 scrollbar-none">
               {exhibitors.map((ex) => {
-                const exItems = menuItems.filter((i) => i.exhibitor_id === ex.id);
-                const totalStock = exItems.reduce((s, i) => s + i.stock, 0);
                 const isSelected = ex.id === selectedExhibitorId;
                 const isFavorite = favoriteExhibitorIds.includes(ex.id);
 
@@ -331,20 +315,15 @@ export default function MapView() {
                   <button
                     key={ex.id}
                     onClick={() => handleSelectExhibitorChange(ex.id)}
-                    className={`flex-shrink-0 flex flex-col items-center gap-1.5 p-3 rounded-md border transition-all relative ${
+                    className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-md border transition-all cursor-pointer ${
                       isSelected
-                        ? 'bg-amber-800 text-white border-amber-800 shadow-md scale-105'
-                        : 'bg-white text-stone-900 border-stone-200 hover:border-amber-600'
+                        ? 'bg-amber-800 text-white border-amber-800 shadow-md scale-105 font-black'
+                        : 'bg-white text-stone-900 border-stone-200 hover:border-amber-600 font-bold'
                     }`}
                   >
-                    <div className="flex items-center gap-1 text-xs font-bold">
-                      <MapPin className={`w-3.5 h-3.5 ${isSelected ? 'text-amber-300' : 'text-amber-700'}`} />
-                      <span>{ex.name}</span>
-                      {isFavorite && <Heart className="w-3.5 h-3.5 text-rose-600 fill-rose-600" />}
-                    </div>
-                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${isSelected ? 'bg-amber-700 text-amber-100' : 'bg-stone-100 text-stone-600'}`}>
-                      {totalStock} adag kapható
-                    </span>
+                    <MapPin className={`w-3.5 h-3.5 ${isSelected ? 'text-amber-300' : 'text-amber-700'}`} />
+                    <span className="text-xs">{ex.name}</span>
+                    {isFavorite && <Heart className="w-3.5 h-3.5 text-rose-600 fill-rose-600" />}
                   </button>
                 );
               })}
@@ -367,8 +346,12 @@ export default function MapView() {
                     </span>
                   )}
                 </div>
-                <h3 className="text-lg sm:text-xl font-extrabold text-stone-900 mt-1">
-                  {selectedExhibitor.name}
+                <h3
+                  onClick={() => navigateToStand(selectedExhibitor)}
+                  className="text-lg sm:text-xl font-extrabold text-stone-900 mt-1 cursor-pointer hover:text-amber-800 transition-colors flex items-center gap-1.5 group"
+                >
+                  <span>{selectedExhibitor.name}</span>
+                  <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity text-amber-700 inline" />
                 </h3>
                 {selectedExhibitor.story && (
                   <p className="text-xs text-stone-700 mt-1 leading-relaxed">
@@ -378,38 +361,33 @@ export default function MapView() {
               </div>
 
               <button
-                onClick={() => setActiveView('visitor')}
+                onClick={() => navigateToStand(selectedExhibitor)}
                 className="px-4 py-2 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-md shadow-xs self-start sm:self-center flex items-center gap-1 whitespace-nowrap cursor-pointer"
               >
-                <span>Ételek listázása</span>
+                <span>Ugrás a stand oldalára</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
 
-            {/* Dishes */}
+            {/* Dishes Non-Clickable Simple List */}
             <div className="space-y-2">
               <h4 className="text-xs font-bold text-stone-500 uppercase tracking-wider">
                 Stand kínálata:
               </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {selectedItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className="bg-white border border-stone-200 p-3 rounded-md flex items-center justify-between text-xs"
-                  >
-                    <div>
-                      <span className="font-bold text-stone-900 block">{item.name}</span>
-                    </div>
-                    <button
-                      onClick={() => addToCart(item, selectedExhibitor)}
-                      disabled={item.stock <= 0}
-                      className="px-2.5 py-1 bg-amber-800 text-white rounded-lg font-bold text-[11px] hover:bg-amber-700 transition-all disabled:opacity-40 cursor-pointer"
+              {selectedItems.length > 0 ? (
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {selectedItems.map((item) => (
+                    <span
+                      key={item.id}
+                      className="px-3 py-1 bg-white border border-stone-200 text-stone-800 font-bold text-xs rounded-md shadow-2xs select-none"
                     >
-                      + Kóstoló ({item.stock} adag)
-                    </button>
-                  </div>
-                ))}
-              </div>
+                      • {item.name}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-stone-500 italic">Kínálat hamarosan...</p>
+              )}
             </div>
           </div>
         )}
@@ -417,4 +395,5 @@ export default function MapView() {
     </div>
   );
 }
+
 
