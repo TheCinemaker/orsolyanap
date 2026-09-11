@@ -28,7 +28,23 @@ export default function MapView() {
     }
   }, [focusedExhibitorIdOnMap, exhibitors]);
 
-  const filteredExhibitorsOnMap = exhibitors.filter((ex) => !showOnlyDrinks || ex.hasDrinks);
+  const [mapCategoryFilter, setMapCategoryFilter] = useState('all'); // 'all' | 'meleg_etel' | 'hideg_etel' | 'sutemeny' | 'street_food' | 'italok' | 'favorites'
+
+  const filteredExhibitorsOnMap = exhibitors.filter((ex) => {
+    const exItems = menuItems.filter((i) => i.exhibitor_id === ex.id);
+
+    if (mapCategoryFilter === 'favorites') {
+      return favoriteExhibitorIds.includes(ex.id);
+    }
+    if (mapCategoryFilter === 'italok') {
+      return ex.hasDrinks || ex.category === 'italok' || ex.category === 'ital' || exItems.some((i) => i.category === 'italok' || i.category === 'ital');
+    }
+    if (mapCategoryFilter !== 'all') {
+      return ex.category === mapCategoryFilter || exItems.some((i) => i.category === mapCategoryFilter);
+    }
+    return true;
+  });
+
   const selectedExhibitor = exhibitors.find((ex) => ex.id === selectedExhibitorId);
   const selectedItems = menuItems.filter((i) => i.exhibitor_id === selectedExhibitorId);
 
@@ -65,29 +81,22 @@ export default function MapView() {
       }
     });
 
-    // Add Exhibitor Markers
+    // Add Exhibitor Markers (NO EMOJIS, NO FLASHING / ANIMATIONS)
     filteredExhibitorsOnMap.forEach((ex) => {
       if (!ex.coordinates) return;
 
       const isSelected = ex.id === selectedExhibitorId;
       const isFav = favoriteExhibitorIds.includes(ex.id);
-      
-      let emoji = '🍲';
-      if (ex.category === 'sutemeny') emoji = '🍰';
-      else if (ex.category === 'italok' || ex.hasDrinks) emoji = '🥤';
-      else if (ex.category === 'street_food') emoji = '🍔';
-      else if (ex.category === 'hideg_etel') emoji = '🥗';
 
       const pinBg = isSelected
-        ? 'bg-amber-900 text-white ring-4 ring-amber-400 scale-110'
+        ? 'bg-amber-900 text-white font-black border-amber-950 shadow-md scale-105'
         : isFav
-        ? 'bg-rose-800 text-white ring-2 ring-rose-300'
-        : 'bg-stone-900 text-white hover:bg-amber-900';
+        ? 'bg-rose-800 text-white font-extrabold border-rose-900 shadow-sm'
+        : 'bg-stone-900 text-white font-extrabold border-stone-950 shadow-2xs hover:bg-amber-900';
 
       const customHtml = `
-        <div class="relative group cursor-pointer transition-transform duration-200">
-          <div class="px-2.5 py-1 rounded-full ${pinBg} font-extrabold text-[11px] shadow-lg flex items-center gap-1.5 border-2 border-white whitespace-nowrap">
-            <span class="text-xs">${emoji}</span>
+        <div class="relative group cursor-pointer">
+          <div class="px-3 py-1.5 rounded-full ${pinBg} text-[11px] flex items-center justify-center border-2 border-white whitespace-nowrap tracking-wide">
             <span>${ex.name}</span>
           </div>
         </div>
@@ -112,7 +121,6 @@ export default function MapView() {
     if (userLocation) {
       const userHtml = `
         <div class="relative flex items-center justify-center">
-          <span class="animate-ping absolute inline-flex h-6 w-6 rounded-full bg-sky-400 opacity-75"></span>
           <div class="w-4 h-4 bg-sky-600 border-2 border-white rounded-full shadow-lg"></div>
         </div>
       `;
@@ -124,7 +132,7 @@ export default function MapView() {
       });
       userMarkerRef.current = L.marker(userLocation, { icon: userIcon }).addTo(map);
     }
-  }, [mapMode, exhibitors, selectedExhibitorId, favoriteExhibitorIds, menuItems, userLocation, showOnlyDrinks]);
+  }, [mapMode, exhibitors, selectedExhibitorId, favoriteExhibitorIds, menuItems, userLocation, mapCategoryFilter]);
 
   // Handle Geolocation tracking
   const handleGetLocation = () => {
@@ -168,9 +176,89 @@ export default function MapView() {
         </p>
       </div>
 
-      {/* Map Control Bar */}
-      <div className="bg-white border border-stone-200/90 rounded-md p-4 sm:p-6 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-stone-100 pb-3">
+      {/* Map Control & Category Filter Bar */}
+      <div className="bg-white border border-stone-200/90 rounded-md p-4 sm:p-6 shadow-xs space-y-3">
+        {/* Category Pills Bar */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-bold scrollbar-none">
+          <button
+            onClick={() => setMapCategoryFilter('all')}
+            className={`px-3 py-1.5 rounded-md transition-all whitespace-nowrap cursor-pointer ${
+              mapCategoryFilter === 'all'
+                ? 'bg-amber-900 text-white shadow-xs font-extrabold'
+                : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+            }`}
+          >
+            Összes Stand ({exhibitors.length})
+          </button>
+
+          <button
+            onClick={() => setMapCategoryFilter('meleg_etel')}
+            className={`px-3 py-1.5 rounded-md transition-all whitespace-nowrap cursor-pointer ${
+              mapCategoryFilter === 'meleg_etel'
+                ? 'bg-amber-900 text-white shadow-xs font-extrabold'
+                : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+            }`}
+          >
+            Meleg ételek
+          </button>
+
+          <button
+            onClick={() => setMapCategoryFilter('hideg_etel')}
+            className={`px-3 py-1.5 rounded-md transition-all whitespace-nowrap cursor-pointer ${
+              mapCategoryFilter === 'hideg_etel'
+                ? 'bg-amber-900 text-white shadow-xs font-extrabold'
+                : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+            }`}
+          >
+            Hideg ételek
+          </button>
+
+          <button
+            onClick={() => setMapCategoryFilter('sutemeny')}
+            className={`px-3 py-1.5 rounded-md transition-all whitespace-nowrap cursor-pointer ${
+              mapCategoryFilter === 'sutemeny'
+                ? 'bg-amber-900 text-white shadow-xs font-extrabold'
+                : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+            }`}
+          >
+            Sütemény / Édesség
+          </button>
+
+          <button
+            onClick={() => setMapCategoryFilter('street_food')}
+            className={`px-3 py-1.5 rounded-md transition-all whitespace-nowrap cursor-pointer ${
+              mapCategoryFilter === 'street_food'
+                ? 'bg-amber-900 text-white shadow-xs font-extrabold'
+                : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+            }`}
+          >
+            Street Food
+          </button>
+
+          <button
+            onClick={() => setMapCategoryFilter('italok')}
+            className={`px-3 py-1.5 rounded-md transition-all whitespace-nowrap cursor-pointer ${
+              mapCategoryFilter === 'italok'
+                ? 'bg-cyan-800 text-white shadow-xs font-extrabold'
+                : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+            }`}
+          >
+            Italok
+          </button>
+
+          <button
+            onClick={() => setMapCategoryFilter('favorites')}
+            className={`px-3 py-1.5 rounded-md transition-all whitespace-nowrap cursor-pointer ${
+              mapCategoryFilter === 'favorites'
+                ? 'bg-rose-800 text-white shadow-xs font-extrabold'
+                : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
+            }`}
+          >
+            Kedvenceim ({favoriteExhibitorIds.length})
+          </button>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-stone-100 pt-3">
           {/* Mode Switcher */}
           <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
             <button
@@ -183,18 +271,6 @@ export default function MapView() {
             >
               <Compass className="w-3.5 h-3.5" />
               <span>GPS Műholdas Térkép</span>
-            </button>
-
-            <button
-              onClick={() => setShowOnlyDrinks((prev) => !prev)}
-              className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-extrabold transition-all border ${
-                showOnlyDrinks
-                  ? 'bg-cyan-100 border-cyan-300 text-cyan-900 shadow-xs'
-                  : 'bg-stone-50 border-stone-200 text-stone-600 hover:bg-stone-100'
-              }`}
-            >
-              <CupSoda className="w-3.5 h-3.5 text-cyan-800" />
-              <span>Csak italos árusok</span>
             </button>
 
             <button

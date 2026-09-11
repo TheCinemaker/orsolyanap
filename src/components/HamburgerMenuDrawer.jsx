@@ -230,11 +230,29 @@ export default function HamburgerMenuDrawer({
             </button>
 
             <button
+              onClick={() => handleSelectCategory('hideg_etel')}
+              className="w-full flex items-center justify-between px-3.5 py-2 rounded-md text-xs font-semibold text-stone-700 hover:bg-stone-100 transition-all cursor-pointer"
+            >
+              <span className="flex items-center gap-2">
+                <Utensils className="w-3.5 h-3.5 text-stone-700" /> Hideg ételek
+              </span>
+            </button>
+
+            <button
               onClick={() => handleSelectCategory('sutemeny')}
               className="w-full flex items-center justify-between px-3.5 py-2 rounded-md text-xs font-semibold text-stone-700 hover:bg-stone-100 transition-all cursor-pointer"
             >
               <span className="flex items-center gap-2">
                 <Cookie className="w-3.5 h-3.5 text-amber-800" /> Sütemény / Édesség
+              </span>
+            </button>
+
+            <button
+              onClick={() => handleSelectCategory('street_food')}
+              className="w-full flex items-center justify-between px-3.5 py-2 rounded-md text-xs font-semibold text-stone-700 hover:bg-stone-100 transition-all cursor-pointer"
+            >
+              <span className="flex items-center gap-2">
+                <Package className="w-3.5 h-3.5 text-amber-800" /> Street Food
               </span>
             </button>
 
