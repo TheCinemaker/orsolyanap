@@ -1,15 +1,35 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { FESTIVAL_BOUNDS } from '../data/mockOrsolyaData';
-import { MapPin, ArrowRight, Compass, Waves, Trees, Castle, Heart, Navigation, Layers, CupSoda } from 'lucide-react';
+import { MapPin, ArrowRight, Compass, Waves, Trees, Castle, Heart, Navigation, Layers } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+
+// Helper function to shorten exhibitor names for clean map pills
+const getShortExhibitorName = (exhibitor) => {
+  if (!exhibitor || !exhibitor.name) return '';
+  if (exhibitor.short_name) return exhibitor.short_name;
+
+  const name = exhibitor.name.trim();
+  const lower = name.toLowerCase();
+
+  if (lower.includes('fitt-box') || lower.includes('fitt box')) return 'Fitt-Box';
+  if (lower.includes('turisztikai')) return 'KTSZE';
+  if (lower.includes('kovács miklós')) return 'Csendes Kovács';
+  if (lower.includes('sütiarcok') || lower.includes('sutiarcok')) return 'Sütiarcok';
+
+  if (name.length > 14) {
+    const parts = name.split(' ');
+    if (parts.length > 1) {
+      return `${parts[0]} ${parts[1].charAt(0)}.`;
+    }
+  }
+  return name;
+};
 
 export default function MapView() {
   const { exhibitors, menuItems, favoriteExhibitorIds, setActiveView, addToCart, showToast, focusedExhibitorIdOnMap } = useOrsolya();
   const [selectedExhibitorId, setSelectedExhibitorId] = useState(focusedExhibitorIdOnMap || exhibitors[0]?.id || null);
   const [mapMode, setMapMode] = useState('gps'); // 'gps' | 'schematic'
-  const [showOnlyDrinks, setShowOnlyDrinks] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
   const [isLocating, setIsLocating] = useState(false);
 
@@ -17,33 +37,39 @@ export default function MapView() {
   const leafletMapRef = useRef(null);
   const userMarkerRef = useRef(null);
 
+  // Auto-locate user immediately when MapView is opened (request phone permission)
+  useEffect(() => {
+    if (navigator.geolocation && !userLocation) {
+      setIsLocating(true);
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const coords = [pos.coords.latitude, pos.coords.longitude];
+          setUserLocation(coords);
+          setIsLocating(false);
+          if (leafletMapRef.current) {
+            leafletMapRef.current.flyTo(coords, 20);
+          }
+          showToast('GPS pozíció azonosítva! Látható hol állsz a Diáksétányon.', 'success');
+        },
+        (err) => {
+          setIsLocating(false);
+          console.warn('Geolocation notice:', err.message);
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    }
+  }, []);
+
   // If focusedExhibitorIdOnMap changes, focus it
   useEffect(() => {
     if (focusedExhibitorIdOnMap) {
       setSelectedExhibitorId(focusedExhibitorIdOnMap);
       const found = exhibitors.find((e) => e.id === focusedExhibitorIdOnMap);
       if (found && found.coordinates && leafletMapRef.current) {
-        leafletMapRef.current.panTo(found.coordinates);
+        leafletMapRef.current.flyTo(found.coordinates, 20);
       }
     }
   }, [focusedExhibitorIdOnMap, exhibitors]);
-
-  const [mapCategoryFilter, setMapCategoryFilter] = useState('all'); // 'all' | 'meleg_etel' | 'hideg_etel' | 'sutemeny' | 'street_food' | 'italok' | 'favorites'
-
-  const filteredExhibitorsOnMap = exhibitors.filter((ex) => {
-    const exItems = menuItems.filter((i) => i.exhibitor_id === ex.id);
-
-    if (mapCategoryFilter === 'favorites') {
-      return favoriteExhibitorIds.includes(ex.id);
-    }
-    if (mapCategoryFilter === 'italok') {
-      return ex.hasDrinks || ex.category === 'italok' || ex.category === 'ital' || exItems.some((i) => i.category === 'italok' || i.category === 'ital');
-    }
-    if (mapCategoryFilter !== 'all') {
-      return ex.category === mapCategoryFilter || exItems.some((i) => i.category === mapCategoryFilter);
-    }
-    return true;
-  });
 
   const selectedExhibitor = exhibitors.find((ex) => ex.id === selectedExhibitorId);
   const selectedItems = menuItems.filter((i) => i.exhibitor_id === selectedExhibitorId);
@@ -53,7 +79,6 @@ export default function MapView() {
     if (mapMode !== 'gps' || !mapContainerRef.current) return;
 
     if (!leafletMapRef.current) {
-      // Center of festival polygon
       const map = L.map(mapContainerRef.current, {
         center: [47.38936, 16.53894],
         zoom: 19,
@@ -81,8 +106,8 @@ export default function MapView() {
       }
     });
 
-    // Add Exhibitor Markers (NO EMOJIS, NO FLASHING / ANIMATIONS)
-    filteredExhibitorsOnMap.forEach((ex) => {
+    // Add Exhibitor Markers (Compact pills with sharp minimal corners & shortened names)
+    exhibitors.forEach((ex) => {
       if (!ex.coordinates) return;
 
       const isSelected = ex.id === selectedExhibitorId;
@@ -91,13 +116,15 @@ export default function MapView() {
       const pinBg = isSelected
         ? 'bg-amber-900 text-white font-black border-amber-950 shadow-md scale-105'
         : isFav
-        ? 'bg-rose-800 text-white font-extrabold border-rose-900 shadow-sm'
-        : 'bg-stone-900 text-white font-extrabold border-stone-950 shadow-2xs hover:bg-amber-900';
+        ? 'bg-rose-800 text-white font-extrabold border-rose-900 shadow-2xs'
+        : 'bg-stone-900 text-white font-bold border-stone-950 shadow-2xs hover:bg-amber-900';
+
+      const shortName = getShortExhibitorName(ex);
 
       const customHtml = `
         <div class="relative group cursor-pointer">
-          <div class="px-3 py-1.5 rounded-full ${pinBg} text-[11px] flex items-center justify-center border-2 border-white whitespace-nowrap tracking-wide">
-            <span>${ex.name}</span>
+          <div class="px-1.5 py-0.5 rounded-xs ${pinBg} text-[10px] flex items-center justify-center border border-white whitespace-nowrap tracking-tight">
+            <span>${shortName}</span>
           </div>
         </div>
       `;
@@ -105,8 +132,8 @@ export default function MapView() {
       const icon = L.divIcon({
         html: customHtml,
         className: 'custom-leaflet-pin',
-        iconSize: [140, 36],
-        iconAnchor: [70, 18]
+        iconSize: [90, 24],
+        iconAnchor: [45, 12]
       });
 
       const marker = L.marker(ex.coordinates, { icon }).addTo(map);
@@ -117,24 +144,24 @@ export default function MapView() {
       });
     });
 
-    // Add user marker if available
+    // Add user location marker if available (solid blue marker, no flashing)
     if (userLocation) {
       const userHtml = `
         <div class="relative flex items-center justify-center">
-          <div class="w-4 h-4 bg-sky-600 border-2 border-white rounded-full shadow-lg"></div>
+          <div class="w-4 h-4 bg-sky-600 border-2 border-white rounded-full shadow-lg" title="Te itt állsz!"></div>
         </div>
       `;
       const userIcon = L.divIcon({
         html: userHtml,
         className: 'user-location-pin',
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
+        iconSize: [20, 20],
+        iconAnchor: [10, 10]
       });
       userMarkerRef.current = L.marker(userLocation, { icon: userIcon }).addTo(map);
     }
-  }, [mapMode, exhibitors, selectedExhibitorId, favoriteExhibitorIds, menuItems, userLocation, mapCategoryFilter]);
+  }, [mapMode, exhibitors, selectedExhibitorId, favoriteExhibitorIds, userLocation]);
 
-  // Handle Geolocation tracking
+  // Handle Geolocation tracking & re-centering
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
       showToast('A böngésző nem támogatja a GPS helymeghatározást.', 'error');
@@ -148,16 +175,24 @@ export default function MapView() {
         setUserLocation(coords);
         setIsLocating(false);
         if (leafletMapRef.current) {
-          leafletMapRef.current.flyTo(coords, 19);
+          leafletMapRef.current.flyTo(coords, 20);
         }
         showToast('Pozíció azonosítva a Diáksétányon!', 'success');
       },
       (err) => {
         setIsLocating(false);
-        showToast('Nem sikerült lekérni a GPS pozíciót.', 'error');
+        showToast('Nem sikerült lekérni a GPS pozíciót. Ellenőrizd a helymeghatározási engedélyt.', 'error');
       },
-      { enableHighAccuracy: true }
+      { enableHighAccuracy: true, timeout: 10000 }
     );
+  };
+
+  const handleSelectExhibitorChange = (exhibitorId) => {
+    setSelectedExhibitorId(exhibitorId);
+    const found = exhibitors.find((ex) => ex.id === exhibitorId);
+    if (found && found.coordinates && leafletMapRef.current) {
+      leafletMapRef.current.flyTo(found.coordinates, 20);
+    }
   };
 
   return (
@@ -176,94 +211,48 @@ export default function MapView() {
         </p>
       </div>
 
-      {/* Map Control & Category Filter Bar */}
-      <div className="bg-white border border-stone-200/90 rounded-md p-4 sm:p-6 shadow-xs space-y-3">
-        {/* Category Pills Bar */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-bold scrollbar-none">
-          <button
-            onClick={() => setMapCategoryFilter('all')}
-            className={`px-3 py-1.5 rounded-md transition-all whitespace-nowrap cursor-pointer ${
-              mapCategoryFilter === 'all'
-                ? 'bg-amber-900 text-white shadow-xs font-extrabold'
-                : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
-            }`}
-          >
-            Összes Stand ({exhibitors.length})
-          </button>
+      {/* Map Dropdown & Location Control Bar */}
+      <div className="bg-white border border-stone-200/90 rounded-md p-4 sm:p-5 shadow-xs space-y-4">
+        {/* Exhibitor Dropdown Menu & GPS Button Row */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div className="flex-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <label htmlFor="exhibitor-select" className="text-xs font-bold text-stone-700 whitespace-nowrap">
+              Kiállító keresése:
+            </label>
+            <select
+              id="exhibitor-select"
+              value={selectedExhibitorId || ''}
+              onChange={(e) => handleSelectExhibitorChange(e.target.value)}
+              className="w-full flex-1 bg-stone-50 border border-stone-300 rounded-md px-3 py-2 text-xs font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-800 cursor-pointer"
+            >
+              <option value="" disabled>-- Válassz kiállítót a megtekintéshez --</option>
+              {exhibitors.map((ex) => (
+                <option key={ex.id} value={ex.id}>
+                  {ex.name} ({getShortExhibitorName(ex)})
+                </option>
+              ))}
+            </select>
+          </div>
 
-          <button
-            onClick={() => setMapCategoryFilter('meleg_etel')}
-            className={`px-3 py-1.5 rounded-md transition-all whitespace-nowrap cursor-pointer ${
-              mapCategoryFilter === 'meleg_etel'
-                ? 'bg-amber-900 text-white shadow-xs font-extrabold'
-                : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
-            }`}
-          >
-            Meleg ételek
-          </button>
-
-          <button
-            onClick={() => setMapCategoryFilter('hideg_etel')}
-            className={`px-3 py-1.5 rounded-md transition-all whitespace-nowrap cursor-pointer ${
-              mapCategoryFilter === 'hideg_etel'
-                ? 'bg-amber-900 text-white shadow-xs font-extrabold'
-                : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
-            }`}
-          >
-            Hideg ételek
-          </button>
-
-          <button
-            onClick={() => setMapCategoryFilter('sutemeny')}
-            className={`px-3 py-1.5 rounded-md transition-all whitespace-nowrap cursor-pointer ${
-              mapCategoryFilter === 'sutemeny'
-                ? 'bg-amber-900 text-white shadow-xs font-extrabold'
-                : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
-            }`}
-          >
-            Sütemény / Édesség
-          </button>
-
-          <button
-            onClick={() => setMapCategoryFilter('street_food')}
-            className={`px-3 py-1.5 rounded-md transition-all whitespace-nowrap cursor-pointer ${
-              mapCategoryFilter === 'street_food'
-                ? 'bg-amber-900 text-white shadow-xs font-extrabold'
-                : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
-            }`}
-          >
-            Street Food
-          </button>
-
-          <button
-            onClick={() => setMapCategoryFilter('italok')}
-            className={`px-3 py-1.5 rounded-md transition-all whitespace-nowrap cursor-pointer ${
-              mapCategoryFilter === 'italok'
-                ? 'bg-cyan-800 text-white shadow-xs font-extrabold'
-                : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
-            }`}
-          >
-            Italok
-          </button>
-
-          <button
-            onClick={() => setMapCategoryFilter('favorites')}
-            className={`px-3 py-1.5 rounded-md transition-all whitespace-nowrap cursor-pointer ${
-              mapCategoryFilter === 'favorites'
-                ? 'bg-rose-800 text-white shadow-xs font-extrabold'
-                : 'bg-stone-100 text-stone-700 hover:bg-stone-200'
-            }`}
-          >
-            Kedvenceim ({favoriteExhibitorIds.length})
-          </button>
+          {/* User Location Button */}
+          {mapMode === 'gps' && (
+            <button
+              onClick={handleGetLocation}
+              disabled={isLocating}
+              className="px-4 py-2 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-md shadow-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer whitespace-nowrap"
+            >
+              <Navigation className="w-3.5 h-3.5 text-white" />
+              <span>{isLocating ? 'Helymeghatározás...' : 'Hol vagyok? (GPS)'}</span>
+            </button>
+          )}
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-stone-100 pt-3">
-          {/* Mode Switcher */}
-          <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto">
+        {/* Mode Switcher */}
+        <div className="flex items-center justify-between border-t border-stone-100 pt-3 text-xs">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setMapMode('gps')}
-              className={`flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-bold transition-all ${
+              className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md font-bold transition-all cursor-pointer ${
                 mapMode === 'gps'
                   ? 'bg-amber-800 text-white shadow-xs'
                   : 'bg-stone-100 text-stone-600 hover:text-stone-900'
@@ -275,9 +264,9 @@ export default function MapView() {
 
             <button
               onClick={() => setMapMode('schematic')}
-              className={`flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-bold transition-all ${
+              className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md font-bold transition-all cursor-pointer ${
                 mapMode === 'schematic'
-                  ? 'bg-white text-stone-900 shadow-xs'
+                  ? 'bg-white text-stone-900 border border-stone-300 shadow-xs'
                   : 'text-stone-600 hover:text-stone-900'
               }`}
             >
@@ -286,16 +275,11 @@ export default function MapView() {
             </button>
           </div>
 
-          {/* User Geolocation Button */}
-          {mapMode === 'gps' && (
-            <button
-              onClick={handleGetLocation}
-              disabled={isLocating}
-              className="w-full sm:w-auto px-4 py-2 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-md shadow-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-50"
-            >
-              <Navigation className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} />
-              <span>{isLocating ? 'Helymeghatározás...' : 'Hol vagyok a fesztiválon?'}</span>
-            </button>
+          {userLocation && (
+            <span className="text-[11px] font-semibold text-emerald-700 flex items-center gap-1">
+              <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block"></span>
+              Saját pozíció aktív
+            </span>
           )}
         </div>
 
@@ -346,7 +330,7 @@ export default function MapView() {
                 return (
                   <button
                     key={ex.id}
-                    onClick={() => setSelectedExhibitorId(ex.id)}
+                    onClick={() => handleSelectExhibitorChange(ex.id)}
                     className={`flex-shrink-0 flex flex-col items-center gap-1.5 p-3 rounded-md border transition-all relative ${
                       isSelected
                         ? 'bg-amber-800 text-white border-amber-800 shadow-md scale-105'
@@ -395,7 +379,7 @@ export default function MapView() {
 
               <button
                 onClick={() => setActiveView('visitor')}
-                className="px-4 py-2 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-md shadow-xs self-start sm:self-center flex items-center gap-1 whitespace-nowrap"
+                className="px-4 py-2 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-md shadow-xs self-start sm:self-center flex items-center gap-1 whitespace-nowrap cursor-pointer"
               >
                 <span>Ételek listázása</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -419,7 +403,7 @@ export default function MapView() {
                     <button
                       onClick={() => addToCart(item, selectedExhibitor)}
                       disabled={item.stock <= 0}
-                      className="px-2.5 py-1 bg-amber-800 text-white rounded-lg font-bold text-[11px] hover:bg-amber-700 transition-all disabled:opacity-40"
+                      className="px-2.5 py-1 bg-amber-800 text-white rounded-lg font-bold text-[11px] hover:bg-amber-700 transition-all disabled:opacity-40 cursor-pointer"
                     >
                       + Kóstoló ({item.stock} adag)
                     </button>
@@ -433,3 +417,4 @@ export default function MapView() {
     </div>
   );
 }
+
