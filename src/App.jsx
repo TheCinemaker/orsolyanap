@@ -236,7 +236,7 @@ function MainApp() {
                     <div className="space-y-4">
                       <div className="flex items-center justify-center gap-2 text-xs font-extrabold text-amber-900 py-3 bg-amber-50 rounded-md border border-amber-200/80 shadow-2xs">
                         <Loader2 className="w-4 h-4 text-amber-800 animate-spin" />
-                        <span>Adatok betöltése a Supabase adatbázisból...</span>
+                        <span>Adatok betöltése, kis türelmet...</span>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {[1, 2, 3, 4, 5, 6].map((sk) => (
