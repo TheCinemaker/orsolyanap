@@ -42,11 +42,15 @@ CREATE TABLE IF NOT EXISTS public.menu_items (
     is_lactose_free BOOLEAN DEFAULT false,
     is_sugar_free BOOLEAN DEFAULT false,
     is_vegan BOOLEAN DEFAULT false,
+    is_hidden BOOLEAN DEFAULT false,
     tags TEXT[] DEFAULT '{}',
     price TEXT,
     image TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Ensure is_hidden column exists if schema was created previously
+ALTER TABLE public.menu_items ADD COLUMN IF NOT EXISTS is_hidden BOOLEAN DEFAULT false;
 
 -- Votes (Közönségszavazás követése)
 CREATE TABLE IF NOT EXISTS public.votes (
