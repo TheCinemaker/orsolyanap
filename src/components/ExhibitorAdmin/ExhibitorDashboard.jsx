@@ -122,7 +122,6 @@ export default function ExhibitorDashboard() {
     name: '',
     description: '',
     category: 'meleg_etel',
-    price: '',
     tags: 'Meleg étel',
     available_day: 'both',
     is_gluten_free: false,
