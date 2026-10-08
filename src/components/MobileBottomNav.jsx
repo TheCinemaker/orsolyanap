@@ -9,7 +9,8 @@ export default function MobileBottomNav({ onOpenFavorites, onOpenScanner, setMai
     favoriteExhibitorIds,
     favoriteItemIds,
     navigateToStandFeed,
-    navigateToFoodCatalog
+    navigateToFoodCatalog,
+    mainTab
   } = useOrsolya();
   const totalFavs = favoriteExhibitorIds.length + (favoriteItemIds?.length || 0);
 
@@ -52,7 +53,7 @@ export default function MobileBottomNav({ onOpenFavorites, onOpenScanner, setMai
             if (setMainTab) setMainTab('program');
           }}
           className={`flex flex-col items-center gap-0.5 py-1 px-1.5 rounded-md transition-all ${
-            activeView === 'visitor' && false ? 'text-amber-900 font-black' : 'text-stone-500 font-medium hover:text-stone-900'
+            activeView === 'visitor' && mainTab === 'program' ? 'text-amber-900 font-black' : 'text-stone-500 font-medium hover:text-stone-900'
           }`}
           title="Programfüzet"
         >
