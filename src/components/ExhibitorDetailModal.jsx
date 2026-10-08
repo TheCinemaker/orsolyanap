@@ -203,11 +203,10 @@ export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish 
                 return (
                   <div
                     key={item.id}
-                    onClick={(e) => e.stopPropagation()}
-                    className={`border p-3 rounded-md flex items-center justify-between gap-3 shadow-2xs transition-all cursor-pointer hover:border-amber-400 ${
+                                    className={`border p-3 rounded-md flex items-center justify-between gap-3 shadow-2xs ${
                       isSoldOut ? 'border-stone-300 bg-stone-100 opacity-80 grayscale' : 'bg-white border-stone-200'
                     }`}
-                    title="Étel információ"
+                   
                   >
                     {/* Item Image */}
                     {item.image && (
