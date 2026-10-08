@@ -16,7 +16,9 @@ import {
   CupSoda,
   Package,
   Sparkles,
-  Heart
+  Heart,
+  Search,
+  X
 } from 'lucide-react';
 
 const CATEGORY_SECTIONS = [
@@ -44,6 +46,8 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
 
   // Collapsible section open/closed state (default: all open)
   const [closedSections, setClosedSections] = useState({});
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [activeTag, setActiveTag] = useState('all');
 
   // Location modal state ({ item, exhibitor })
   const [selectedLocationModalData, setSelectedLocationModalData] = useState(null);
@@ -55,7 +59,20 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
     }));
   };
 
-  // Filter items matching search & day & visibility (hidden mode)
+  const availableTags = useMemo(() => {
+    const counts = new Map();
+    menuItems.forEach((item) => {
+      (item.tags || []).forEach((tag) => counts.set(tag, (counts.get(tag) || 0) + 1));
+    });
+    return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'hu'));
+  }, [menuItems]);
+
+  const categoryFilters = CATEGORY_SECTIONS.filter((section) =>
+    menuItems.some((item) => item.category === section.id || (section.id === 'italok' && item.category === 'ital'))
+  );
+
+  // Filter items matching search, day, category, tag and visitor visibility
+
   const filteredItems = useMemo(() => {
     return menuItems.filter((item) => {
       const exhibitor = exhibitors.find((ex) => ex.id === item.exhibitor_id);
@@ -63,6 +80,8 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
       const exLoc = exhibitor ? exhibitor.location.toLowerCase() : '';
 
       const matchesVisibility = isItemVisibleToVisitors ? isItemVisibleToVisitors(item) : !item.is_hidden;
+      const matchesCategory = activeCategory === 'all' || item.category === activeCategory || (activeCategory === 'italok' && item.category === 'ital');
+      const matchesTag = activeTag === 'all' || (item.tags || []).includes(activeTag);
 
       const matchesSearch =
         !searchQuery ||
@@ -80,19 +99,22 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
         itemDay === selectedDay ||
         (exDay !== 'both' && exDay === selectedDay);
 
-      return matchesVisibility && matchesSearch && matchesDay;
+      return matchesVisibility && matchesSearch && matchesDay && matchesCategory && matchesTag;
     });
-  }, [menuItems, exhibitors, searchQuery, selectedDay, isItemVisibleToVisitors]);
+  }, [menuItems, exhibitors, searchQuery, selectedDay, activeCategory, activeTag, isItemVisibleToVisitors]);
 
-  // Fair Randomized Shuffle of items on each load so exhibitors get equal top exposure
-  const randomizedItems = useMemo(() => {
-    const list = [...filteredItems];
-    for (let i = list.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [list[i], list[j]] = [list[j], list[i]];
-    }
-    return list;
-  }, [filteredItems]);
+  // Stable ordering: first by category, then by exhibitor, then by dish name.
+  const sortedItems = useMemo(() => {
+    const categoryOrder = { meleg_etel: 1, street_food: 2, sutemeny: 3, italok: 4, ital: 4, hideg_etel: 5, egyeb: 6 };
+    return [...filteredItems].sort((a, b) => {
+      const cat = (categoryOrder[a.category] || 99) - (categoryOrder[b.category] || 99);
+      if (cat !== 0) return cat;
+      const exA = exhibitors.find((ex) => ex.id === a.exhibitor_id)?.name || '';
+      const exB = exhibitors.find((ex) => ex.id === b.exhibitor_id)?.name || '';
+      const ex = exA.localeCompare(exB, 'hu');
+      return ex !== 0 ? ex : a.name.localeCompare(b.name, 'hu');
+    });
+  }, [filteredItems, exhibitors]);
 
   const renderDishCard = (item) => {
     const exhibitor = exhibitors.find((ex) => ex.id === item.exhibitor_id);
@@ -122,9 +144,13 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
         )}
 
         {/* Item Image */}
-        {item.image && (
+        {item.image ? (
           <div className="w-full aspect-video rounded-md overflow-hidden my-1 border border-stone-200 bg-stone-950 flex items-center justify-center">
             <img src={item.image} alt={item.name} className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105" />
+          </div>
+        ) : (
+          <div className="w-full aspect-video rounded-md my-1 border border-stone-200 bg-stone-100 flex items-center justify-center text-stone-400">
+            <Utensils className="w-8 h-8 opacity-40" />
           </div>
         )}
 
@@ -163,7 +189,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
               {item.name}
             </h3>
             <span className="shrink-0 text-[11px] font-black text-amber-950 bg-amber-100 px-2 py-0.5 rounded border border-amber-300 flex items-center gap-1">
-              <Tag className="w-3 h-3 text-amber-700" />
+              <span className="sr-only">Étel</span>
             </span>
           </div>
           {item.description && (
@@ -243,7 +269,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
             </span>
             <h2 className="text-base font-extrabold text-stone-900 mt-0.5 flex items-center gap-2">
               <Utensils className="w-4 h-4 text-amber-700" />
-              <span>Civil Ízek Utcája • Ételek/italok katalógusa ({randomizedItems.length} találat)</span>
+              <span>Civil Ízek Utcája • Ételek és italok ({sortedItems.length} találat)</span>
             </h2>
           </div>
 
@@ -283,6 +309,49 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
         </div>
       </div>
 
+      {/* Search and filter controls */}
+      <div className="bg-white border border-stone-200/90 rounded-md p-3 sm:p-4 shadow-2xs space-y-3">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+          <input
+            value={searchQuery || ''}
+            onChange={(e) => setSearchQuery && setSearchQuery(e.target.value)}
+            placeholder="Étel, ital vagy árus keresése..."
+            className="w-full h-10 pl-9 pr-9 rounded-md border border-stone-200 bg-stone-50 text-sm font-medium text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400"
+          />
+          {searchQuery && (
+            <button onClick={() => setSearchQuery && setSearchQuery('')} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-stone-400 hover:text-stone-800" title="Keresés törlése">
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          <button onClick={() => setActiveCategory('all')} className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-extrabold border transition-all ${activeCategory === 'all' ? 'bg-amber-900 text-white border-amber-900' : 'bg-stone-50 text-stone-600 border-stone-200 hover:border-amber-300'}`}>Minden</button>
+          {categoryFilters.map((section) => {
+            const IconComp = section.icon;
+            return <button key={section.id} onClick={() => setActiveCategory(section.id)} className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-extrabold border transition-all flex items-center gap-1.5 ${activeCategory === section.id ? 'bg-amber-900 text-white border-amber-900' : 'bg-stone-50 text-stone-600 border-stone-200 hover:border-amber-300'}`}>
+              <IconComp className="w-3.5 h-3.5" />{section.title.replace(' / Édesség', '')}
+            </button>;
+          })}
+        </div>
+
+        {availableTags.length > 0 && (
+          <div className="flex gap-1.5 overflow-x-auto pb-1">
+            <button onClick={() => setActiveTag('all')} className={`shrink-0 px-2.5 py-1 rounded-md text-[11px] font-bold border transition-all ${activeTag === 'all' ? 'bg-stone-800 text-white border-stone-800' : 'bg-white text-stone-500 border-stone-200 hover:border-stone-400'}`}>Összes jelleg</button>
+            {availableTags.slice(0, 12).map(([tag]) => (
+              <button key={tag} onClick={() => setActiveTag(tag)} className={`shrink-0 px-2.5 py-1 rounded-md text-[11px] font-bold border transition-all ${activeTag === tag ? 'bg-stone-800 text-white border-stone-800' : 'bg-white text-stone-500 border-stone-200 hover:border-stone-400'}`}>{tag}</button>
+            ))}
+          </div>
+        )}
+
+        {(activeCategory !== 'all' || activeTag !== 'all' || searchQuery) && (
+          <button onClick={() => { setActiveCategory('all'); setActiveTag('all'); if (setSearchQuery) setSearchQuery(''); }} className="text-[11px] font-bold text-amber-800 hover:text-amber-950 flex items-center gap-1">
+            <X className="w-3 h-3" /> Szűrők törlése
+          </button>
+        )}
+      </div>
+
       {/* Dishes Content */}
       {isLoadingData ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 animate-pulse">
@@ -303,6 +372,8 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
           <button
             onClick={() => {
               if (setSelectedCategory) setSelectedCategory('all');
+              setActiveCategory('all');
+              setActiveTag('all');
               setSelectedDay('all');
               if (setSearchQuery) setSearchQuery('');
             }}
@@ -316,7 +387,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
           {/* Ultra-thin Minimalist Collapsible Category Accordion Sections */}
           {CATEGORY_SECTIONS.map((section) => {
             const isDrinkSection = section.id === 'italok';
-            const sectionItems = randomizedItems.filter((i) => {
+            const sectionItems = sortedItems.filter((i) => {
               if (isDrinkSection) return i.category === 'italok' || i.category === 'ital';
               return i.category === section.id;
             });
