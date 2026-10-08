@@ -78,17 +78,21 @@ function MainApp() {
     const exItems = itemsByExhibitor.get(ex.id) || [];
     const lowerQuery = searchQuery.trim().toLowerCase();
 
+    // Minden szöveges mező opcionális láncolással: az adatbázisban a
+    // `description` nullable, és a 60 étel közül 54-nek nincs leírása. Egy
+    // nyers `.toLowerCase()` itt az első beírt karakternél elhasal, és
+    // magával viszi az egész nézetet.
     const matchesSearch =
       !lowerQuery ||
-      ex.name.toLowerCase().includes(lowerQuery) ||
-      ex.location.toLowerCase().includes(lowerQuery) ||
-      (ex.story && ex.story.toLowerCase().includes(lowerQuery)) ||
-      (ex.offerings && ex.offerings.toLowerCase().includes(lowerQuery)) ||
+      ex.name?.toLowerCase?.().includes(lowerQuery) ||
+      ex.location?.toLowerCase?.().includes(lowerQuery) ||
+      ex.story?.toLowerCase?.().includes(lowerQuery) ||
+      ex.offerings?.toLowerCase?.().includes(lowerQuery) ||
       exItems.some(
         (i) =>
-          i.name.toLowerCase().includes(lowerQuery) ||
-          i.description.toLowerCase().includes(lowerQuery) ||
-          (i.tags && i.tags.some((t) => t.toLowerCase().includes(lowerQuery)))
+          i.name?.toLowerCase?.().includes(lowerQuery) ||
+          i.description?.toLowerCase?.().includes(lowerQuery) ||
+          (i.tags && i.tags.some((t) => t?.toLowerCase?.().includes(lowerQuery)))
       );
 
     const matchesCategory =

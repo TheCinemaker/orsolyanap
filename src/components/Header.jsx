@@ -48,13 +48,16 @@ export default function Header({
   const instantMatchingItems = searchTrim
     ? menuItems.filter((item) => {
         const exhibitor = exhibitors.find((ex) => ex.id === item.exhibitor_id);
-        const exName = exhibitor ? exhibitor.name.toLowerCase() : '';
-        const exLoc = exhibitor ? exhibitor.location.toLowerCase() : '';
+        // Opcionális láncolás mindenhol: az adatbázisban a `description`
+        // nullable, és a legtöbb ételnek nincs leírása -- egy nyers
+        // .toLowerCase() itt az első leütött karakternél elhasal.
+        const exName = exhibitor?.name?.toLowerCase?.() ?? '';
+        const exLoc = exhibitor?.location?.toLowerCase?.() ?? '';
 
         return (
-          item.name.toLowerCase().includes(searchTrim) ||
-          item.description.toLowerCase().includes(searchTrim) ||
-          (item.tags && item.tags.some((t) => t.toLowerCase().includes(searchTrim))) ||
+          item.name?.toLowerCase?.().includes(searchTrim) ||
+          item.description?.toLowerCase?.().includes(searchTrim) ||
+          (item.tags && item.tags.some((t) => t?.toLowerCase?.().includes(searchTrim))) ||
           exName.includes(searchTrim) ||
           exLoc.includes(searchTrim)
         );
