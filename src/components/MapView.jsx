@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { MapPin, ArrowRight, Compass, Waves, Trees, Castle, Heart, Navigation, Layers } from 'lucide-react';
+import { MapPin, ArrowRight, Compass, Heart, Navigation } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -30,7 +30,7 @@ const getShortExhibitorName = (exhibitor) => {
 export default function MapView() {
   const { exhibitors, menuItems, favoriteExhibitorIds, navigateToStand, showToast, focusedExhibitorIdOnMap } = useOrsolya();
   const [selectedExhibitorId, setSelectedExhibitorId] = useState(focusedExhibitorIdOnMap || exhibitors[0]?.id || null);
-  const [mapMode, setMapMode] = useState('gps'); // 'gps' | 'schematic'
+  const [mapMode, setMapMode] = useState('gps');
   const [userLocation, setUserLocation] = useState(null);
   const [isLocating, setIsLocating] = useState(false);
 
@@ -234,42 +234,6 @@ export default function MapView() {
           )}
         </div>
 
-        {/* Mode Switcher */}
-        <div className="flex items-center justify-between border-t border-stone-100 pt-3 text-xs">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setMapMode('gps')}
-              className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md font-bold transition-all cursor-pointer ${
-                mapMode === 'gps'
-                  ? 'bg-amber-800 text-white shadow-xs'
-                  : 'bg-stone-100 text-stone-600 hover:text-stone-900'
-              }`}
-            >
-              <Compass className="w-3.5 h-3.5" />
-              <span>GPS Műholdas Térkép</span>
-            </button>
-
-            <button
-              onClick={() => setMapMode('schematic')}
-              className={`flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md font-bold transition-all cursor-pointer ${
-                mapMode === 'schematic'
-                  ? 'bg-white text-stone-900 border border-stone-300 shadow-xs'
-                  : 'text-stone-600 hover:text-stone-900'
-              }`}
-            >
-              <Layers className="w-3.5 h-3.5 text-amber-700" />
-              <span>Sematikus Sétány</span>
-            </button>
-          </div>
-
-          {userLocation && (
-            <span className="text-[11px] font-semibold text-emerald-700 flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block"></span>
-              Saját pozíció aktív
-            </span>
-          )}
-        </div>
-
         {/* GPS Leaflet View */}
         {mapMode === 'gps' ? (
           <div className="relative rounded-md overflow-hidden border border-stone-200 shadow-inner min-h-[380px] sm:min-h-[440px] z-10">
@@ -282,52 +246,6 @@ export default function MapView() {
                 Diáksétány Fesztiválterület
               </span>
               <span className="text-[10px] text-stone-500 block">47.3889N - 47.3900N • 16.5379E - 16.5399E</span>
-            </div>
-          </div>
-        ) : (
-          /* Schematic Path View */
-          <div className="relative bg-stone-50 border border-stone-200/90 rounded-md p-6 min-h-[300px] flex flex-col justify-between overflow-hidden">
-            {/* Stream */}
-            <div className="absolute top-1/2 left-0 right-0 h-10 -translate-y-1/2 bg-sky-100/90 border-y border-sky-300/70 flex items-center justify-around text-sky-800 text-[11px] font-bold tracking-widest pointer-events-none select-none">
-              <span className="flex items-center gap-1"><Waves className="w-3.5 h-3.5 text-sky-700" /> Gyöngyös-patak</span>
-              <span className="flex items-center gap-1"><Waves className="w-3.5 h-3.5 text-sky-700" /> Gyöngyös-patak</span>
-              <span className="flex items-center gap-1"><Waves className="w-3.5 h-3.5 text-sky-700" /> Gyöngyös-patak</span>
-            </div>
-
-            {/* Landmarks */}
-            <div className="flex justify-between items-center relative z-10 text-xs font-bold text-stone-700">
-              <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-md border border-stone-200 shadow-xs">
-                <Castle className="w-4 h-4 text-amber-700" />
-                <span>Jurisics Vár</span>
-              </div>
-              <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-md border border-stone-200 shadow-xs">
-                <Trees className="w-4 h-4 text-emerald-700" />
-                <span>Várpark & Színpad</span>
-              </div>
-            </div>
-
-            {/* Stand Pills */}
-            <div className="relative z-10 my-6 flex items-center justify-between gap-2 overflow-x-auto py-3 px-1 scrollbar-none">
-              {exhibitors.map((ex) => {
-                const isSelected = ex.id === selectedExhibitorId;
-                const isFavorite = favoriteExhibitorIds.includes(ex.id);
-
-                return (
-                  <button
-                    key={ex.id}
-                    onClick={() => handleSelectExhibitorChange(ex.id)}
-                    className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-md border transition-all cursor-pointer ${
-                      isSelected
-                        ? 'bg-amber-800 text-white border-amber-800 shadow-md scale-105 font-black'
-                        : 'bg-white text-stone-900 border-stone-200 hover:border-amber-600 font-bold'
-                    }`}
-                  >
-                    <MapPin className={`w-3.5 h-3.5 ${isSelected ? 'text-amber-300' : 'text-amber-700'}`} />
-                    <span className="text-xs">{ex.name}</span>
-                    {isFavorite && <Heart className="w-3.5 h-3.5 text-rose-600 fill-rose-600" />}
-                  </button>
-                );
-              })}
             </div>
           </div>
         )}
