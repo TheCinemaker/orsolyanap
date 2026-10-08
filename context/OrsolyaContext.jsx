@@ -466,7 +466,7 @@ export function OrsolyaProvider({ children }) {
     showToast('Állapot frissítve!');
   };
 
-  // Save/Add menu item dynamically (with Allergen flags, Available day, and optional Price)
+  // Save/Add menu item dynamically (with Allergen flags and Available day)
   const saveMenuItem = async (itemData) => {
     const formattedItem = {
       ...itemData,
