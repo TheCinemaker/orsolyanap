@@ -218,7 +218,7 @@ export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish 
 
                     <div className="flex-1 min-w-0 space-y-1">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <h5 className="font-extrabold text-stone-900 text-xs sm:text-sm">{item.name}</h5>
+                        <h5 className="font-extrabold text-stone-900 text-base sm:text-lg leading-snug">{item.name}</h5>
                         {item.is_gluten_free && (
                           <span className="text-[8px] font-extrabold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-200">
                             GM
