@@ -201,7 +201,7 @@ function MainApp() {
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-stone-200 pb-2.5">
                     <h2 className="text-xs font-black text-stone-950 uppercase tracking-widest flex items-center gap-2">
                       <Store className="w-4 h-4 text-amber-800" />
-                      <span>Standok a Diáksétányon ({filteredExhibitors.length})</span>
+                      <span>Standok ({filteredExhibitors.length})</span>
                     </h2>
 
                     {/* Stand Sorting & Shuffle Controls */}
@@ -243,7 +243,7 @@ function MainApp() {
                         <Loader2 className="w-4 h-4 text-amber-800 animate-spin" />
                         <span>Adatok betöltése, kis türelmet...</span>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-2 gap-3 sm:gap-4">
                         {[1, 2, 3, 4, 5, 6].map((sk) => (
                           <div key={sk} className="bg-white border border-stone-200 rounded-md p-4 space-y-3 shadow-xs">
                             <div className="flex justify-between items-center">
