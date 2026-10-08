@@ -172,7 +172,7 @@ function MainApp() {
             {/* Top Title Section */}
             <div className="text-center py-1">
               <h1 className="text-xs sm:text-sm font-black text-amber-950 uppercase tracking-widest">
-                CIVIL ÍZEK UTCÁJA
+                {mainTab === 'program' ? 'PROGRAMFÜZET' : 'CIVIL ÍZEK UTCÁJA'}
               </h1>
             </div>
 
