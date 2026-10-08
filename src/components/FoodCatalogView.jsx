@@ -8,7 +8,6 @@ import {
   Flame,
   Info,
   Trophy,
-  Tag,
   ChevronDown,
   ChevronUp,
   Cake,
@@ -188,9 +187,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
             }`}>
               {item.name}
             </h3>
-            <span className="shrink-0 text-[11px] font-black text-amber-950 bg-amber-100 px-2 py-0.5 rounded border border-amber-300 flex items-center gap-1">
-              <span className="sr-only">Étel</span>
-            </span>
+            
           </div>
           {item.description && (
             <p className={`text-[11px] line-clamp-2 leading-relaxed font-medium ${
