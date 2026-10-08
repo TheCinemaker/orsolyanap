@@ -115,5 +115,24 @@ export const ORSOLYA_GASTRO_CATALOG = [
       { name: 'Zsákbamacska', category: 'egyeb', availableDay: 'both', tags: ['játék', 'nyeremény'] }
     ]
   }
+,
+  {
+    exhibitorKey: 'bersek-iskola',
+    exhibitorName: 'Bersek Iskola',
+    location: 'Diáksétány',
+    items: [
+      { name: 'Vadpörkölt nokedlival, uborkával', category: 'meleg_etel', availableDay: 'saturday', tags: ['vad', 'pörkölt', 'magyaros'] },
+      { name: 'Chilis bab', category: 'meleg_etel', availableDay: 'saturday', tags: ['bab', 'csípős', 'házias'] },
+      { name: 'Csülkös babgulyás', category: 'meleg_etel', availableDay: 'sunday', tags: ['bab', 'gulyás', 'csülök', 'magyaros'] },
+      { name: 'Többféle házi készítésű sütemény', category: 'sutemeny', availableDay: 'both', tags: ['házi', 'édes'] },
+      { name: 'Lángos', category: 'street_food', availableDay: 'both', tags: ['lángos', 'street food'] },
+      { name: 'Palacsinta', category: 'sutemeny', availableDay: 'both', tags: ['palacsinta', 'desszert'] },
+      { name: 'Amerika fánk csokiöntettel', category: 'sutemeny', availableDay: 'both', tags: ['fánk', 'desszert', 'csokoládé'] },
+      { name: 'Gesztenyepüré', category: 'sutemeny', availableDay: 'both', tags: ['gesztenye', 'desszert'] },
+      { name: 'Tea', category: 'italok', availableDay: 'both', tags: ['forró ital'] },
+      { name: 'Forralt bor', category: 'italok', availableDay: 'both', tags: ['forró ital'] },
+      { name: 'Alkoholmentes puncs', category: 'italok', availableDay: 'both', tags: ['forró ital', 'alkoholmentes'] }
+    ]
+  }
 
 ];
