@@ -21,6 +21,7 @@ export function OrsolyaProvider({ children }) {
   const [menuItems, setMenuItems] = useState([]);
   const [orders, setOrders] = useState([]);
   const [reels, setReels] = useState([]);
+  const [events, setEvents] = useState([]);
 
   // Scanned Favorite Exhibitors
   const [favoriteExhibitorIds, setFavoriteExhibitorIds] = useState([]);
@@ -138,6 +139,13 @@ export function OrsolyaProvider({ children }) {
           setMenuItems(validOrsolyaItems);
         }
 
+        const { data: eventData, error: eventErr } = await supabase
+          .from('events')
+          .select('id,title,description,event_date,start_time,end_time,location,category,performer,is_free,image')
+          .order('event_date', { ascending: true })
+          .order('start_time', { ascending: true });
+        if (!eventErr && eventData) setEvents(eventData);
+
         const { data: reelData, error: reelErr } = await supabase.from('reels').select('*').order('created_at', { ascending: false });
         if (!reelErr && reelData) {
           setReels(reelData);
@@ -147,6 +155,7 @@ export function OrsolyaProvider({ children }) {
         setExhibitors([]);
         setMenuItems([]);
         setReels([]);
+        setEvents([]);
       } finally {
         setIsLoadingData(false);
       }
@@ -951,6 +960,7 @@ export function OrsolyaProvider({ children }) {
         menuItems,
         orders,
         reels,
+        events,
         postReel,
         likeReel,
         convertFileToBase64,
