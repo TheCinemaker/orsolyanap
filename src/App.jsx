@@ -15,6 +15,8 @@ import VisitKoszegLogo from './components/VisitKoszegLogo';
 import LiveReelBar from './components/LiveReelBar';
 import ReelsGallery from './components/ReelsGallery';
 import BackToTopButton from './components/BackToTopButton';
+import DonationResult from './components/DonationResult';
+import SignageView from './components/SignageView';
 import {
   Utensils,
   Info,
@@ -35,6 +37,19 @@ import {
 import './App.css';
 
 function MainApp() {
+  const isDonationResult = window.location.pathname === '/adomany/visszajelzes';
+  const isSignageView = window.location.search.includes('view=signage');
+
+  if (isDonationResult) {
+    return <DonationResult onClose={() => window.location.assign('/')} />;
+  }
+
+  if (isSignageView) {
+    const params = new URLSearchParams(window.location.search);
+    const targetStand = params.get('stand') || params.get('exhibitor') || null;
+    return <SignageView targetExhibitorId={targetStand} onClose={() => window.location.assign('/')} />;
+  }
+
   const {
     activeView,
     exhibitors,
@@ -168,6 +183,8 @@ function MainApp() {
           <MapView />
         ) : activeView === 'reels' ? (
           <ReelsGallery />
+        ) : activeView === 'signage' ? (
+          <SignageView />
         ) : (
           /* Visitor Main View */
           <div className="max-w-5xl mx-auto px-3 sm:px-4 pt-2 pb-4 space-y-4">

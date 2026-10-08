@@ -108,11 +108,6 @@ export default function DishLocationModal({ item, exhibitor, onClose }) {
                   <span>{exhibitor.name}</span>
                 </div>
               </div>
-              {item.price && (
-                <span className="bg-amber-100 text-amber-950 font-black text-xs px-2.5 py-1 rounded-md border border-amber-300 whitespace-nowrap">
-                  {item.price} Ft
-                </span>
-              )}
             </div>
             <p className="text-xs text-stone-600 font-medium flex items-center gap-1 pt-1 border-t border-stone-200/60">
               <MapPin className="w-3.5 h-3.5 text-amber-700 shrink-0" />

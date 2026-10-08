@@ -28,7 +28,8 @@ import {
   CupSoda,
   Tag,
   Eye,
-  EyeOff
+  EyeOff,
+  Monitor
 } from 'lucide-react';
 import ExhibitorQRCard from '../ExhibitorQRCard';
 

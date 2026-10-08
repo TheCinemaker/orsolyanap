@@ -4,8 +4,9 @@ import OrsolyaInfoModal from './OrsolyaInfoModal';
 import FavoritesModal from './FavoritesModal';
 import QRScannerModal from './QRScannerModal';
 import MobileBottomNav from './MobileBottomNav';
+import DonationModal from './DonationModal';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { Utensils, MapPin, Store, Heart, Search, X, Info, Calendar, Clock, Menu, ThumbsUp } from 'lucide-react';
+import { Utensils, MapPin, Store, Heart, Search, X, Info, Calendar, Clock, Menu, ThumbsUp, CreditCard } from 'lucide-react';
 import HamburgerMenuDrawer from './HamburgerMenuDrawer';
 
 export default function Header({
@@ -44,6 +45,7 @@ export default function Header({
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [isHamburgerOpen, setIsHamburgerOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isDonationOpen, setIsDonationOpen] = useState(false);
 
   // Instant matching dishes calculation
   const searchTrim = searchQuery.trim().toLowerCase();
@@ -148,6 +150,16 @@ export default function Header({
 
           {/* Right Actions (Desktop & Tablet) */}
           <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* KTSZE Adomány Button */}
+            <button
+              onClick={() => setIsDonationOpen(true)}
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md bg-gradient-to-r from-amber-800 to-amber-950 hover:from-amber-700 hover:to-amber-900 text-white text-xs font-black transition-all border border-amber-700/60 shadow-2xs cursor-pointer"
+              title="KTSZE Adománygyűjtés (SimplePay & Qvik)"
+            >
+              <CreditCard className="w-3.5 h-3.5 text-amber-300 flex-shrink-0" />
+              <span className="hidden sm:inline">KTSZE Adomány</span>
+            </button>
+
             {/* Kedvencek Button */}
             <button
               onClick={() => setIsFavoritesOpen(true)}
@@ -327,6 +339,13 @@ export default function Header({
         onOpenScanner={() => setIsScannerOpen(true)}
       />
       <QRScannerModal isOpen={isScannerOpen} onClose={() => setIsScannerOpen(false)} />
+      
+      {/* KTSZE Adomány Modal */}
+      <DonationModal
+        isOpen={isDonationOpen}
+        onClose={() => setIsDonationOpen(false)}
+        title="KTSZE Adománygyűjtés — SimplePay v2 & Qvik"
+      />
     </>
   );
 }

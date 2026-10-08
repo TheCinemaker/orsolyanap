@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { X, Clock, User, Phone, CheckCircle, Utensils, MapPin } from 'lucide-react';
+import { X, Clock, User, Phone, CheckCircle, Utensils, MapPin, CreditCard, ShieldCheck } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { isKTSZEExhibitor } from '../lib/ktszeUtils';
+import DonationModal from './DonationModal';
 
 export default function PreOrderModal({ exhibitor, onClose }) {
   const { cart, placeOrder, setIsMyOrdersOpen } = useOrsolya();
@@ -10,8 +12,16 @@ export default function PreOrderModal({ exhibitor, onClose }) {
   const [userPhone, setUserPhone] = useState('');
   const [pickupTime, setPickupTime] = useState('12:45');
   const [completedOrder, setCompletedOrder] = useState(null);
+  const [isDonationOpen, setIsDonationOpen] = useState(false);
 
+  const isKTSZE = isKTSZEExhibitor(exhibitor);
   const exhibitorItems = cart.filter((c) => c.item.exhibitor_id === exhibitor.id);
+  // Javasolt adomány a kosár alapján -- csak az űrlap előkitöltésére szolgál,
+  // összegként sehol nem jelenik meg.
+  const suggestedAmount = exhibitorItems.reduce((acc, curr) => {
+    const p = parseInt(String(curr.item.price || '').replace(/\D/g, ''), 10) || 1500;
+    return acc + p * curr.quantity;
+  }, 0);
   const timeSlots = ['12:15', '12:30', '12:45', '13:00', '13:15', '13:30', '14:00', '14:30'];
 
   const handleSubmit = (e) => {
@@ -116,13 +126,32 @@ export default function PreOrderModal({ exhibitor, onClose }) {
                 </div>
               </div>
 
-              <button
-                type="submit"
-                className="w-full py-3 bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs rounded-md shadow-sm transition-all flex items-center justify-center gap-2 mt-2"
-              >
-                <Utensils className="w-4 h-4" />
-                <span>Kóstoló Foglalás Véglegesítése</span>
-              </button>
+              {/* Payment / Booking Action Buttons */}
+              <div className="space-y-2 pt-2 border-t border-zinc-200 dark:border-zinc-800">
+                {isKTSZE ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsDonationOpen(true)}
+                    className="w-full py-3 bg-gradient-to-r from-amber-700 to-amber-900 hover:from-amber-600 hover:to-amber-800 text-white font-extrabold text-xs rounded-md shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer border border-amber-600/50"
+                  >
+                    <CreditCard className="w-4 h-4 text-amber-300" />
+                    <span>Támogatom kártyával</span>
+                  </button>
+                ) : (
+                  <div className="bg-zinc-50 dark:bg-zinc-800 p-2.5 rounded-md border border-zinc-200 dark:border-zinc-700 text-[11px] text-zinc-500 dark:text-zinc-400 flex items-start gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-zinc-400 shrink-0 mt-0.5" />
+                    <span>Online bankkártyás fizetés és adományozás kizárólag a KTSZE ételeinél érhető el. Ennél a kiállítónál a helyszínen, átvételkor fizethetsz készpénzzel.</span>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-semibold text-xs rounded-md shadow-sm transition-all flex items-center justify-center gap-2"
+                >
+                  <Utensils className="w-4 h-4" />
+                  <span>Kóstoló Foglalás Helyszíni Fizetéssel</span>
+                </button>
+              </div>
             </form>
           </>
         ) : (
@@ -165,6 +194,14 @@ export default function PreOrderModal({ exhibitor, onClose }) {
           </div>
         )}
       </div>
+
+      {/* KTSZE Donation Modal */}
+      <DonationModal
+        isOpen={isDonationOpen}
+        onClose={() => setIsDonationOpen(false)}
+        initialAmount={suggestedAmount}
+        title={`Fizetés / Adomány — ${exhibitor.name}`}
+      />
     </div>
   );
 }

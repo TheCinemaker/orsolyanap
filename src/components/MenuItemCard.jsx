@@ -1,9 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { ThumbsUp, Trophy, Tag, CupSoda, MapPin } from 'lucide-react';
+import { ThumbsUp, Trophy, CupSoda, MapPin, CreditCard } from 'lucide-react';
+import { isKTSZEExhibitor } from '../lib/ktszeUtils';
+import DonationModal from './DonationModal';
 
 export default function MenuItemCard({ item, exhibitor, onOpenLocationModal }) {
+  const [isDonationOpen, setIsDonationOpen] = useState(false);
   const { votedItemIds, voteForItem } = useOrsolya();
+
+  const isKTSZE = isKTSZEExhibitor(exhibitor);
+  // Javasolt adomány összege az űrlap előkitöltéséhez.
+  // FIGYELEM: ez sehol nem jelenik meg árként -- a standon adománygyűjtés
+  // folyik, nem értékesítés, ezért kiírt ár nem szerepelhet.
+  const suggestedAmount = parseInt(String(item.price || '').replace(/\D/g, ''), 10) || 2000;
 
   const isVoted = votedItemIds.includes(item.id);
   const isTopVoted = (item.votes || 0) >= 40;
@@ -11,20 +20,6 @@ export default function MenuItemCard({ item, exhibitor, onOpenLocationModal }) {
   const isSoldOut = item.status === 'sold_out';
   const isCooking = item.status === 'cooking';
   const isDrink = item.category === 'italok';
-
-  // Format optional price display
-  const getDisplayPrice = () => {
-    if (item.price !== undefined && item.price !== null && String(item.price).trim() !== '') {
-      const pStr = String(item.price).trim();
-      if (pStr === '0' || pStr.toLowerCase() === 'ingyenes') return 'Ingyenes';
-      if (!isNaN(Number(pStr))) return `${Number(pStr).toLocaleString('hu-HU')} Ft`;
-      return pStr;
-    }
-    if (isDrink) return 'Ingyenes';
-    return null;
-  };
-
-  const displayPrice = getDisplayPrice();
 
   return (
     <div
@@ -96,18 +91,6 @@ export default function MenuItemCard({ item, exhibitor, onOpenLocationModal }) {
             {item.name}
           </h3>
 
-          {displayPrice && (
-            <span
-              className={`shrink-0 text-xs font-black px-2.5 py-1 rounded-md border flex items-center gap-1 ${
-                displayPrice === 'Ingyenes'
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                  : 'bg-amber-100 text-amber-950 border-amber-300'
-              }`}
-            >
-              <Tag className="w-3 h-3 text-stone-600" />
-              <span>{displayPrice}</span>
-            </span>
-          )}
         </div>
 
         {/* Description */}
@@ -133,42 +116,66 @@ export default function MenuItemCard({ item, exhibitor, onOpenLocationModal }) {
       </div>
 
       {/* Footer / Action Buttons */}
-      <div className="pt-3 border-t border-stone-100 flex items-center justify-between gap-2">
-        {/* Hol találom? Button */}
-        {exhibitor ? (
+      <div className="pt-3 border-t border-stone-100 flex flex-col gap-2">
+        <div className="flex items-center justify-between gap-2">
+          {/* Hol találom? Button */}
+          {exhibitor ? (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onOpenLocationModal) onOpenLocationModal(item, exhibitor);
+              }}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-bold bg-stone-100 hover:bg-amber-100 text-stone-800 hover:text-amber-950 border border-stone-200 hover:border-amber-300 transition-all cursor-pointer"
+              title="Stand helyszínének megjelenítése kis térképen"
+            >
+              <MapPin className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+              <span>Hol találom?</span>
+            </button>
+          ) : <div />}
+
+          {/* Public Vote Button */}
+          <button
+            disabled={isCooking || isSoldOut}
+            onClick={(e) => {
+              e.stopPropagation();
+              voteForItem(item.id);
+            }}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-extrabold transition-all border shadow-2xs cursor-pointer ${
+              isSoldOut || isCooking
+                ? 'bg-stone-100 text-stone-400 border-stone-200 cursor-not-allowed pointer-events-none'
+                : isVoted
+                ? 'bg-emerald-800 text-white border-emerald-800'
+                : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-300/80'
+            }`}
+            title={isCooking ? 'Főzés alatt - a szavazás hamarosan indul' : isVoted ? 'Leadott közönségszavazat' : 'Szavazok erre az ételre'}
+          >
+            <ThumbsUp className={`w-3.5 h-3.5 ${isVoted ? 'fill-white' : 'text-amber-800'}`} />
+            <span>{isVoted ? `Szavazva (${item.votes || 1})` : `Szavazok (${item.votes || 0})`}</span>
+          </button>
+        </div>
+
+        {/* KTSZE Card Payment Button (SimplePay & Qvik) */}
+        {isKTSZE && !isSoldOut && (
           <button
             onClick={(e) => {
               e.stopPropagation();
-              if (onOpenLocationModal) onOpenLocationModal(item, exhibitor);
+              setIsDonationOpen(true);
             }}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-bold bg-stone-100 hover:bg-amber-100 text-stone-800 hover:text-amber-950 border border-stone-200 hover:border-amber-300 transition-all cursor-pointer"
-            title="Stand helyszínének megjelenítése kis térképen"
+            className="w-full mt-1 py-2 px-3 bg-amber-800 hover:bg-amber-700 text-white font-extrabold text-xs rounded-md shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-amber-600/60"
           >
-            <MapPin className="w-3.5 h-3.5 text-amber-700 shrink-0" />
-            <span>Hol találom?</span>
+            <CreditCard className="w-3.5 h-3.5 text-amber-200" />
+            <span>Támogatom kártyával</span>
           </button>
-        ) : <div />}
-
-        {/* Public Vote Button */}
-        <button
-          disabled={isCooking || isSoldOut}
-          onClick={(e) => {
-            e.stopPropagation();
-            voteForItem(item.id);
-          }}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-extrabold transition-all border shadow-2xs cursor-pointer ${
-            isSoldOut || isCooking
-              ? 'bg-stone-100 text-stone-400 border-stone-200 cursor-not-allowed pointer-events-none'
-              : isVoted
-              ? 'bg-emerald-800 text-white border-emerald-800'
-              : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-300/80'
-          }`}
-          title={isCooking ? 'Főzés alatt - a szavazás hamarosan indul' : isVoted ? 'Leadott közönségszavazat' : 'Szavazok erre az ételre'}
-        >
-          <ThumbsUp className={`w-3.5 h-3.5 ${isVoted ? 'fill-white' : 'text-amber-800'}`} />
-          <span>{isVoted ? `Szavazva (${item.votes || 1})` : `Szavazok (${item.votes || 0})`}</span>
-        </button>
+        )}
       </div>
+
+      {/* KTSZE Donation Modal */}
+      <DonationModal
+        isOpen={isDonationOpen}
+        onClose={() => setIsDonationOpen(false)}
+        initialAmount={suggestedAmount}
+        title={`Fizetés / Adomány — ${item.name}`}
+      />
     </div>
   );
 }
