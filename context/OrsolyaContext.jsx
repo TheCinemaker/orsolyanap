@@ -470,7 +470,6 @@ export function OrsolyaProvider({ children }) {
   const saveMenuItem = async (itemData) => {
     const formattedItem = {
       ...itemData,
-      price: itemData.price !== undefined ? itemData.price : '',
       is_gluten_free: !!itemData.is_gluten_free,
       is_lactose_free: !!itemData.is_lactose_free,
       is_sugar_free: !!itemData.is_sugar_free,
@@ -488,7 +487,6 @@ export function OrsolyaProvider({ children }) {
           description: formattedItem.description,
           initial_stock: Number(formattedItem.initial_stock) || 30,
           category: formattedItem.category,
-          price: formattedItem.price || null,
           tags: formattedItem.tags,
           available_day: formattedItem.available_day,
           is_gluten_free: formattedItem.is_gluten_free,
@@ -523,7 +521,6 @@ export function OrsolyaProvider({ children }) {
           status: newItem.status,
           votes: 0,
           category: newItem.category || 'meleg_etel',
-          price: newItem.price || null,
           available_day: newItem.available_day || 'both',
           is_gluten_free: newItem.is_gluten_free,
           is_lactose_free: newItem.is_lactose_free,
