@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { INITIAL_EXHIBITORS, INITIAL_MENU_ITEMS, INITIAL_ORDERS } from '../data/mockOrsolyaData';
+import { ORSOLYA_GASTRO_CATALOG } from '../data/orsolyaGastroCatalog';
 import { supabase } from '../lib/supabaseClient';
 
 const OrsolyaContext = createContext();
@@ -347,6 +348,72 @@ export function OrsolyaProvider({ children }) {
 
     showToast(`Új csapat (${newTeam.name}) sikeresen regisztrálva! PIN: ${generatedPin}`, 'success');
     return newTeam;
+  };
+
+  // Import the structured flyer catalog into Supabase once, preserving stable item IDs.
+  const seedGastroCatalog = async () => {
+    try {
+      const exhibitorIds = {
+        'koszegfalvi-ovoda': 'ex-koszegfalvi-ovoda',
+        'kozponti-ovoda': 'ex-kozponti-ovoda',
+        'beszedgyogyitas-alapitvany': 'ex-beszedgyogyitas-alapitvany',
+        'koszegi-ifjusagi-tuzoltok': 'ex-ifjusagi-tuzoltok',
+        'balog-iskola': 'ex-balog-iskola',
+        'koszegi-turisztikai-szovetseg': 'ex-1789026854704'
+      };
+
+      const { data: existingItems, error: readError } = await supabase
+        .from('menu_items')
+        .select('id');
+      if (readError) throw readError;
+
+      const existingIds = new Set((existingItems || []).map((item) => item.id));
+      const rows = [];
+
+      ORSOLYA_GASTRO_CATALOG.forEach((exhibitor) => {
+        const exhibitorId = exhibitorIds[exhibitor.exhibitorKey];
+        if (!exhibitorId) return;
+        exhibitor.items.forEach((item, index) => {
+          const stableId = `g-${exhibitor.exhibitorKey}-${index + 1}`;
+          if (existingIds.has(stableId)) return;
+          rows.push({
+            id: stableId,
+            exhibitor_id: exhibitorId,
+            name: item.name,
+            description: item.description || '',
+            initial_stock: 30,
+            stock: 30,
+            status: 'ready',
+            votes: 0,
+            category: item.category,
+            available_day: item.availableDay || 'both',
+            is_gluten_free: false,
+            is_lactose_free: false,
+            is_sugar_free: false,
+            is_vegan: false,
+            tags: item.tags || []
+          });
+        });
+      });
+
+      if (rows.length > 0) {
+        const { error: insertError } = await supabase.from('menu_items').insert(rows);
+        if (insertError) throw insertError;
+      }
+
+      const { data: refreshedItems, error: refreshError } = await supabase
+        .from('menu_items')
+        .select('*');
+      if (refreshError) throw refreshError;
+
+      setMenuItems((refreshedItems || []).filter((item) => item.exhibitor_id));
+      showToast(rows.length ? `${rows.length} gasztro tétel betöltve a katalógusba.` : 'A gasztro katalógus már naprakész.', 'success');
+      return rows.length;
+    } catch (error) {
+      console.error('Gasztro katalógus import error:', error);
+      showToast(`A gasztro katalógus betöltése nem sikerült: ${error.message}`, 'error');
+      return 0;
+    }
   };
 
   // Full Database & State Purge (Super Admin helper)
@@ -736,6 +803,7 @@ export function OrsolyaProvider({ children }) {
         addExhibitorTeam,
         updateExhibitorPin,
         updateExhibitorProfile,
+        seedGastroCatalog,
         updateOrderStatus,
         selectedDay,
         setSelectedDay,
