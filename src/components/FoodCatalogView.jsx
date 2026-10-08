@@ -128,7 +128,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
           </div>
         )}
 
-        {/* Title & Description & Price */}
+        {/* Title & Description */}
         <div className="space-y-1">
           <div className="flex items-center gap-1 flex-wrap">
             {item.status === 'sold_out' || item.stock === 0 ? (
