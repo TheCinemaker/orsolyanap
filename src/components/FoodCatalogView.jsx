@@ -70,11 +70,13 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
     menuItems.some((item) => item.category === section.id || (section.id === 'italok' && item.category === 'ital'))
   );
 
+  const exhibitorById = useMemo(() => new Map(exhibitors.map((ex) => [ex.id, ex])), [exhibitors]);
+
   // Filter items matching search, day, category, tag and visitor visibility
 
   const filteredItems = useMemo(() => {
     return menuItems.filter((item) => {
-      const exhibitor = exhibitors.find((ex) => ex.id === item.exhibitor_id);
+      const exhibitor = exhibitorById.get(item.exhibitor_id);
       const exName = exhibitor ? exhibitor.name.toLowerCase() : '';
       const exLoc = exhibitor ? exhibitor.location.toLowerCase() : '';
 
@@ -145,7 +147,9 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
         {/* Item Image */}
         {item.image ? (
           <div className="w-full aspect-video rounded-md overflow-hidden my-1 border border-stone-200 bg-stone-950 flex items-center justify-center">
-            <img src={item.image} alt={item.name} className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105" />
+            <img src={item.image} alt={item.name} loading="lazy"
+              decoding="async"
+              className="w-full h-full object-cover transition-transform duration-300 sm:group-hover:scale-105" />
           </div>
         ) : (
           <div className="w-full aspect-video rounded-md my-1 border border-stone-200 bg-stone-100 flex items-center justify-center text-stone-400">
@@ -215,7 +219,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
             {/* Hol találom? Button */}
             <button
               onClick={() => setSelectedLocationModalData({ item, exhibitor })}
-              className="flex items-center gap-1 px-2 py-1 rounded text-xs font-extrabold bg-stone-100 hover:bg-amber-100 text-stone-800 hover:text-amber-950 border border-stone-200 hover:border-amber-300 transition-all cursor-pointer"
+              className="min-h-10 flex items-center gap-1 px-2.5 py-1.5 rounded text-xs font-extrabold bg-stone-100 hover:bg-amber-100 text-stone-800 hover:text-amber-950 border border-stone-200 hover:border-amber-300 transition-all cursor-pointer"
               title="Stand helyszínének megjelenítése kis térképen"
             >
               <MapPin className="w-3.5 h-3.5 text-amber-700 shrink-0" />
@@ -225,7 +229,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
             {/* Heart / Favorite Button */}
             <button
               onClick={() => toggleFavoriteItem(item.id)}
-              className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-extrabold transition-all border shadow-2xs cursor-pointer ${
+              className={`min-h-10 flex items-center gap-1 px-2.5 py-1.5 rounded text-xs font-extrabold transition-all border shadow-2xs cursor-pointer ${
                 isFavItem
                   ? 'bg-rose-100 text-rose-800 border-rose-300'
                   : 'bg-stone-50 hover:bg-rose-50 text-stone-600 hover:text-rose-700 border-stone-200'
@@ -240,7 +244,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
           {/* Vote Button */}
           <button
             onClick={() => voteForItem(item.id)}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-extrabold transition-all border shadow-2xs cursor-pointer ${
+            className={`min-h-10 flex items-center gap-1 px-3 py-1.5 rounded text-xs font-extrabold transition-all border shadow-2xs cursor-pointer ${
               isVoted
                 ? 'bg-emerald-800 text-white border-emerald-800'
                 : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-300/80'
@@ -362,7 +366,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
             </div>
           ))}
         </div>
-      ) : randomizedItems.length === 0 ? (
+      ) : sortedItems.length === 0 ? (
         <div className="bg-white border border-stone-200 rounded-md p-8 text-center text-stone-400 space-y-2">
           <Info className="w-8 h-8 mx-auto opacity-40 text-amber-800" />
           <p className="text-sm font-bold text-stone-700">Nincs a szűrésnek megfelelő étel vagy ital.</p>
@@ -434,7 +438,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
           {/* Uncategorized fallback items section */}
           {(() => {
             const definedCatIds = ['meleg_etel', 'hideg_etel', 'sutemeny', 'street_food', 'italok', 'ital', 'egyeb'];
-            const uncategorized = randomizedItems.filter((i) => !definedCatIds.includes(i.category));
+            const uncategorized = sortedItems.filter((i) => !definedCatIds.includes(i.category));
             if (uncategorized.length === 0) return null;
             return (
               <div className="bg-white border border-stone-200 rounded-md overflow-hidden shadow-2xs">
