@@ -57,6 +57,20 @@ export function OrsolyaProvider({ children }) {
   const [mainTab, setMainTab] = useState('tents');
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Navigáció után mindig az új nézet tetejére állunk.
+  // A scrollTo csak a kattintás pillanatában nem elég megbízható: a React
+  // állapotfrissítés után a böngésző még visszaállíthatja az előző scrollpozíciót.
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      });
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [activeView, mainTab]);
+
   const navigateToFoodCatalog = (query = '') => {
     setActiveView('visitor');
     setMainTab('food');
