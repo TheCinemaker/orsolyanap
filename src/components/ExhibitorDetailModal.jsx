@@ -25,11 +25,7 @@ export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish 
 
   const handleDishClick = (item) => {
     onClose();
-    if (onSelectDish) {
-      onSelectDish(item);
-    } else {
-      navigateToFoodCatalog(item ? item.name : '');
-    }
+    if (onSelectDish) onSelectDish(item);
   };
 
   return (
@@ -207,11 +203,11 @@ export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish 
                 return (
                   <div
                     key={item.id}
-                    onClick={() => handleDishClick(item)}
+                    onClick={(e) => e.stopPropagation()}
                     className={`border p-3 rounded-md flex items-center justify-between gap-3 shadow-2xs transition-all cursor-pointer hover:border-amber-400 ${
                       isSoldOut ? 'border-stone-300 bg-stone-100 opacity-80 grayscale' : 'bg-white border-stone-200'
                     }`}
-                    title="Kattints az étel megtekintéséhez a Katalógusban"
+                    title="Étel információ"
                   >
                     {/* Item Image */}
                     {item.image && (
