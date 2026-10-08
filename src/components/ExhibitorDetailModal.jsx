@@ -50,7 +50,7 @@ export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish 
               decoding="async"
               width="800"
               height="450"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain p-3 sm:p-4 bg-white"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
             <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between flex-wrap gap-1.5">
