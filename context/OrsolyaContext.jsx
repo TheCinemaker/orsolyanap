@@ -494,7 +494,8 @@ export function OrsolyaProvider({ children }) {
           is_gluten_free: formattedItem.is_gluten_free,
           is_lactose_free: formattedItem.is_lactose_free,
           is_sugar_free: formattedItem.is_sugar_free,
-          is_vegan: formattedItem.is_vegan
+          is_vegan: formattedItem.is_vegan,
+          image: formattedItem.image || null
         }).eq('id', itemData.id);
       } catch (e) {
         console.warn('Supabase sync warning:', e);
@@ -528,7 +529,8 @@ export function OrsolyaProvider({ children }) {
           is_lactose_free: newItem.is_lactose_free,
           is_sugar_free: newItem.is_sugar_free,
           is_vegan: newItem.is_vegan,
-          tags: newItem.tags || []
+          tags: newItem.tags || [],
+          image: newItem.image || null
         };
         const { error: insErr } = await supabase.from('menu_items').insert([dbPayload]);
         if (insErr) {
@@ -668,7 +670,7 @@ export function OrsolyaProvider({ children }) {
         return [savedReel, ...prev];
       });
 
-      showToast('📸 Élő pillanat sikeresen közzétéve!', 'success');
+      showToast('Élő pillanat sikeresen közzétéve!', 'success');
       return savedReel;
     } catch (e) {
       console.error('Supabase reel insert exception:', e);
