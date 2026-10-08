@@ -47,6 +47,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
   const [closedSections, setClosedSections] = useState({});
   const [activeCategory, setActiveCategory] = useState('all');
   const [activeTag, setActiveTag] = useState('all');
+  const [showAllTags, setShowAllTags] = useState(false);
 
   // Location modal state ({ item, exhibitor })
   const [selectedLocationModalData, setSelectedLocationModalData] = useState(null);
@@ -71,6 +72,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
   );
 
   const exhibitorById = useMemo(() => new Map(exhibitors.map((ex) => [ex.id, ex])), [exhibitors]);
+  const visibleTags = showAllTags ? availableTags : availableTags.slice(0, 8);
 
   // Filter items matching search, day, category, tag and visitor visibility
 
@@ -161,7 +163,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
         <div className="space-y-1">
           <div className="flex items-center gap-1 flex-wrap">
             {item.status === 'sold_out' || item.stock === 0 ? (
-              <span className="text-[10px] font-black text-white bg-rose-700 px-2 py-0.5 rounded border border-rose-800 uppercase tracking-wider animate-pulse">
+              <span className="text-[10px] font-black text-white bg-rose-700 px-2 py-0.5 rounded border border-rose-800 uppercase tracking-wider ">
                 ELFOGYOTT
               </span>
             ) : item.status === 'cooking' ? (
@@ -340,10 +342,15 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
         {availableTags.length > 0 && (
           <div className="flex gap-1.5 overflow-x-auto pb-1">
             <button onClick={() => setActiveTag('all')} className={`shrink-0 px-2.5 py-1 rounded-md text-[11px] font-bold border transition-all ${activeTag === 'all' ? 'bg-stone-800 text-white border-stone-800' : 'bg-white text-stone-500 border-stone-200 hover:border-stone-400'}`}>Összes jelleg</button>
-            {availableTags.slice(0, 12).map(([tag]) => (
+            {visibleTags.map(([tag]) => (
               <button key={tag} onClick={() => setActiveTag(tag)} className={`shrink-0 px-2.5 py-1 rounded-md text-[11px] font-bold border transition-all ${activeTag === tag ? 'bg-stone-800 text-white border-stone-800' : 'bg-white text-stone-500 border-stone-200 hover:border-stone-400'}`}>{tag}</button>
             ))}
           </div>
+        )}
+        {availableTags.length > 8 && (
+          <button onClick={() => setShowAllTags((v) => !v)} className="text-[11px] font-bold text-stone-500 hover:text-stone-900">
+            {showAllTags ? 'Kevesebb szűrő' : `További szűrők (${availableTags.length - 8})`}
+          </button>
         )}
 
         {(activeCategory !== 'all' || activeTag !== 'all' || searchQuery) && (
@@ -385,7 +392,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
         </div>
       ) : (
         <div className="space-y-3">
-          {/* Ultra-thin Minimalist Collapsible Category Accordion Sections */}
+          {/* Category sections */}
           {CATEGORY_SECTIONS.map((section) => {
             const isDrinkSection = section.id === 'italok';
             const sectionItems = sortedItems.filter((i) => {
@@ -427,7 +434,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
 
                 {/* Section Items Grid */}
                 {!isClosed && (
-                  <div className="p-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 animate-in fade-in duration-150">
+                  <div className="p-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 ">
                     {sectionItems.map((item) => renderDishCard(item))}
                   </div>
                 )}
