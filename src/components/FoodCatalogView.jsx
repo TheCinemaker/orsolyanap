@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
 import DishLocationModal from './DishLocationModal';
 import {
@@ -45,12 +45,16 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
 
   // Collapsible section open/closed state (default: all open)
   const [closedSections, setClosedSections] = useState({});
-  const [activeCategory, setActiveCategory] = useState('all');
+  const [activeCategory, setActiveCategory] = useState(selectedCategory || 'all');
   const [activeTag, setActiveTag] = useState('all');
   const [showAllTags, setShowAllTags] = useState(false);
 
   // Location modal state ({ item, exhibitor })
   const [selectedLocationModalData, setSelectedLocationModalData] = useState(null);
+
+  useEffect(() => {
+    setActiveCategory(selectedCategory || 'all');
+  }, [selectedCategory]);
 
   const toggleSection = (catId) => {
     setClosedSections((prev) => ({
@@ -330,10 +334,10 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
         </div>
 
         <div className="flex gap-2 overflow-x-auto pb-1">
-          <button onClick={() => setActiveCategory('all')} className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-extrabold border transition-all ${activeCategory === 'all' ? 'bg-amber-900 text-white border-amber-900' : 'bg-stone-50 text-stone-600 border-stone-200 hover:border-amber-300'}`}>Minden</button>
+          <button onClick={() => { setActiveCategory('all'); if (setSelectedCategory) setSelectedCategory('all'); }} className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-extrabold border transition-all ${activeCategory === 'all' ? 'bg-amber-900 text-white border-amber-900' : 'bg-stone-50 text-stone-600 border-stone-200 hover:border-amber-300'}`}>Minden</button>
           {categoryFilters.map((section) => {
             const IconComp = section.icon;
-            return <button key={section.id} onClick={() => setActiveCategory(section.id)} className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-extrabold border transition-all flex items-center gap-1.5 ${activeCategory === section.id ? 'bg-amber-900 text-white border-amber-900' : 'bg-stone-50 text-stone-600 border-stone-200 hover:border-amber-300'}`}>
+            return <button key={section.id} onClick={() => { setActiveCategory(section.id); if (setSelectedCategory) setSelectedCategory(section.id); }} className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-extrabold border transition-all flex items-center gap-1.5 ${activeCategory === section.id ? 'bg-amber-900 text-white border-amber-900' : 'bg-stone-50 text-stone-600 border-stone-200 hover:border-amber-300'}`}>
               <IconComp className="w-3.5 h-3.5" />{section.title.replace(' / Édesség', '')}
             </button>;
           })}
@@ -362,7 +366,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
 
       {/* Dishes Content */}
       {isLoadingData ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 animate-pulse">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div key={i} className="bg-white border border-stone-200 rounded-md p-4 space-y-3">
               <div className="h-4 bg-stone-200 rounded w-1/2"></div>
