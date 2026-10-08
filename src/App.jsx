@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { OrsolyaProvider, useOrsolya } from './context/OrsolyaContext';
 import Header from './components/Header';
 import ExhibitorCard from './components/ExhibitorCard';
@@ -81,8 +81,19 @@ function MainApp() {
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const activeCategoryObj = intentCategories.find((cat) => cat.id === selectedCategory) || intentCategories[0];
 
+  const itemsByExhibitor = useMemo(() => {
+    const map = new Map();
+    menuItems.forEach((item) => {
+      if (!item.exhibitor_id) return;
+      const list = map.get(item.exhibitor_id);
+      if (list) list.push(item);
+      else map.set(item.exhibitor_id, [item]);
+    });
+    return map;
+  }, [menuItems]);
+
   const filteredExhibitors = exhibitors.filter((ex) => {
-    const exItems = menuItems.filter((i) => i.exhibitor_id === ex.id);
+    const exItems = itemsByExhibitor.get(ex.id) || [];
     const lowerQuery = searchQuery.trim().toLowerCase();
 
     const matchesSearch =
@@ -106,6 +117,10 @@ function MainApp() {
 
     return matchesSearch && matchesCategory;
   });
+
+  useEffect(() => {
+    setVisibleCount(12);
+  }, [searchQuery, selectedCategory, selectedZone, standSortMode]);
 
   const sortedExhibitors = useMemo(() => {
     let list = [...filteredExhibitors];
@@ -132,7 +147,7 @@ function MainApp() {
       {/* Toast Notification */}
       {toastMessage && (
         <div
-          className={`fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 px-4 py-3 rounded-md shadow-xl font-extrabold text-xs flex items-center gap-2 border animate-in slide-in-from-bottom duration-200 ${
+          className={`fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 px-4 py-3 rounded-md shadow-xl font-extrabold text-xs flex items-center gap-2 border ${
             toastMessage.type === 'error'
               ? 'bg-rose-900 text-white border-rose-800'
               : toastMessage.type === 'success'
@@ -240,7 +255,7 @@ function MainApp() {
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {[1, 2, 3, 4, 5, 6].map((sk) => (
-                          <div key={sk} className="bg-white border border-stone-200 rounded-md p-4 space-y-3 animate-pulse shadow-xs">
+                          <div key={sk} className="bg-white border border-stone-200 rounded-md p-4 space-y-3 shadow-xs">
                             <div className="flex justify-between items-center">
                               <div className="h-4 bg-stone-200 rounded-md w-1/3" />
                               <div className="h-4 bg-stone-100 rounded-full w-1/4" />
