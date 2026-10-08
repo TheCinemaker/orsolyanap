@@ -1,6 +1,6 @@
 import React from 'react';
-import { useOrsolya, formatPrice } from '../context/OrsolyaContext';
-import { X, MapPin, Phone, Mail, Heart, Utensils, Map, ThumbsUp, CupSoda, Calendar, Share2, Tag } from 'lucide-react';
+import { useOrsolya } from '../context/OrsolyaContext';
+import { X, MapPin, Phone, Mail, Heart, Utensils, Map, ThumbsUp, CupSoda, Calendar, Share2 } from 'lucide-react';
 
 export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish }) {
   const {
@@ -51,7 +51,10 @@ export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish 
             <img
               src={exhibitor.image}
               alt={exhibitor.name}
-              className="w-full h-full object-contain"
+              decoding="async"
+              width="800"
+              height="450"
+              className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
             <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between flex-wrap gap-1.5">
@@ -200,7 +203,6 @@ export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish 
                 const isFavItem = favoriteItemIds?.includes(item.id);
                 const isVoted = votedItemIds.includes(item.id);
                 const isSoldOut = item.status === 'sold_out';
-                const formattedP = formatPrice(item.price);
 
                 return (
                   <div
@@ -231,12 +233,6 @@ export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish 
                             LM
                           </span>
                         )}
-                      </div>
-
-                      {/* Display Price Badge */}
-                      <div className="flex items-center gap-1 text-[11px] font-bold text-amber-900">
-                        <Tag className="w-3 h-3 text-amber-700" />
-                        <span>{formattedP}</span>
                       </div>
 
                       {item.description && (

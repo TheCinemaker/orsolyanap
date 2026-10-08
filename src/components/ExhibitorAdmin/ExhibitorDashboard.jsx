@@ -26,7 +26,6 @@ import {
   Sparkles,
   Leaf,
   CupSoda,
-  Tag,
   Eye,
   EyeOff
 } from 'lucide-react';
@@ -123,7 +122,6 @@ export default function ExhibitorDashboard() {
     name: '',
     description: '',
     category: 'meleg_etel',
-    price: '',
     tags: 'Meleg étel',
     available_day: 'both',
     is_gluten_free: false,
@@ -181,7 +179,6 @@ export default function ExhibitorDashboard() {
       name: dish.name || '',
       description: dish.description || '',
       category: dish.category || 'meleg_etel',
-      price: dish.price || '',
       tags: dish.tags ? dish.tags.join(', ') : '',
       available_day: dish.available_day || 'both',
       is_gluten_free: !!dish.is_gluten_free,
@@ -200,7 +197,6 @@ export default function ExhibitorDashboard() {
       name: '',
       description: '',
       category: defaultCategory,
-      price: '',
       tags: defaultCategory === 'italok' ? 'Ital, Frissítő' : 'Meleg étel',
       available_day: 'both',
       is_gluten_free: false,
@@ -481,7 +477,7 @@ export default function ExhibitorDashboard() {
         <div className="flex items-start gap-3">
           <EyeOff className="w-5 h-5 text-amber-800 flex-shrink-0 mt-0.5" />
           <div>
-            <span className="font-extrabold text-amber-950 text-xs block">🙈 Előzetes Menüfeltöltés (Rejtett Mód)</span>
+            <span className="font-extrabold text-amber-950 text-xs block">Előzetes Menüfeltöltés (Rejtett Mód)</span>
             <p className="text-amber-900 font-medium mt-0.5 text-[11px] leading-relaxed">
               Nyugodtan töltsétek fel az ételeiteket előre! Ha bepipáljátok a <strong>"Rejtett mód"</strong> opciót, az ételeteket péntek délig csak ti látjátok az admin felületen. <strong>Pénteken délben (12:00-kor) automatikusan mindenki előtt nyilvánossá válik a teljes menüsor!</strong>
             </p>
@@ -575,18 +571,6 @@ export default function ExhibitorDashboard() {
                           {item.available_day === 'saturday' ? 'Szombat' : item.available_day === 'sunday' ? 'Vasárnap' : 'Mindkét nap'}
                         </span>
 
-                        {/* Price Badge in Admin */}
-                        {(item.price || item.category === 'italok') && (
-                          <span className={`text-[10px] font-black px-2 py-0.5 rounded-md border flex items-center gap-1 ${
-                            !item.price || item.price === '0' || String(item.price).toLowerCase() === 'ingyenes'
-                              ? 'bg-emerald-100 text-emerald-950 border-emerald-300'
-                              : 'bg-amber-100 text-amber-950 border-amber-300'
-                          }`}>
-                            <Tag className="w-2.5 h-2.5 text-stone-600" />
-                            {item.price ? (!isNaN(Number(item.price)) ? `${Number(item.price).toLocaleString('hu-HU')} Ft` : item.price) : 'Ingyenes'}
-                          </span>
-                        )}
-
                         {item.is_gluten_free && (
                           <span className="text-[9px] font-extrabold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md border border-emerald-200">
                             Gluténmentes
@@ -621,12 +605,12 @@ export default function ExhibitorDashboard() {
                           {item.is_hidden ? (
                             <>
                               <EyeOff className="w-3 h-3 text-amber-800" />
-                              <span>🙈 Rejtett (Péntek délig)</span>
+                              <span>Rejtett (Péntek délig)</span>
                             </>
                           ) : (
                             <>
                               <Eye className="w-3 h-3 text-emerald-700" />
-                              <span>👁️ Nyilvános</span>
+                              <span>Nyilvános</span>
                             </>
                           )}
                         </button>
@@ -971,28 +955,15 @@ export default function ExhibitorDashboard() {
                     onChange={(e) => setDishForm({ ...dishForm, category: e.target.value })}
                     className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 font-bold focus:outline-none focus:ring-2 focus:ring-amber-500/40 cursor-pointer"
                   >
-                    <option value="italok">🥤 Italok</option>
-                    <option value="meleg_etel">🍲 Meleg ételek</option>
-                    <option value="hideg_etel">🥗 Hideg ételek</option>
-                    <option value="sutemeny">🍰 Sütemény / Édesség</option>
-                    <option value="street_food">🍔 Street Food</option>
-                    <option value="egyeb">📦 Egyéb</option>
+                    <option value="italok">Italok</option>
+                    <option value="meleg_etel">Meleg ételek</option>
+                    <option value="hideg_etel">Hideg ételek</option>
+                    <option value="sutemeny">Sütemény / Édesség</option>
+                    <option value="street_food">Street Food</option>
+                    <option value="egyeb">Egyéb</option>
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1 flex items-center justify-between">
-                    <span>Ár (Ft)</span>
-                    <span className="normal-case font-medium text-emerald-700 text-[10px]">Opcionális (ha üres: Ingyenes)</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Pl. 500 (üres = Ingyenes)"
-                    value={dishForm.price}
-                    onChange={(e) => setDishForm({ ...dishForm, price: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 font-bold focus:outline-none focus:ring-2 focus:ring-amber-500/40"
-                  />
-                </div>
               </div>
 
               <div>
@@ -1022,7 +993,7 @@ export default function ExhibitorDashboard() {
                   <div>
                     <span className="text-xs font-extrabold text-amber-950 flex items-center gap-1">
                       <EyeOff className="w-3.5 h-3.5 text-amber-800" />
-                      <span>🙈 Rejtett mód (Péntek délig csapattagsági titok)</span>
+                      <span>Rejtett mód (Péntek délig csapattagsági titok)</span>
                     </span>
                     <span className="text-[10px] font-semibold text-amber-850 block mt-0.5 leading-tight">
                       Ha bepipálod, ezt az ételt a látogatók nem látják a vásári katalógusban péntek délig. Pénteken délben (12:00-kor) automatikusan mindenki előtt nyilvánossá válik!

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { ThumbsUp, Trophy, Tag, CupSoda, MapPin } from 'lucide-react';
+import { ThumbsUp, Trophy, CupSoda, MapPin } from 'lucide-react';
 
 export default function MenuItemCard({ item, exhibitor, onOpenLocationModal }) {
   const { votedItemIds, voteForItem } = useOrsolya();
@@ -11,20 +11,6 @@ export default function MenuItemCard({ item, exhibitor, onOpenLocationModal }) {
   const isSoldOut = item.status === 'sold_out';
   const isCooking = item.status === 'cooking';
   const isDrink = item.category === 'italok';
-
-  // Format optional price display
-  const getDisplayPrice = () => {
-    if (item.price !== undefined && item.price !== null && String(item.price).trim() !== '') {
-      const pStr = String(item.price).trim();
-      if (pStr === '0' || pStr.toLowerCase() === 'ingyenes') return 'Ingyenes';
-      if (!isNaN(Number(pStr))) return `${Number(pStr).toLocaleString('hu-HU')} Ft`;
-      return pStr;
-    }
-    if (isDrink) return 'Ingyenes';
-    return null;
-  };
-
-  const displayPrice = getDisplayPrice();
 
   return (
     <div
@@ -82,12 +68,16 @@ export default function MenuItemCard({ item, exhibitor, onOpenLocationModal }) {
             <img
               src={item.image}
               alt={item.name}
-              className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+              loading="lazy"
+              decoding="async"
+              width="800"
+              height="450"
+              className="w-full h-full object-cover"
             />
           </div>
         )}
 
-        {/* Title and Optional Price */}
+        {/* Title */}
         <div className="flex items-start justify-between gap-2">
           <h3
             onClick={() => onOpenLocationModal && onOpenLocationModal(item, exhibitor)}
@@ -96,18 +86,7 @@ export default function MenuItemCard({ item, exhibitor, onOpenLocationModal }) {
             {item.name}
           </h3>
 
-          {displayPrice && (
-            <span
-              className={`shrink-0 text-xs font-black px-2.5 py-1 rounded-md border flex items-center gap-1 ${
-                displayPrice === 'Ingyenes'
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
-                  : 'bg-amber-100 text-amber-950 border-amber-300'
-              }`}
-            >
-              <Tag className="w-3 h-3 text-stone-600" />
-              <span>{displayPrice}</span>
-            </span>
-          )}
+
         </div>
 
         {/* Description */}
