@@ -68,7 +68,11 @@ export default function MenuItemCard({ item, exhibitor, onOpenLocationModal }) {
             <img
               src={item.image}
               alt={item.name}
-              className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
+              loading="lazy"
+              decoding="async"
+              width="800"
+              height="450"
+              className="w-full h-full object-cover"
             />
           </div>
         )}
