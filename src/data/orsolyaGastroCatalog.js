@@ -100,5 +100,20 @@ export const ORSOLYA_GASTRO_CATALOG = [
       { name: 'Glutén- és laktózmentes sütemények', category: 'sutemeny', availableDay: 'both', tags: ['gluténmentes', 'laktózmentes', 'sütemény'], isGlutenFree: true, isLactoseFree: true }
     ]
   }
+,
+  {
+    exhibitorKey: 'ujvarosi-tagovoda',
+    exhibitorName: 'Újvárosi Tagóvoda',
+    location: 'Diáksétány',
+    items: [
+      { name: 'Pincepörkölt', category: 'meleg_etel', availableDay: 'saturday', tags: ['pörkölt', 'magyaros', 'házias'] },
+      { name: 'Császármorzsa házi lekvárral', category: 'sutemeny', availableDay: 'saturday', tags: ['császármorzsa', 'desszert', 'házi'] },
+      { name: 'Székelykáposzta', category: 'meleg_etel', availableDay: 'sunday', tags: ['káposzta', 'magyaros', 'házias'] },
+      { name: 'Palacsinta', category: 'sutemeny', availableDay: 'sunday', tags: ['palacsinta', 'desszert', 'házi'] },
+      { name: 'Gesztenyepüré tejszínhabbal', category: 'sutemeny', availableDay: 'both', tags: ['gesztenye', 'desszert'] },
+      { name: 'Házi sütemények', category: 'sutemeny', availableDay: 'both', tags: ['házi', 'édes'] },
+      { name: 'Zsákbamacska', category: 'egyeb', availableDay: 'both', tags: ['játék', 'nyeremény'] }
+    ]
+  }
 
 ];
