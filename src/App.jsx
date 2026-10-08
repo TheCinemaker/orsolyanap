@@ -253,8 +253,8 @@ function MainApp() {
                             <div className="h-6 bg-stone-300 rounded-md w-3/4" />
                             <div className="h-4 bg-stone-200 rounded-md w-1/2" />
                             <div className="space-y-1.5 pt-2 border-t border-stone-100">
-                              <div className="h-3 bg-stone-150 rounded-md w-full" />
-                              <div className="h-3 bg-stone-150 rounded-md w-4/5" />
+                              <div className="h-3 bg-stone-200 rounded-md w-full" />
+                              <div className="h-3 bg-stone-200 rounded-md w-4/5" />
                             </div>
                             <div className="grid grid-cols-3 gap-1.5 pt-2">
                               <div className="h-8 bg-stone-200 rounded-md" />

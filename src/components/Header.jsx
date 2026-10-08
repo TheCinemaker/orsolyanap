@@ -227,7 +227,7 @@ export default function Header({
                 {/* Instant Search Dropdown Popover */}
                 {searchTrim.length > 0 && isSearchFocused && (
                   <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-stone-200 rounded-md shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-1 duration-150">
-                    <div className="bg-amber-900 text-amber-5 px-3 py-1.5 text-[11px] font-bold flex items-center justify-between">
+                    <div className="bg-amber-900 text-amber-50 px-3 py-1.5 text-[11px] font-bold flex items-center justify-between">
                       <span className="flex items-center gap-1">
                         <Utensils className="w-3 h-3 text-amber-300" />
                         <span>Azonnali találatok ("{searchQuery}")</span>

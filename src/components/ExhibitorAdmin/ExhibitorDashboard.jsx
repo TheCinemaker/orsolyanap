@@ -992,7 +992,7 @@ export default function ExhibitorDashboard() {
                       <EyeOff className="w-3.5 h-3.5 text-amber-800" />
                       <span>Rejtett mód (Péntek délig csapattagsági titok)</span>
                     </span>
-                    <span className="text-[10px] font-semibold text-amber-850 block mt-0.5 leading-tight">
+                    <span className="text-[10px] font-semibold text-amber-900 block mt-0.5 leading-tight">
                       Ha bepipálod, ezt az ételt a látogatók nem látják a vásári katalógusban péntek délig. Pénteken délben (12:00-kor) automatikusan mindenki előtt nyilvánossá válik!
                     </span>
                   </div>
