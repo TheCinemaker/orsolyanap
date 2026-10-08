@@ -75,5 +75,30 @@ export const ORSOLYA_GASTRO_CATALOG = [
       { name: 'Ropogósra sült bőrös császár', description: 'Párolt káposztával', category: 'meleg_etel', availableDay: 'sunday', tags: ['sertés', 'császár', 'káposzta'] },
       { name: 'Sétáló pizza', category: 'street_food', availableDay: 'sunday', tags: ['pizza', 'street food'] }
     ]
+  },
+  {
+    exhibitorKey: 'koszegi-birkozok',
+    exhibitorName: 'Kőszegi Birkózók',
+    location: 'Diáksétány',
+    items: [
+      { name: 'Vadas krumpligombóccal', category: 'meleg_etel', availableDay: 'saturday', tags: ['vadas', 'magyaros', 'házias'] },
+      { name: 'Grillezett húsok, krumpli és káposztasaláta', category: 'meleg_etel', availableDay: 'saturday', tags: ['grill', 'hús', 'magyaros'] },
+      { name: 'Pejsli zsemlegombóccal', category: 'meleg_etel', availableDay: 'sunday', tags: ['pejsli', 'zsemlegombóc', 'magyaros'] },
+      { name: 'Vadraguleves', category: 'meleg_etel', availableDay: 'sunday', tags: ['vad', 'raguleves', 'leves'] },
+      { name: 'Házi sütemények', category: 'sutemeny', availableDay: 'both', tags: ['házi', 'édes'] },
+      { name: 'Must', category: 'egyeb', availableDay: 'both', tags: ['must', 'őszi'] },
+      { name: 'Egyéb finomságok', category: 'egyeb', availableDay: 'both', tags: ['finomságok'] }
+    ]
+  },
+  {
+    exhibitorKey: 'felsovarosi-tagovoda',
+    exhibitorName: 'Kőszeg Meseváros Felsővárosi Tagóvodája',
+    location: 'Diáksétány',
+    items: [
+      { name: 'Harcsapaprikás sztrapacskával', category: 'meleg_etel', availableDay: 'both', tags: ['hal', 'paprikás', 'magyaros'] },
+      { name: 'Házi sütemények', category: 'sutemeny', availableDay: 'both', tags: ['házi', 'édes'] },
+      { name: 'Glutén- és laktózmentes sütemények', category: 'sutemeny', availableDay: 'both', tags: ['gluténmentes', 'laktózmentes', 'sütemény'], isGlutenFree: true, isLactoseFree: true }
+    ]
   }
+
 ];
