@@ -69,98 +69,70 @@ export function OrsolyaProvider({ children }) {
   useEffect(() => {
     let channel;
 
-    const fetchSupabaseData = async () => {
+    const fetchCoreData = async () => {
       try {
-        const { data: exData, error: exErr } = await supabase.from('exhibitors').select('*');
-        if (exErr) {
-          console.warn('Supabase exhibitors notice:', exErr.message);
+        const [exResult, itemResult] = await Promise.all([
+          supabase
+            .from('exhibitors')
+            .select('id,name,location,coordinates,pin,category,has_drinks,offerings,days,is_open,story,cause,phone,email,facebook_url,instagram_url,image,notice'),
+          supabase
+            .from('menu_items')
+            .select('id,exhibitor_id,name,description,initial_stock,stock,status,votes,category,available_day,is_gluten_free,is_lactose_free,is_sugar_free,is_vegan,tags,image,is_hidden')
+            .not('exhibitor_id', 'is', null)
+        ]);
+
+        if (exResult.error) {
+          console.warn('Supabase exhibitors notice:', exResult.error.message);
           setExhibitors([]);
-        } else if (exData) {
-          const formattedEx = exData.map((e) => ({
+        } else {
+          setExhibitors((exResult.data || []).map((e) => ({
             ...e,
             hasDrinks: e.has_drinks !== undefined ? e.has_drinks : e.hasDrinks
-          }));
-          setExhibitors(formattedEx);
+          })));
         }
 
-        const { data: itemData, error: itemErr } = await supabase.from('menu_items').select('*');
-        if (itemErr) {
-          console.warn('Supabase menu_items notice:', itemErr.message);
+        if (itemResult.error) {
+          console.warn('Supabase menu_items notice:', itemResult.error.message);
           setMenuItems([]);
-        } else if (itemData) {
-          // Filter out legacy restaurant food items (items without exhibitor_id)
-          const validOrsolyaItems = itemData.filter((item) => item.exhibitor_id);
-          setMenuItems(validOrsolyaItems);
-        }
-
-        const { data: reelData, error: reelErr } = await supabase.from('reels').select('*').order('created_at', { ascending: false });
-        if (!reelErr && reelData) {
-          setReels(reelData);
+        } else {
+          setMenuItems(itemResult.data || []);
         }
       } catch (err) {
-        console.warn('Supabase fetch notice: Using clean empty state', err);
+        console.warn('Supabase core fetch notice:', err);
         setExhibitors([]);
         setMenuItems([]);
-        setReels([]);
       }
     };
 
-    fetchSupabaseData();
+    fetchCoreData();
 
-    // Subscribe to Realtime Postgres changes across all connected devices & screens
     try {
       channel = supabase
-        .channel('orsolya-realtime-channel')
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'exhibitors' },
-          (payload) => {
-            if (payload.eventType === 'UPDATE' && payload.new) {
-              setExhibitors((prev) =>
-                prev.map((e) =>
-                  e.id === payload.new.id
-                    ? { ...e, ...payload.new, hasDrinks: payload.new.has_drinks ?? e.hasDrinks }
-                    : e
-                )
-              );
-            } else if (payload.eventType === 'INSERT' && payload.new) {
-              setExhibitors((prev) => [...prev, { ...payload.new, hasDrinks: payload.new.has_drinks }]);
-            }
+        .channel('orsolya-core-realtime')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'exhibitors' }, (payload) => {
+          if (payload.eventType === 'UPDATE' && payload.new) {
+            setExhibitors((prev) => prev.map((e) =>
+              e.id === payload.new.id
+                ? { ...e, ...payload.new, hasDrinks: payload.new.has_drinks ?? e.hasDrinks }
+                : e
+            ));
+          } else if (payload.eventType === 'INSERT' && payload.new) {
+            setExhibitors((prev) => [...prev, { ...payload.new, hasDrinks: payload.new.has_drinks }]);
+          } else if (payload.eventType === 'DELETE' && payload.old) {
+            setExhibitors((prev) => prev.filter((e) => e.id !== payload.old.id));
           }
-        )
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'menu_items' },
-          (payload) => {
-            if (payload.eventType === 'UPDATE' && payload.new) {
-              setMenuItems((prev) =>
-                prev.map((item) => (item.id === payload.new.id ? { ...item, ...payload.new } : item))
-              );
-            } else if (payload.eventType === 'INSERT' && payload.new) {
-              if (payload.new.exhibitor_id) {
-                setMenuItems((prev) => [...prev, payload.new]);
-              }
-            } else if (payload.eventType === 'DELETE' && payload.old) {
-              setMenuItems((prev) => prev.filter((item) => item.id !== payload.old.id));
-            }
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'menu_items' }, (payload) => {
+          if (payload.eventType === 'UPDATE' && payload.new) {
+            setMenuItems((prev) => prev.map((item) =>
+              item.id === payload.new.id ? payload.new : item
+            ));
+          } else if (payload.eventType === 'INSERT' && payload.new?.exhibitor_id) {
+            setMenuItems((prev) => prev.some((item) => item.id === payload.new.id) ? prev : [...prev, payload.new]);
+          } else if (payload.eventType === 'DELETE' && payload.old) {
+            setMenuItems((prev) => prev.filter((item) => item.id !== payload.old.id));
           }
-        )
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'reels' },
-          (payload) => {
-            if (payload.eventType === 'INSERT' && payload.new) {
-              setReels((prev) => {
-                if (prev.some((r) => r.id === payload.new.id)) return prev;
-                return [payload.new, ...prev];
-              });
-            } else if (payload.eventType === 'UPDATE' && payload.new) {
-              setReels((prev) => prev.map((r) => (r.id === payload.new.id ? { ...r, ...payload.new } : r)));
-            } else if (payload.eventType === 'DELETE' && payload.old) {
-              setReels((prev) => prev.filter((r) => r.id !== payload.old.id));
-            }
-          }
-        )
+        })
         .subscribe();
     } catch (err) {
       console.warn('Realtime subscription fallback:', err);
@@ -170,6 +142,25 @@ export function OrsolyaProvider({ children }) {
       if (channel) supabase.removeChannel(channel);
     };
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadRecentReels = async () => {
+      if (activeView !== 'visitor' && activeView !== 'reels') return;
+
+      const { data, error } = await supabase
+        .from('reels')
+        .select('id,exhibitor_id,exhibitor_name,caption,image,likes,created_at')
+        .order('created_at', { ascending: false })
+        .limit(12);
+
+      if (!cancelled && !error) setReels(data || []);
+    };
+
+    loadRecentReels();
+    return () => { cancelled = true; };
+  }, [activeView]);
 
   // Keep only small visitor preferences in LocalStorage. Live catalog data stays in memory/Supabase.
 
