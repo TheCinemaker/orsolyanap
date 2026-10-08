@@ -24,7 +24,7 @@ export const ORSOLYA_GASTRO_CATALOG = [
   },
   {
     exhibitorKey: 'beszedgyogyitas-alapitvany',
-    exhibitorName: 'Beszédgyógyítás Alapítvány',
+    exhibitorName: 'Dr. Nagy László EGYMI',
     location: 'Diáksétány',
     items: [
       { name: 'Töltött káposzta', category: 'meleg_etel', availableDay: 'saturday', tags: ['káposzta', 'magyaros', 'házias'] },
