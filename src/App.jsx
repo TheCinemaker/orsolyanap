@@ -63,16 +63,6 @@ function MainApp() {
     }
   };
 
-  const intentCategories = [
-    { id: 'all', label: 'Összes kínálat', icon: Sparkles },
-    { id: 'meleg_etel', label: 'Meleg ételek', icon: Flame },
-    { id: 'hideg_etel', label: 'Hideg ételek', icon: Utensils },
-    { id: 'sutemeny', label: 'Sütemény', icon: Cake },
-    { id: 'street_food', label: 'Street Food', icon: Cookie },
-    { id: 'italok', label: 'Italok', icon: CupSoda },
-    { id: 'egyeb', label: 'Egyéb', icon: Package }
-  ];
-
   const itemsByExhibitor = useMemo(() => {
     const map = new Map();
     menuItems.forEach((item) => {
