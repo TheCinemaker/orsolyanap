@@ -26,7 +26,13 @@ export default function CompactExhibitorCard({ exhibitor, items, onOpenDetails }
 
           {/* 7.2 Logo / Image Centered Under Name */}
           {exhibitor.image && (
-            <div className="w-full aspect-video rounded-md overflow-hidden relative border border-stone-200 bg-stone-950 flex items-center justify-center mx-auto">
+            <div className="w-full aspect-video rounded-md overflow-hidden relative border border-stone-200 bg-white flex items-center justify-center mx-auto p-2">
+              {/* object-CONTAIN, nem cover: itt logó van, nem fotó.
+                  A cover kitölti a 16:9 keretet és levágja a széleket -- egy
+                  logónál ez a feliratot nyírja le. A contain a teljes képet
+                  megmutatja, a maradék helyet pedig a fehér alap tölti ki,
+                  ami a logók túlnyomó részéhez illik (a korábbi fekete
+                  háttéren egy sötét betűs logó eltűnt volna). */}
               <img
                 src={exhibitor.image}
                 alt=""
@@ -34,7 +40,7 @@ export default function CompactExhibitorCard({ exhibitor, items, onOpenDetails }
                 decoding="async"
                 width="800"
                 height="450"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
               />
             </div>
           )}
