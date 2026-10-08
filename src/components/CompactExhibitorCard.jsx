@@ -1,5 +1,5 @@
 import React from 'react';
-import { useOrsolya, formatPrice } from '../context/OrsolyaContext';
+import { useOrsolya } from '../context/OrsolyaContext';
 import { MapPin, Heart, ChevronRight, ThumbsUp, Map, CupSoda, Calendar, Tag } from 'lucide-react';
 
 export default function CompactExhibitorCard({ exhibitor, items, onOpenDetails }) {
@@ -29,8 +29,12 @@ export default function CompactExhibitorCard({ exhibitor, items, onOpenDetails }
             <div className="w-full aspect-video rounded-md overflow-hidden relative border border-stone-200 bg-stone-950 flex items-center justify-center mx-auto">
               <img
                 src={exhibitor.image}
-                alt={exhibitor.name}
-                className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                alt=""
+                loading="lazy"
+                decoding="async"
+                width="800"
+                height="450"
+                className="w-full h-full object-cover"
               />
             </div>
           )}
@@ -62,7 +66,6 @@ export default function CompactExhibitorCard({ exhibitor, items, onOpenDetails }
             {items.slice(0, 4).map((item) => {
               const isVoted = votedItemIds.includes(item.id);
               const isSoldOut = item.status === 'sold_out';
-              const formattedP = formatPrice(item.price);
 
               return (
                 <div
@@ -75,9 +78,6 @@ export default function CompactExhibitorCard({ exhibitor, items, onOpenDetails }
                 >
                   <div className="flex-1 min-w-0 flex items-center justify-between gap-1.5">
                     <span className="font-bold text-stone-800 truncate block text-[11px]">{item.name}</span>
-                    <span className="text-[9px] font-extrabold text-amber-900 bg-amber-100/90 px-1.5 py-0.5 rounded border border-amber-300 flex-shrink-0">
-                      {formattedP}
-                    </span>
                   </div>
 
                   <button
