@@ -83,8 +83,8 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
   const filteredItems = useMemo(() => {
     return menuItems.filter((item) => {
       const exhibitor = exhibitorById.get(item.exhibitor_id);
-      const exName = exhibitor ? exhibitor.name.toLowerCase() : '';
-      const exLoc = exhibitor ? exhibitor.location.toLowerCase() : '';
+      const exName = exhibitor?.name?.toLowerCase?.() || '';
+      const exLoc = exhibitor?.location?.toLowerCase?.() || '';
 
       const matchesVisibility = isItemVisibleToVisitors ? isItemVisibleToVisitors(item) : !item.is_hidden;
       const matchesCategory = activeCategory === 'all' || item.category === activeCategory || (activeCategory === 'italok' && item.category === 'ital');
@@ -92,9 +92,9 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
 
       const matchesSearch =
         !searchQuery ||
-        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (item.tags && item.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()))) ||
+        item.name?.toLowerCase?.().includes(searchQuery.toLowerCase()) ||
+        (item.description?.toLowerCase?.().includes(searchQuery.toLowerCase())) ||
+        (item.tags && item.tags.some((t) => t?.toLowerCase?.().includes(searchQuery.toLowerCase()))) ||
         exName.includes(searchQuery.toLowerCase()) ||
         exLoc.includes(searchQuery.toLowerCase());
 
