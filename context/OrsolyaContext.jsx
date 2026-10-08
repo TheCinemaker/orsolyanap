@@ -5,6 +5,15 @@ import { supabase } from '../lib/supabaseClient';
 
 const OrsolyaContext = createContext();
 
+const readLocalArray = (key) => {
+  try {
+    const value = JSON.parse(localStorage.getItem(key) || '[]');
+    return Array.isArray(value) ? value : [];
+  } catch {
+    return [];
+  }
+};
+
 export function OrsolyaProvider({ children }) {
   // Active View Mode: 'visitor' | 'exhibitor' | 'map' | 'login' | 'tv'
   const [activeView, setActiveView] = useState('visitor');
@@ -21,10 +30,10 @@ export function OrsolyaProvider({ children }) {
   const [reels, setReels] = useState([]);
 
   // Scanned Favorite Exhibitors
-  const [favoriteExhibitorIds, setFavoriteExhibitorIds] = useState([]);
+  const [favoriteExhibitorIds, setFavoriteExhibitorIds] = useState(() => readLocalArray('orsolya_favorite_exhibitor_ids'));
 
   // Favorite Dish IDs
-  const [favoriteItemIds, setFavoriteItemIds] = useState([]);
+  const [favoriteItemIds, setFavoriteItemIds] = useState(() => readLocalArray('orsolya_favorite_item_ids'));
 
   // Focused Exhibitor ID on Map
   const [focusedExhibitorIdOnMap, setFocusedExhibitorIdOnMap] = useState(null);
@@ -33,10 +42,10 @@ export function OrsolyaProvider({ children }) {
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMyOrdersOpen, setIsMyOrdersOpen] = useState(false);
-  const [myOrderIds, setMyOrderIds] = useState([]);
+  const [myOrderIds, setMyOrderIds] = useState(() => readLocalArray('orsolya_my_order_ids'));
 
   // Public Voting system: voted item IDs persisted in LocalStorage
-  const [votedItemIds, setVotedItemIds] = useState([]);
+  const [votedItemIds, setVotedItemIds] = useState(() => readLocalArray('orsolya_voted_item_ids'));
 
   // Global Visitor Filter States (Day & Dietary Preferences)
   const [selectedDay, setSelectedDay] = useState('all'); // 'all' | 'saturday' | 'sunday'
@@ -262,6 +271,7 @@ export function OrsolyaProvider({ children }) {
     const found = exhibitors.find((ex) => ex.pin === pin.trim());
     if (found) {
       setActiveExhibitorId(found.id);
+      localStorage.setItem('orsolya_logged_exhibitor_id', found.id);
       setActiveView('exhibitor');
       showToast(`Üdvözlünk, ${found.name}! Stand belépés sikeres.`, 'success');
       return true;
@@ -273,6 +283,7 @@ export function OrsolyaProvider({ children }) {
 
   const logoutExhibitor = () => {
     setActiveExhibitorId(null);
+    localStorage.removeItem('orsolya_logged_exhibitor_id');
     setActiveView('visitor');
     showToast('Kijelentkeztél az árus felületről.');
   };
