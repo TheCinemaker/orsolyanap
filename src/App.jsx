@@ -283,7 +283,7 @@ function MainApp() {
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {visibleExhibitors.map((exhibitor) => {
-                        const exItems = menuItems.filter((item) => item.exhibitor_id === exhibitor.id);
+                        const exItems = itemsByExhibitor.get(exhibitor.id) || [];
 
                         return (
                           <CompactExhibitorCard
