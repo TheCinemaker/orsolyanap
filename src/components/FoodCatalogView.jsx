@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useOrsolya, formatPrice } from '../context/OrsolyaContext';
+import { useOrsolya } from '../context/OrsolyaContext';
 import DishLocationModal from './DishLocationModal';
 import {
   Utensils,
@@ -164,7 +164,6 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
             </h3>
             <span className="shrink-0 text-[11px] font-black text-amber-950 bg-amber-100 px-2 py-0.5 rounded border border-amber-300 flex items-center gap-1">
               <Tag className="w-3 h-3 text-amber-700" />
-              <span>{formatPrice(item.price)}</span>
             </span>
           </div>
           {item.description && (
