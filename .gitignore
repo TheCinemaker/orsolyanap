@@ -26,3 +26,6 @@ dist-ssr
 .env.*
 !.env.example
 scratch/
+
+# Kiallitoi PIN kodok: ervenyes belepesi adatok, nem tartoznak a repoba.
+KIALLITO_PIN_KODOK.txt

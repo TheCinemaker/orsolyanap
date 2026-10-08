@@ -6,6 +6,9 @@ import { Key, ArrowRight, ArrowLeft, ShieldCheck, Copy, Check, Plus, X, Lock, St
 export default function ExhibitorAuthPage() {
   const {
     loginExhibitor,
+    loginAsExhibitor,
+    isSuperAdmin,
+    logoutExhibitor,
     setActiveView,
     exhibitors,
     updateExhibitorPin,
@@ -15,7 +18,6 @@ export default function ExhibitorAuthPage() {
   } = useOrsolya();
 
   const [pinInput, setPinInput] = useState('');
-  const [isOrganizerDirectoryOpen, setIsOrganizerDirectoryOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [copiedPinId, setCopiedPinId] = useState(null);
   const [editingPinExhibitorId, setEditingPinExhibitorId] = useState(null);
@@ -103,13 +105,13 @@ export default function ExhibitorAuthPage() {
               Árus & Stand Belépés
             </h1>
             <p className="text-xs text-stone-600 mt-1 leading-relaxed">
-              Írd be a szervezőktől kapott 4 jegyű PIN kódodat a belépéshez, vagy regisztrálj új csapatot!
+              Írd be a szervezőktől kapott 4 jegyű PIN kódodat.
             </p>
           </div>
         </div>
 
         {/* Notice banner if empty database */}
-        {exhibitors.length === 0 && (
+        {exhibitors.length === 0 && isSuperAdmin && (
           <div className="bg-amber-50 border border-amber-300/80 rounded-md p-4 text-center space-y-2">
             <p className="text-xs font-bold text-amber-950">
               Még nincs regisztrált csapat az adatbázisban.
@@ -154,6 +156,7 @@ export default function ExhibitorAuthPage() {
         </form>
 
         {/* Action Button: Register New Team */}
+        {isSuperAdmin && (
         <div className="pt-2">
           <button
             onClick={() => setIsRegisterModalOpen(true)}
@@ -163,36 +166,7 @@ export default function ExhibitorAuthPage() {
             <span>➕ Új Csapat / Árus Regisztrálása</span>
           </button>
         </div>
-
-        {/* Live Registered PIN shortcuts */}
-        {exhibitors.length > 0 && (
-          <div className="pt-4 border-t border-stone-100 text-center space-y-2">
-            <p className="text-xs text-stone-400 font-medium">Gyors belépés (Regisztrált standok):</p>
-            <div className="flex flex-wrap justify-center gap-1.5 text-[11px] font-mono font-bold">
-              {exhibitors.slice(0, 4).map((ex) => (
-                <button
-                  key={ex.id}
-                  type="button"
-                  onClick={() => setPinInput(ex.pin)}
-                  className="bg-stone-100 hover:bg-stone-200 text-stone-700 px-2.5 py-1 rounded-md border border-stone-200 transition-colors"
-                >
-                  {ex.pin} ({ex.name.split(' ')[0]})
-                </button>
-              ))}
-            </div>
-          </div>
         )}
-
-        {/* Organizer PIN directory button */}
-        <div className="pt-2 border-t border-stone-100">
-          <button
-            onClick={() => setIsOrganizerDirectoryOpen(true)}
-            className="w-full py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-950 font-bold text-xs rounded-md border border-amber-200 flex items-center justify-center gap-2 transition-colors"
-          >
-            <ShieldCheck className="w-4 h-4 text-amber-800" />
-            <span>Szervezői Csapat & PIN Kód Jegyzék</span>
-          </button>
-        </div>
 
         <button
           onClick={() => setActiveView('visitor')}
@@ -416,11 +390,11 @@ export default function ExhibitorAuthPage() {
       {/* ------------------------------------------------------------------ */}
       {/* ORGANIZER PIN DIRECTORY MODAL */}
       {/* ------------------------------------------------------------------ */}
-      {isOrganizerDirectoryOpen && (
+      {isSuperAdmin && (
         <div className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
           <div className="bg-white border border-stone-200 rounded-md p-6 w-full max-w-xl shadow-2xl relative max-h-[90vh] overflow-y-auto space-y-4">
             <button
-              onClick={() => setIsOrganizerDirectoryOpen(false)}
+              onClick={logoutExhibitor}
               className="absolute top-4 right-4 text-stone-400 hover:text-stone-600 p-1"
             >
               <X className="w-5 h-5" />
@@ -443,7 +417,6 @@ export default function ExhibitorAuthPage() {
 
               <button
                 onClick={() => {
-                  setIsOrganizerDirectoryOpen(false);
                   setIsRegisterModalOpen(true);
                 }}
                 className="px-3 py-1.5 bg-amber-900 hover:bg-amber-950 text-white text-xs font-extrabold rounded-md flex items-center gap-1 flex-shrink-0"
@@ -521,8 +494,7 @@ export default function ExhibitorAuthPage() {
 
                           <button
                             onClick={() => {
-                              loginExhibitor(ex.pin);
-                              setIsOrganizerDirectoryOpen(false);
+                              loginAsExhibitor(ex.id);
                             }}
                             className="px-2.5 py-1 bg-amber-900 hover:bg-amber-950 text-white text-[11px] font-extrabold rounded-md"
                           >
@@ -538,7 +510,7 @@ export default function ExhibitorAuthPage() {
 
             <div className="pt-3 border-t border-stone-200 flex justify-end">
               <button
-                onClick={() => setIsOrganizerDirectoryOpen(false)}
+              onClick={logoutExhibitor}
                 className="px-4 py-2 bg-stone-900 text-white font-bold text-xs rounded-md"
               >
                 Bezárás

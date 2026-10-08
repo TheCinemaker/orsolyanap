@@ -2,6 +2,16 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { INITIAL_EXHIBITORS, INITIAL_MENU_ITEMS } from '../data/mockOrsolyaData';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 
+/**
+ * Szervezői PIN kód.
+ *
+ * FIGYELEM: ez kliensoldali kód, tehát a böngészőbe letöltött JS-ből
+ * kiolvasható. A felületen semmi nem mutatja meg, és véletlenül nem lehet
+ * ráakadni, de aki a bundle-t olvassa, megtalálja. Valódi védelemhez
+ * szerveroldali hitelesítés kellene (Supabase Auth + RLS).
+ */
+const ORGANIZER_PIN = '0169';
+
 const OrsolyaContext = createContext();
 
 export function OrsolyaProvider({ children }) {
@@ -30,6 +40,11 @@ export function OrsolyaProvider({ children }) {
 
   // Focused Exhibitor ID on Map
   const [focusedExhibitorIdOnMap, setFocusedExhibitorIdOnMap] = useState(null);
+
+  // Szervezői (szuper admin) mód: a PIN-jegyzék és a standok közti váltás
+  // kizárólag ezzel érhető el. SZÁNDÉKOSAN nem perzisztálódik: újratöltés
+  // után ki kell lépni és újra belépni.
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   // Public Voting system: voted item IDs persisted in LocalStorage
   const [votedItemIds, setVotedItemIds] = useState([]);
@@ -367,21 +382,57 @@ export function OrsolyaProvider({ children }) {
   };
 
   // Login as Exhibitor with PIN
+  /**
+   * Belépés PIN kóddal.
+   *
+   * Két eset van:
+   *   - a szervezői kód (ORGANIZER_PIN): nem egy standba lép be, hanem
+   *     megnyitja a csapat- és PIN-jegyzéket, ahonnan BÁRMELYIK stand
+   *     felülete elérhető
+   *   - egy stand kódja: az adott stand felületére lép be
+   *
+   * A hibaüzenet szándékosan nem ad példát kódra.
+   */
   const loginExhibitor = (pin) => {
-    const found = exhibitors.find((ex) => ex.pin === pin.trim());
+    const clean = String(pin ?? '').trim();
+
+    if (clean === ORGANIZER_PIN) {
+      setIsSuperAdmin(true);
+      showToast('Szervezői belépés. Válaszd ki, melyik stand felületére lépsz.', 'success');
+      return true;
+    }
+
+    const found = exhibitors.find((ex) => ex.pin === clean);
     if (found) {
+      setIsSuperAdmin(false);
       setActiveExhibitorId(found.id);
       setActiveView('exhibitor');
       showToast(`Üdvözlünk, ${found.name}! Stand belépés sikeres.`, 'success');
       return true;
-    } else {
-      showToast('Hibás PIN kód! Próbáld újra (pl. 1234, 2345, 3456).', 'error');
-      return false;
     }
+
+    showToast('Hibás PIN kód.', 'error');
+    return false;
+  };
+
+  /**
+   * Belépés egy konkrét stand felületére a szervezői jegyzékből.
+   * Csak szervezői módban hívható -- a jegyzék is csak ott érhető el.
+   */
+  const loginAsExhibitor = (exhibitorId) => {
+    if (!isSuperAdmin) return false;
+    const found = exhibitors.find((ex) => ex.id === exhibitorId);
+    if (!found) return false;
+
+    setActiveExhibitorId(found.id);
+    setActiveView('exhibitor');
+    showToast(`${found.name} felülete megnyitva (szervezői belépés).`, 'success');
+    return true;
   };
 
   const logoutExhibitor = () => {
     setActiveExhibitorId(null);
+    setIsSuperAdmin(false);
     setActiveView('visitor');
     showToast('Kijelentkeztél az árus felületről.');
   };
@@ -875,6 +926,8 @@ export function OrsolyaProvider({ children }) {
         activeExhibitor,
         isLoadingData,
         loginExhibitor,
+        loginAsExhibitor,
+        isSuperAdmin,
         logoutExhibitor,
         exhibitors,
         menuItems,

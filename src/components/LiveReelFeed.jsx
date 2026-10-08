@@ -3,7 +3,7 @@ import { useOrsolya } from '../context/OrsolyaContext';
 import { Camera, Heart, MapPin, Store, Sparkles, Clock, Flame, Image as ImageIcon } from 'lucide-react';
 
 export default function LiveReelFeed() {
-  const { reels, exhibitors, likeReel, focusExhibitorOnMap, setActiveView } = useOrsolya();
+  const { reels, exhibitors, likeReel, focusExhibitorOnMap } = useOrsolya();
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [likedReelIds, setLikedReelIds] = useState(() => {
     try { return JSON.parse(localStorage.getItem('orsolya_liked_reel_ids') || '[]'); } catch { return []; }
@@ -40,13 +40,6 @@ export default function LiveReelFeed() {
           </p>
         </div>
 
-        <button
-          onClick={() => setActiveView('login')}
-          className="z-10 px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-stone-950 font-black text-xs rounded-md shadow-xs transition-all flex items-center gap-2 flex-shrink-0 cursor-pointer"
-        >
-          <Camera className="w-4 h-4" />
-          <span>Árus Posztolása</span>
-        </button>
       </div>
 
       {/* Reels Feed Grid */}

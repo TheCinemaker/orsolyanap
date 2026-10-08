@@ -34,6 +34,7 @@ import {
 export default function ExhibitorDashboard() {
   const {
     activeExhibitor,
+    isSuperAdmin,
     logoutExhibitor,
     menuItems,
     updateItemStatus,
@@ -485,7 +486,7 @@ export default function ExhibitorDashboard() {
         </div>
 
         {/* Super-Admin Friday Force Activation Toggle */}
-        {activeExhibitor?.pin === '9999' || activeExhibitor?.id === 'ex-admin' ? (
+        {isSuperAdmin ? (
           <button
             onClick={toggleSaturdayActivation}
             className={`px-3 py-1.5 rounded-md font-extrabold text-[11px] flex-shrink-0 transition-all border shadow-xs ${
