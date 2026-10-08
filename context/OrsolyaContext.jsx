@@ -171,18 +171,7 @@ export function OrsolyaProvider({ children }) {
     };
   }, []);
 
-  // Sync to LocalStorage & cross-tab sync
-  useEffect(() => {
-    localStorage.setItem('orsolya_exhibitors', JSON.stringify(exhibitors));
-  }, [exhibitors]);
-
-  useEffect(() => {
-    localStorage.setItem('orsolya_menu_items', JSON.stringify(menuItems));
-  }, [menuItems]);
-
-  useEffect(() => {
-    localStorage.setItem('orsolya_orders', JSON.stringify(orders));
-  }, [orders]);
+  // Keep only small visitor preferences in LocalStorage. Live catalog data stays in memory/Supabase.
 
   useEffect(() => {
     localStorage.setItem('orsolya_my_order_ids', JSON.stringify(myOrderIds));
