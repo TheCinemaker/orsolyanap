@@ -55,9 +55,10 @@ export function OrsolyaProvider({ children }) {
   const [toastMessage, setToastMessage] = useState(null);
 
   const showToast = (msg, type = 'info') => {
-    setToastMessage({ text: msg, type, id: Date.now() });
+    const id = Date.now();
+    setToastMessage({ text: msg, type, id });
     setTimeout(() => {
-      setToastMessage((prev) => (prev?.text === msg ? null : prev));
+      setToastMessage((prev) => (prev?.id === id ? null : prev));
     }, 3500);
   };
 
