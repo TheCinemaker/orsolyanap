@@ -1,6 +1,6 @@
 import React from 'react';
-import { useOrsolya, formatPrice } from '../context/OrsolyaContext';
-import { X, MapPin, Phone, Mail, Heart, Utensils, Map, ThumbsUp, CupSoda, Calendar, Share2, Tag } from 'lucide-react';
+import { useOrsolya } from '../context/OrsolyaContext';
+import { X, MapPin, Phone, Mail, Heart, Utensils, Map, ThumbsUp, CupSoda, Calendar, Share2 } from 'lucide-react';
 
 export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish }) {
   const {
@@ -200,7 +200,6 @@ export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish 
                 const isFavItem = favoriteItemIds?.includes(item.id);
                 const isVoted = votedItemIds.includes(item.id);
                 const isSoldOut = item.status === 'sold_out';
-                const formattedP = formatPrice(item.price);
 
                 return (
                   <div
@@ -231,12 +230,6 @@ export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish 
                             LM
                           </span>
                         )}
-                      </div>
-
-                      {/* Display Price Badge */}
-                      <div className="flex items-center gap-1 text-[11px] font-bold text-amber-900">
-                        <Tag className="w-3 h-3 text-amber-700" />
-                        <span>{formattedP}</span>
                       </div>
 
                       {item.description && (
