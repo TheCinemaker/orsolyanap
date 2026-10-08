@@ -16,6 +16,7 @@ import {
   Package,
   Sparkles,
   Heart,
+  Search,
   X
 } from 'lucide-react';
 
@@ -28,7 +29,7 @@ const CATEGORY_SECTIONS = [
   { id: 'egyeb', title: 'Egyéb', icon: Package }
 ];
 
-export default function FoodCatalogView({ selectedCategory, setSelectedCategory }) {
+export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedCategory, setSelectedCategory }) {
   const {
     menuItems,
     exhibitors,
@@ -89,9 +90,25 @@ export default function FoodCatalogView({ selectedCategory, setSelectedCategory 
       const matchesCategory = activeCategory === 'all' || item.category === activeCategory || (activeCategory === 'italok' && item.category === 'ital');
       const matchesTag = activeTag === 'all' || (item.tags || []).includes(activeTag);
 
-      return matchesVisibility && matchesDay && matchesCategory && matchesTag;
+      const matchesSearch =
+        !searchQuery ||
+        item.name?.toLowerCase?.().includes(searchQuery.toLowerCase()) ||
+        (item.description?.toLowerCase?.().includes(searchQuery.toLowerCase())) ||
+        (item.tags && item.tags.some((t) => t?.toLowerCase?.().includes(searchQuery.toLowerCase()))) ||
+        exName.includes(searchQuery.toLowerCase()) ||
+        exLoc.includes(searchQuery.toLowerCase());
+
+      const itemDay = item.available_day || 'both';
+      const exDay = exhibitor?.days || 'both';
+      const matchesDay =
+        selectedDay === 'all' ||
+        itemDay === 'both' ||
+        itemDay === selectedDay ||
+        (exDay !== 'both' && exDay === selectedDay);
+
+      return matchesVisibility && matchesSearch && matchesDay && matchesCategory && matchesTag;
     });
-  }, [menuItems, exhibitors, selectedDay, activeCategory, activeTag, isItemVisibleToVisitors]);
+  }, [menuItems, exhibitors, searchQuery, selectedDay, activeCategory, activeTag, isItemVisibleToVisitors]);
 
   // Stable ordering: first by category, then by exhibitor, then by dish name.
   const sortedItems = useMemo(() => {
@@ -298,8 +315,23 @@ export default function FoodCatalogView({ selectedCategory, setSelectedCategory 
         </div>
       </div>
 
-      {/* Filter controls */}
+      {/* Search and filter controls */}
       <div className="bg-white border border-stone-200/90 rounded-md p-3 sm:p-4 shadow-2xs space-y-3">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+          <input
+            value={searchQuery || ''}
+            onChange={(e) => setSearchQuery && setSearchQuery(e.target.value)}
+            placeholder="Étel, ital vagy árus keresése..."
+            className="w-full h-10 pl-9 pr-9 rounded-md border border-stone-200 bg-stone-50 text-sm font-medium text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400"
+          />
+          {searchQuery && (
+            <button onClick={() => setSearchQuery && setSearchQuery('')} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-stone-400 hover:text-stone-800" title="Keresés törlése">
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
         <div className="flex gap-2 overflow-x-auto pb-1">
           <button onClick={() => { setActiveCategory('all'); if (setSelectedCategory) setSelectedCategory('all'); }} className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-extrabold border transition-all ${activeCategory === 'all' ? 'bg-amber-900 text-white border-amber-900' : 'bg-stone-50 text-stone-600 border-stone-200 hover:border-amber-300'}`}>Minden</button>
           {categoryFilters.map((section) => {
@@ -309,6 +341,7 @@ export default function FoodCatalogView({ selectedCategory, setSelectedCategory 
             </button>;
           })}
         </div>
+
         {availableTags.length > 0 && (
           <div className="flex gap-1.5 overflow-x-auto pb-1">
             <button onClick={() => setActiveTag('all')} className={`shrink-0 px-2.5 py-1 rounded-md text-[11px] font-bold border transition-all ${activeTag === 'all' ? 'bg-stone-800 text-white border-stone-800' : 'bg-white text-stone-500 border-stone-200 hover:border-stone-400'}`}>Összes jelleg</button>
@@ -322,8 +355,9 @@ export default function FoodCatalogView({ selectedCategory, setSelectedCategory 
             {showAllTags ? 'Kevesebb szűrő' : `További szűrők (${availableTags.length - 8})`}
           </button>
         )}
-        {(activeCategory !== 'all' || activeTag !== 'all') && (
-          <button onClick={() => { setActiveCategory('all'); setActiveTag('all'); }} className="text-[11px] font-bold text-amber-800 hover:text-amber-950 flex items-center gap-1">
+
+        {(activeCategory !== 'all' || activeTag !== 'all' || searchQuery) && (
+          <button onClick={() => { setActiveCategory('all'); setActiveTag('all'); if (setSearchQuery) setSearchQuery(''); }} className="text-[11px] font-bold text-amber-800 hover:text-amber-950 flex items-center gap-1">
             <X className="w-3 h-3" /> Szűrők törlése
           </button>
         )}
@@ -352,6 +386,7 @@ export default function FoodCatalogView({ selectedCategory, setSelectedCategory 
               setActiveCategory('all');
               setActiveTag('all');
               setSelectedDay('all');
+              if (setSearchQuery) setSearchQuery('');
             }}
             className="px-4 py-2 bg-amber-800 text-white text-xs font-bold rounded-md mt-2 cursor-pointer"
           >
