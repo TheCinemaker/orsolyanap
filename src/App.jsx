@@ -271,7 +271,7 @@ function MainApp() {
                       <p className="text-sm font-bold text-stone-700">Nincs a keresésnek megfelelő stand.</p>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
                       {visibleExhibitors.map((exhibitor) => {
                         const exItems = itemsByExhibitor.get(exhibitor.id) || [];
 
