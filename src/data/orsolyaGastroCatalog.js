@@ -134,5 +134,16 @@ export const ORSOLYA_GASTRO_CATALOG = [
       { name: 'Alkoholmentes puncs', category: 'italok', availableDay: 'both', tags: ['forró ital', 'alkoholmentes'] }
     ]
   }
+,
+  {
+    exhibitorKey: 'dance-jam-koszeg',
+    exhibitorName: 'Dance Jam Kőszeg',
+    location: 'Diáksétány',
+    items: [
+      { name: 'Töltött káposzta', category: 'meleg_etel', availableDay: 'saturday', tags: ['töltött káposzta', 'magyaros', 'házias'] },
+      { name: 'Csülökpörkölt táncos körettel', category: 'meleg_etel', availableDay: 'sunday', tags: ['csülök', 'pörkölt', 'magyaros'] },
+      { name: 'Csülökpörkölt nokedlivel', category: 'meleg_etel', availableDay: 'sunday', tags: ['csülök', 'pörkölt', 'nokedli'] }
+    ]
+  }
 
 ];
