@@ -4,6 +4,7 @@ import Header from './components/Header';
 import CompactExhibitorCard from './components/CompactExhibitorCard';
 import ExhibitorDetailModal from './components/ExhibitorDetailModal';
 import FoodCatalogView from './components/FoodCatalogView';
+import EventProgramBook from './components/EventProgramBook';
 import ExhibitorDashboard from './components/ExhibitorAdmin/ExhibitorDashboard';
 import ExhibitorAuthPage from './components/ExhibitorAuthPage';
 import CartDrawer from './components/CartDrawer';
@@ -176,7 +177,9 @@ function MainApp() {
             </div>
 
             {/* Main Content Area */}
-            {mainTab === 'food' ? (
+            {mainTab === 'program' ? (
+              <EventProgramBook />
+            ) : mainTab === 'food' ? (
               <FoodCatalogView
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
