@@ -1,6 +1,6 @@
 import React from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { Utensils, MapPin, Heart, Store, QrCode } from 'lucide-react';
+import { Utensils, MapPin, Heart, Store, QrCode, CalendarDays } from 'lucide-react';
 
 export default function MobileBottomNav({ onOpenFavorites, onOpenScanner, setMainTab }) {
   const {
@@ -9,7 +9,8 @@ export default function MobileBottomNav({ onOpenFavorites, onOpenScanner, setMai
     favoriteExhibitorIds,
     favoriteItemIds,
     navigateToStandFeed,
-    navigateToFoodCatalog
+    navigateToFoodCatalog,
+    mainTab
   } = useOrsolya();
   const totalFavs = favoriteExhibitorIds.length + (favoriteItemIds?.length || 0);
 
@@ -45,6 +46,21 @@ export default function MobileBottomNav({ onOpenFavorites, onOpenScanner, setMai
           <span className="text-[10px] font-bold">Térkép</span>
         </button>
 
+        {/* Programfüzet */}
+        <button
+          onClick={() => {
+            setActiveView('visitor');
+            if (setMainTab) setMainTab('program');
+          }}
+          className={`flex flex-col items-center gap-0.5 py-1 px-1.5 rounded-md transition-all ${
+            activeView === 'visitor' && mainTab === 'program' ? 'text-amber-900 font-black' : 'text-stone-500 font-medium hover:text-stone-900'
+          }`}
+          title="Programfüzet"
+        >
+          <CalendarDays className="w-5 h-5 text-amber-800" />
+          <span className="text-[10px] font-bold">Programok</span>
+        </button>
+
         {/* 10.1 Center Prominent Cutlery Icon (Ételek / Katalógus) */}
         <button
           onClick={() => {
@@ -73,16 +89,6 @@ export default function MobileBottomNav({ onOpenFavorites, onOpenScanner, setMai
             )}
           </div>
           <span className="text-[10px] font-bold">Kedvencek</span>
-        </button>
-
-        {/* 10.3 Right 2: QR Scanner */}
-        <button
-          onClick={onOpenScanner}
-          className="flex flex-col items-center gap-0.5 py-1 px-2.5 rounded-md transition-all text-stone-600 hover:text-stone-900 font-medium"
-          title="QR Kód Beolvasása"
-        >
-          <QrCode className="w-5 h-5 text-amber-800" />
-          <span className="text-[10px] font-bold">QR Olvasó</span>
         </button>
 
       </div>

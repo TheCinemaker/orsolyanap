@@ -44,7 +44,6 @@ CREATE TABLE IF NOT EXISTS public.menu_items (
     is_vegan BOOLEAN DEFAULT false,
     is_hidden BOOLEAN DEFAULT false,
     tags TEXT[] DEFAULT '{}',
-    price TEXT,
     image TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );

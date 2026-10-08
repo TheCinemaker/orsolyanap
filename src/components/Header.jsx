@@ -114,6 +114,23 @@ export default function Header({
             <button
               onClick={() => {
                 setActiveView('visitor');
+                setMainTab('program');
+              }}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-xs transition-all ${
+                activeView === 'visitor' && mainTab === 'program'
+                  ? 'bg-amber-900 text-white shadow-sm font-extrabold'
+                  : 'text-stone-700 hover:text-stone-900 font-semibold'
+              }`}
+            >
+              <Calendar className={`w-3.5 h-3.5 ${
+                activeView === 'visitor' && mainTab === 'program' ? 'text-amber-200' : 'text-amber-700'
+              }`} />
+              <span>Programok</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setActiveView('visitor');
                 setMainTab('food');
               }}
               className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-xs transition-all ${
@@ -188,7 +205,7 @@ export default function Header({
         </div>
 
         {/* Filter Bar & Instant Live Food Search (Visitor view) */}
-        {activeView === 'visitor' && (
+        {activeView === 'visitor' && mainTab !== 'program' && (
           <div className="border-t border-stone-200/70 px-3 sm:px-4 py-2 bg-stone-50/80 transition-all duration-200">
             <div className="max-w-6xl mx-auto flex items-center justify-between gap-2.5">
               {/* Search Container */}

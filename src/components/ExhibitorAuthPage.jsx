@@ -42,7 +42,7 @@ export default function ExhibitorAuthPage() {
       try {
         const base64 = await convertFileToBase64(file);
         setRegForm((prev) => ({ ...prev, image: base64 }));
-        showToast('📸 Csapat fotó feltöltve!', 'success');
+        showToast('Csapat fotó feltöltve!', 'success');
       } catch (err) {
         showToast('Hiba a kép feldolgozásakor', 'error');
       }

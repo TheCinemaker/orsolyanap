@@ -29,8 +29,12 @@ export default function CompactExhibitorCard({ exhibitor, items, onOpenDetails }
             <div className="w-full aspect-video rounded-md overflow-hidden relative border border-stone-200 bg-stone-950 flex items-center justify-center mx-auto">
               <img
                 src={exhibitor.image}
-                alt={exhibitor.name}
-                className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                alt=""
+                loading="lazy"
+                decoding="async"
+                width="800"
+                height="450"
+                className="w-full h-full object-cover"
               />
             </div>
           )}

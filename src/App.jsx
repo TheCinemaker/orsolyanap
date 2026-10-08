@@ -1,17 +1,15 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { OrsolyaProvider, useOrsolya } from './context/OrsolyaContext';
 import Header from './components/Header';
-import ExhibitorCard from './components/ExhibitorCard';
 import CompactExhibitorCard from './components/CompactExhibitorCard';
 import ExhibitorDetailModal from './components/ExhibitorDetailModal';
-import InlineQRScanner from './components/InlineQRScanner';
 import FoodCatalogView from './components/FoodCatalogView';
+import EventProgramBook from './components/EventProgramBook';
 import ExhibitorDashboard from './components/ExhibitorAdmin/ExhibitorDashboard';
 import ExhibitorAuthPage from './components/ExhibitorAuthPage';
 import CartDrawer from './components/CartDrawer';
 import MyOrdersModal from './components/MyOrdersModal';
 import MapView from './components/MapView';
-import VisitKoszegLogo from './components/VisitKoszegLogo';
 import LiveReelBar from './components/LiveReelBar';
 import ReelsGallery from './components/ReelsGallery';
 import BackToTopButton from './components/BackToTopButton';
@@ -21,7 +19,6 @@ import {
   Utensils,
   Info,
   CheckCircle2,
-  MapPin,
   Flame,
   ChevronDown,
   Store,
@@ -54,7 +51,6 @@ function MainApp() {
     activeView,
     exhibitors,
     menuItems,
-    favoriteExhibitorIds,
     toastMessage,
     isLoadingData,
     mainTab,
@@ -83,21 +79,19 @@ function MainApp() {
     }
   };
 
-  const intentCategories = [
-    { id: 'all', label: 'Összes kínálat', icon: Sparkles },
-    { id: 'meleg_etel', label: 'Meleg ételek', icon: Flame },
-    { id: 'hideg_etel', label: 'Hideg ételek', icon: Utensils },
-    { id: 'sutemeny', label: 'Sütemény', icon: Cake },
-    { id: 'street_food', label: 'Street Food', icon: Cookie },
-    { id: 'italok', label: 'Italok', icon: CupSoda },
-    { id: 'egyeb', label: 'Egyéb', icon: Package }
-  ];
-
-  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
-  const activeCategoryObj = intentCategories.find((cat) => cat.id === selectedCategory) || intentCategories[0];
+  const itemsByExhibitor = useMemo(() => {
+    const map = new Map();
+    menuItems.forEach((item) => {
+      if (!item.exhibitor_id) return;
+      const list = map.get(item.exhibitor_id);
+      if (list) list.push(item);
+      else map.set(item.exhibitor_id, [item]);
+    });
+    return map;
+  }, [menuItems]);
 
   const filteredExhibitors = exhibitors.filter((ex) => {
-    const exItems = menuItems.filter((i) => i.exhibitor_id === ex.id);
+    const exItems = itemsByExhibitor.get(ex.id) || [];
     const lowerQuery = searchQuery.trim().toLowerCase();
 
     const matchesSearch =
@@ -121,6 +115,10 @@ function MainApp() {
 
     return matchesSearch && matchesCategory;
   });
+
+  useEffect(() => {
+    setVisibleCount(12);
+  }, [searchQuery, selectedCategory, selectedZone, standSortMode]);
 
   const sortedExhibitors = useMemo(() => {
     let list = [...filteredExhibitors];
@@ -147,7 +145,7 @@ function MainApp() {
       {/* Toast Notification */}
       {toastMessage && (
         <div
-          className={`fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 px-4 py-3 rounded-md shadow-xl font-extrabold text-xs flex items-center gap-2 border animate-in slide-in-from-bottom duration-200 ${
+          className={`fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-50 px-4 py-3 rounded-md shadow-xl font-extrabold text-xs flex items-center gap-2 border ${
             toastMessage.type === 'error'
               ? 'bg-rose-900 text-white border-rose-800'
               : toastMessage.type === 'success'
@@ -191,12 +189,14 @@ function MainApp() {
             {/* Top Title Section */}
             <div className="text-center py-1">
               <h1 className="text-xs sm:text-sm font-black text-amber-950 uppercase tracking-widest">
-                CIVIL ÍZEK UTCÁJA
+                {mainTab === 'program' ? 'PROGRAMFÜZET' : 'CIVIL ÍZEK UTCÁJA'}
               </h1>
             </div>
 
             {/* Main Content Area */}
-            {mainTab === 'food' ? (
+            {mainTab === 'program' ? (
+              <EventProgramBook />
+            ) : mainTab === 'food' ? (
               <FoodCatalogView
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
@@ -257,7 +257,7 @@ function MainApp() {
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {[1, 2, 3, 4, 5, 6].map((sk) => (
-                          <div key={sk} className="bg-white border border-stone-200 rounded-md p-4 space-y-3 animate-pulse shadow-xs">
+                          <div key={sk} className="bg-white border border-stone-200 rounded-md p-4 space-y-3 shadow-xs">
                             <div className="flex justify-between items-center">
                               <div className="h-4 bg-stone-200 rounded-md w-1/3" />
                               <div className="h-4 bg-stone-100 rounded-full w-1/4" />
@@ -285,7 +285,7 @@ function MainApp() {
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {visibleExhibitors.map((exhibitor) => {
-                        const exItems = menuItems.filter((item) => item.exhibitor_id === exhibitor.id);
+                        const exItems = itemsByExhibitor.get(exhibitor.id) || [];
 
                         return (
                           <CompactExhibitorCard

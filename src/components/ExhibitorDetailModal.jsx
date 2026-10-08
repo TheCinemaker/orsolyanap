@@ -28,11 +28,7 @@ export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish 
 
   const handleDishClick = (item) => {
     onClose();
-    if (onSelectDish) {
-      onSelectDish(item);
-    } else {
-      navigateToFoodCatalog(item ? item.name : '');
-    }
+    if (onSelectDish) onSelectDish(item);
   };
 
   return (
@@ -54,7 +50,10 @@ export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish 
             <img
               src={exhibitor.image}
               alt={exhibitor.name}
-              className="w-full h-full object-contain"
+              decoding="async"
+              width="800"
+              height="450"
+              className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none" />
             <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between flex-wrap gap-1.5">
@@ -223,11 +222,10 @@ export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish 
                 return (
                   <div
                     key={item.id}
-                    onClick={() => handleDishClick(item)}
-                    className={`border p-3 rounded-md flex items-center justify-between gap-3 shadow-2xs transition-all cursor-pointer hover:border-amber-400 ${
+                                    className={`border p-3 rounded-md flex items-center justify-between gap-3 shadow-2xs ${
                       isSoldOut ? 'border-stone-300 bg-stone-100 opacity-80 grayscale' : 'bg-white border-stone-200'
                     }`}
-                    title="Kattints az étel megtekintéséhez a Katalógusban"
+                   
                   >
                     {/* Item Image */}
                     {item.image && (

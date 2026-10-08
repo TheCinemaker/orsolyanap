@@ -1,8 +1,18 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { INITIAL_EXHIBITORS, INITIAL_MENU_ITEMS, INITIAL_ORDERS } from '../data/mockOrsolyaData';
+import { ORSOLYA_GASTRO_CATALOG } from '../data/orsolyaGastroCatalog';
 import { supabase } from '../lib/supabaseClient';
 
 const OrsolyaContext = createContext();
+
+const readLocalArray = (key) => {
+  try {
+    const value = JSON.parse(localStorage.getItem(key) || '[]');
+    return Array.isArray(value) ? value : [];
+  } catch {
+    return [];
+  }
+};
 
 export function OrsolyaProvider({ children }) {
   // Active View Mode: 'visitor' | 'exhibitor' | 'map' | 'login' | 'tv'
@@ -20,10 +30,10 @@ export function OrsolyaProvider({ children }) {
   const [reels, setReels] = useState([]);
 
   // Scanned Favorite Exhibitors
-  const [favoriteExhibitorIds, setFavoriteExhibitorIds] = useState([]);
+  const [favoriteExhibitorIds, setFavoriteExhibitorIds] = useState(() => readLocalArray('orsolya_favorite_exhibitor_ids'));
 
   // Favorite Dish IDs
-  const [favoriteItemIds, setFavoriteItemIds] = useState([]);
+  const [favoriteItemIds, setFavoriteItemIds] = useState(() => readLocalArray('orsolya_favorite_item_ids'));
 
   // Focused Exhibitor ID on Map
   const [focusedExhibitorIdOnMap, setFocusedExhibitorIdOnMap] = useState(null);
@@ -32,10 +42,10 @@ export function OrsolyaProvider({ children }) {
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMyOrdersOpen, setIsMyOrdersOpen] = useState(false);
-  const [myOrderIds, setMyOrderIds] = useState([]);
+  const [myOrderIds, setMyOrderIds] = useState(() => readLocalArray('orsolya_my_order_ids'));
 
   // Public Voting system: voted item IDs persisted in LocalStorage
-  const [votedItemIds, setVotedItemIds] = useState([]);
+  const [votedItemIds, setVotedItemIds] = useState(() => readLocalArray('orsolya_voted_item_ids'));
 
   // Global Visitor Filter States (Day & Dietary Preferences)
   const [selectedDay, setSelectedDay] = useState('all'); // 'all' | 'saturday' | 'sunday'
@@ -45,9 +55,10 @@ export function OrsolyaProvider({ children }) {
   const [toastMessage, setToastMessage] = useState(null);
 
   const showToast = (msg, type = 'info') => {
-    setToastMessage({ text: msg, type, id: Date.now() });
+    const id = Date.now();
+    setToastMessage({ text: msg, type, id });
     setTimeout(() => {
-      setToastMessage((prev) => (prev?.text === msg ? null : prev));
+      setToastMessage((prev) => (prev?.id === id ? null : prev));
     }, 3500);
   };
 
@@ -68,98 +79,70 @@ export function OrsolyaProvider({ children }) {
   useEffect(() => {
     let channel;
 
-    const fetchSupabaseData = async () => {
+    const fetchCoreData = async () => {
       try {
-        const { data: exData, error: exErr } = await supabase.from('exhibitors').select('*');
-        if (exErr) {
-          console.warn('Supabase exhibitors notice:', exErr.message);
+        const [exResult, itemResult] = await Promise.all([
+          supabase
+            .from('exhibitors')
+            .select('id,name,location,coordinates,pin,category,has_drinks,offerings,days,is_open,story,cause,phone,email,facebook_url,instagram_url,image,notice'),
+          supabase
+            .from('menu_items')
+            .select('id,exhibitor_id,name,description,initial_stock,stock,status,votes,category,available_day,is_gluten_free,is_lactose_free,is_sugar_free,is_vegan,tags,image,is_hidden')
+            .not('exhibitor_id', 'is', null)
+        ]);
+
+        if (exResult.error) {
+          console.warn('Supabase exhibitors notice:', exResult.error.message);
           setExhibitors([]);
-        } else if (exData) {
-          const formattedEx = exData.map((e) => ({
+        } else {
+          setExhibitors((exResult.data || []).map((e) => ({
             ...e,
             hasDrinks: e.has_drinks !== undefined ? e.has_drinks : e.hasDrinks
-          }));
-          setExhibitors(formattedEx);
+          })));
         }
 
-        const { data: itemData, error: itemErr } = await supabase.from('menu_items').select('*');
-        if (itemErr) {
-          console.warn('Supabase menu_items notice:', itemErr.message);
+        if (itemResult.error) {
+          console.warn('Supabase menu_items notice:', itemResult.error.message);
           setMenuItems([]);
-        } else if (itemData) {
-          // Filter out legacy restaurant food items (items without exhibitor_id)
-          const validOrsolyaItems = itemData.filter((item) => item.exhibitor_id);
-          setMenuItems(validOrsolyaItems);
-        }
-
-        const { data: reelData, error: reelErr } = await supabase.from('reels').select('*').order('created_at', { ascending: false });
-        if (!reelErr && reelData) {
-          setReels(reelData);
+        } else {
+          setMenuItems(itemResult.data || []);
         }
       } catch (err) {
-        console.warn('Supabase fetch notice: Using clean empty state', err);
+        console.warn('Supabase core fetch notice:', err);
         setExhibitors([]);
         setMenuItems([]);
-        setReels([]);
       }
     };
 
-    fetchSupabaseData();
+    fetchCoreData();
 
-    // Subscribe to Realtime Postgres changes across all connected devices & screens
     try {
       channel = supabase
-        .channel('orsolya-realtime-channel')
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'exhibitors' },
-          (payload) => {
-            if (payload.eventType === 'UPDATE' && payload.new) {
-              setExhibitors((prev) =>
-                prev.map((e) =>
-                  e.id === payload.new.id
-                    ? { ...e, ...payload.new, hasDrinks: payload.new.has_drinks ?? e.hasDrinks }
-                    : e
-                )
-              );
-            } else if (payload.eventType === 'INSERT' && payload.new) {
-              setExhibitors((prev) => [...prev, { ...payload.new, hasDrinks: payload.new.has_drinks }]);
-            }
+        .channel('orsolya-core-realtime')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'exhibitors' }, (payload) => {
+          if (payload.eventType === 'UPDATE' && payload.new) {
+            setExhibitors((prev) => prev.map((e) =>
+              e.id === payload.new.id
+                ? { ...e, ...payload.new, hasDrinks: payload.new.has_drinks ?? e.hasDrinks }
+                : e
+            ));
+          } else if (payload.eventType === 'INSERT' && payload.new) {
+            setExhibitors((prev) => [...prev, { ...payload.new, hasDrinks: payload.new.has_drinks }]);
+          } else if (payload.eventType === 'DELETE' && payload.old) {
+            setExhibitors((prev) => prev.filter((e) => e.id !== payload.old.id));
           }
-        )
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'menu_items' },
-          (payload) => {
-            if (payload.eventType === 'UPDATE' && payload.new) {
-              setMenuItems((prev) =>
-                prev.map((item) => (item.id === payload.new.id ? { ...item, ...payload.new } : item))
-              );
-            } else if (payload.eventType === 'INSERT' && payload.new) {
-              if (payload.new.exhibitor_id) {
-                setMenuItems((prev) => [...prev, payload.new]);
-              }
-            } else if (payload.eventType === 'DELETE' && payload.old) {
-              setMenuItems((prev) => prev.filter((item) => item.id !== payload.old.id));
-            }
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'menu_items' }, (payload) => {
+          if (payload.eventType === 'UPDATE' && payload.new) {
+            setMenuItems((prev) => prev.map((item) =>
+              item.id === payload.new.id ? payload.new : item
+            ));
+          } else if (payload.eventType === 'INSERT' && payload.new?.exhibitor_id) {
+            setMenuItems((prev) => prev.some((item) => item.id === payload.new.id) ? prev : [...prev, payload.new]);
+          } else if (payload.eventType === 'DELETE' && payload.old) {
+            setMenuItems((prev) => prev.filter((item) => item.id !== payload.old.id));
           }
-        )
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'reels' },
-          (payload) => {
-            if (payload.eventType === 'INSERT' && payload.new) {
-              setReels((prev) => {
-                if (prev.some((r) => r.id === payload.new.id)) return prev;
-                return [payload.new, ...prev];
-              });
-            } else if (payload.eventType === 'UPDATE' && payload.new) {
-              setReels((prev) => prev.map((r) => (r.id === payload.new.id ? { ...r, ...payload.new } : r)));
-            } else if (payload.eventType === 'DELETE' && payload.old) {
-              setReels((prev) => prev.filter((r) => r.id !== payload.old.id));
-            }
-          }
-        )
+        })
         .subscribe();
     } catch (err) {
       console.warn('Realtime subscription fallback:', err);
@@ -170,18 +153,26 @@ export function OrsolyaProvider({ children }) {
     };
   }, []);
 
-  // Sync to LocalStorage & cross-tab sync
   useEffect(() => {
-    localStorage.setItem('orsolya_exhibitors', JSON.stringify(exhibitors));
-  }, [exhibitors]);
+    let cancelled = false;
 
-  useEffect(() => {
-    localStorage.setItem('orsolya_menu_items', JSON.stringify(menuItems));
-  }, [menuItems]);
+    const loadRecentReels = async () => {
+      if (activeView !== 'visitor' && activeView !== 'reels') return;
 
-  useEffect(() => {
-    localStorage.setItem('orsolya_orders', JSON.stringify(orders));
-  }, [orders]);
+      const { data, error } = await supabase
+        .from('reels')
+        .select('id,exhibitor_id,exhibitor_name,caption,image,likes,created_at')
+        .order('created_at', { ascending: false })
+        .limit(12);
+
+      if (!cancelled && !error) setReels(data || []);
+    };
+
+    loadRecentReels();
+    return () => { cancelled = true; };
+  }, [activeView]);
+
+  // Keep only small visitor preferences in LocalStorage. Live catalog data stays in memory/Supabase.
 
   useEffect(() => {
     localStorage.setItem('orsolya_my_order_ids', JSON.stringify(myOrderIds));
@@ -281,6 +272,7 @@ export function OrsolyaProvider({ children }) {
     const found = exhibitors.find((ex) => ex.pin === pin.trim());
     if (found) {
       setActiveExhibitorId(found.id);
+      localStorage.setItem('orsolya_logged_exhibitor_id', found.id);
       setActiveView('exhibitor');
       showToast(`Üdvözlünk, ${found.name}! Stand belépés sikeres.`, 'success');
       return true;
@@ -292,6 +284,7 @@ export function OrsolyaProvider({ children }) {
 
   const logoutExhibitor = () => {
     setActiveExhibitorId(null);
+    localStorage.removeItem('orsolya_logged_exhibitor_id');
     setActiveView('visitor');
     showToast('Kijelentkeztél az árus felületről.');
   };
@@ -348,6 +341,73 @@ export function OrsolyaProvider({ children }) {
     showToast(`Új csapat (${newTeam.name}) sikeresen regisztrálva! PIN: ${generatedPin}`, 'success');
     return newTeam;
   };
+
+  // Import the structured flyer catalog into Supabase once, preserving stable item IDs.
+  const seedGastroCatalog = async () => {
+    try {
+      const exhibitorIds = {
+        'koszegfalvi-ovoda': 'ex-koszegfalvi-ovoda',
+        'kozponti-ovoda': 'ex-kozponti-ovoda',
+        'beszedgyogyitas-alapitvany': 'ex-beszedgyogyitas-alapitvany',
+        'koszegi-ifjusagi-tuzoltok': 'ex-ifjusagi-tuzoltok',
+        'balog-iskola': 'ex-balog-iskola',
+        'koszegi-turisztikai-szovetseg': 'ex-1789026854704'
+      };
+
+      const { data: existingItems, error: readError } = await supabase
+        .from('menu_items')
+        .select('id');
+      if (readError) throw readError;
+
+      const existingIds = new Set((existingItems || []).map((item) => item.id));
+      const rows = [];
+
+      ORSOLYA_GASTRO_CATALOG.forEach((exhibitor) => {
+        const exhibitorId = exhibitorIds[exhibitor.exhibitorKey];
+        if (!exhibitorId) return;
+        exhibitor.items.forEach((item, index) => {
+          const stableId = `g-${exhibitor.exhibitorKey}-${index + 1}`;
+          if (existingIds.has(stableId)) return;
+          rows.push({
+            id: stableId,
+            exhibitor_id: exhibitorId,
+            name: item.name,
+            description: item.description || '',
+            initial_stock: 30,
+            stock: 30,
+            status: 'ready',
+            votes: 0,
+            category: item.category,
+            available_day: item.availableDay || 'both',
+            is_gluten_free: false,
+            is_lactose_free: false,
+            is_sugar_free: false,
+            is_vegan: false,
+            tags: item.tags || []
+          });
+        });
+      });
+
+      if (rows.length > 0) {
+        const { error: insertError } = await supabase.from('menu_items').insert(rows);
+        if (insertError) throw insertError;
+      }
+
+      const { data: refreshedItems, error: refreshError } = await supabase
+        .from('menu_items')
+        .select('*');
+      if (refreshError) throw refreshError;
+
+      setMenuItems((refreshedItems || []).filter((item) => item.exhibitor_id));
+      showToast(rows.length ? `${rows.length} gasztro tétel betöltve a katalógusba.` : 'A gasztro katalógus már naprakész.', 'success');
+      return rows.length;
+    } catch (error) {
+      console.error('Gasztro katalógus import error:', error);
+      showToast(`A gasztro katalógus betöltése nem sikerült: ${error.message}`, 'error');
+      return 0;
+    }
+  };
+
 
   // Full Database & State Purge (Super Admin helper)
   const clearAllDatabaseData = async () => {
@@ -466,11 +526,10 @@ export function OrsolyaProvider({ children }) {
     showToast('Állapot frissítve!');
   };
 
-  // Save/Add menu item dynamically (with Allergen flags, Available day, and optional Price)
+  // Save/Add menu item dynamically (with Allergen flags and Available day)
   const saveMenuItem = async (itemData) => {
     const formattedItem = {
       ...itemData,
-      price: itemData.price !== undefined ? itemData.price : '',
       is_gluten_free: !!itemData.is_gluten_free,
       is_lactose_free: !!itemData.is_lactose_free,
       is_sugar_free: !!itemData.is_sugar_free,
@@ -488,13 +547,13 @@ export function OrsolyaProvider({ children }) {
           description: formattedItem.description,
           initial_stock: Number(formattedItem.initial_stock) || 30,
           category: formattedItem.category,
-          price: formattedItem.price || null,
           tags: formattedItem.tags,
           available_day: formattedItem.available_day,
           is_gluten_free: formattedItem.is_gluten_free,
           is_lactose_free: formattedItem.is_lactose_free,
           is_sugar_free: formattedItem.is_sugar_free,
-          is_vegan: formattedItem.is_vegan
+          is_vegan: formattedItem.is_vegan,
+          image: formattedItem.image || null
         }).eq('id', itemData.id);
       } catch (e) {
         console.warn('Supabase sync warning:', e);
@@ -522,13 +581,13 @@ export function OrsolyaProvider({ children }) {
           status: newItem.status,
           votes: 0,
           category: newItem.category || 'meleg_etel',
-          price: newItem.price || null,
           available_day: newItem.available_day || 'both',
           is_gluten_free: newItem.is_gluten_free,
           is_lactose_free: newItem.is_lactose_free,
           is_sugar_free: newItem.is_sugar_free,
           is_vegan: newItem.is_vegan,
-          tags: newItem.tags || []
+          tags: newItem.tags || [],
+          image: newItem.image || null
         };
         const { error: insErr } = await supabase.from('menu_items').insert([dbPayload]);
         if (insErr) {
@@ -668,7 +727,7 @@ export function OrsolyaProvider({ children }) {
         return [savedReel, ...prev];
       });
 
-      showToast('📸 Élő pillanat sikeresen közzétéve!', 'success');
+      showToast('Élő pillanat sikeresen közzétéve!', 'success');
       return savedReel;
     } catch (e) {
       console.error('Supabase reel insert exception:', e);
@@ -737,6 +796,7 @@ export function OrsolyaProvider({ children }) {
         addExhibitorTeam,
         updateExhibitorPin,
         updateExhibitorProfile,
+        seedGastroCatalog,
         updateOrderStatus,
         selectedDay,
         setSelectedDay,
