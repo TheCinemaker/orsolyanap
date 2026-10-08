@@ -1,17 +1,14 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { OrsolyaProvider, useOrsolya } from './context/OrsolyaContext';
 import Header from './components/Header';
-import ExhibitorCard from './components/ExhibitorCard';
 import CompactExhibitorCard from './components/CompactExhibitorCard';
 import ExhibitorDetailModal from './components/ExhibitorDetailModal';
-import InlineQRScanner from './components/InlineQRScanner';
 import FoodCatalogView from './components/FoodCatalogView';
 import ExhibitorDashboard from './components/ExhibitorAdmin/ExhibitorDashboard';
 import ExhibitorAuthPage from './components/ExhibitorAuthPage';
 import CartDrawer from './components/CartDrawer';
 import MyOrdersModal from './components/MyOrdersModal';
 import MapView from './components/MapView';
-import VisitKoszegLogo from './components/VisitKoszegLogo';
 import LiveReelBar from './components/LiveReelBar';
 import ReelsGallery from './components/ReelsGallery';
 import BackToTopButton from './components/BackToTopButton';
@@ -19,7 +16,6 @@ import {
   Utensils,
   Info,
   CheckCircle2,
-  MapPin,
   Flame,
   ChevronDown,
   Store,
@@ -39,7 +35,6 @@ function MainApp() {
     activeView,
     exhibitors,
     menuItems,
-    favoriteExhibitorIds,
     toastMessage,
     isLoadingData,
     mainTab,
@@ -77,9 +72,6 @@ function MainApp() {
     { id: 'italok', label: 'Italok', icon: CupSoda },
     { id: 'egyeb', label: 'Egyéb', icon: Package }
   ];
-
-  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
-  const activeCategoryObj = intentCategories.find((cat) => cat.id === selectedCategory) || intentCategories[0];
 
   const itemsByExhibitor = useMemo(() => {
     const map = new Map();
