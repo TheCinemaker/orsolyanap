@@ -1,8 +1,8 @@
 import React from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { Utensils, MapPin, Heart, Store, QrCode, CalendarDays } from 'lucide-react';
+import { Utensils, MapPin, Heart, Store, CalendarDays } from 'lucide-react';
 
-export default function MobileBottomNav({ onOpenFavorites, onOpenScanner, setMainTab }) {
+export default function MobileBottomNav({ onOpenFavorites, setMainTab }) {
   const {
     activeView,
     setActiveView,

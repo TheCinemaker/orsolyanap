@@ -1,89 +1,8 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { QRCodeSVG } from 'qrcode.react';
 import { Maximize2, Minimize2, RefreshCw, Utensils } from 'lucide-react';
 import { useOrsolya } from '../context/OrsolyaContext';
 import { isKTSZEExhibitor } from '../lib/ktszeUtils';
 import { supabase } from '../lib/supabaseClient';
-
-/**
- * Adomány-QR panel.
- *
- * Szándékosan a komponensen KÍVÜL van: a kijelző időzítőre újrarajzol
- * (óra, lapozás), és egy renderben definiált komponens minden alkalommal új
- * típus lenne — a React leszedné és újra beszúrná a QR SVG-t. Kívül stabil.
- */
-function QrPanel({ url, titleClass, hintClass }) {
-  return (
-    <aside className="h-full rounded-[1.5vw] bg-gradient-to-b from-amber-400 to-amber-500 text-stone-950 flex flex-col items-center justify-center text-center p-[1.5vw] gap-[1vh]">
-      <span className={`${titleClass} font-semibold uppercase tracking-wide leading-tight`}>
-        Támogasd
-        <br />a standot
-      </span>
-
-      <div className="bg-white p-[0.8vw] rounded-[1vw] shadow-xl">
-        <QRCodeSVG
-          value={url}
-          size={256}
-          level="M"
-          marginSize={0}
-          className="w-[min(11vw,22vh)] h-[min(11vw,22vh)]"
-          title="Adomány QR-kód"
-        />
-      </div>
-
-      <span className={`${hintClass} font-medium leading-snug text-stone-900/75`}>
-        Olvasd be a telefonoddal,
-        <br />
-        és adj annyit, amennyit szeretnél
-      </span>
-    </aside>
-  );
-}
-
-/** Az üres állapot QR-blokkja — keskenyebb, középre igazítva. */
-function QrPanelStandalone({ url }) {
-  return (
-    <div className="bg-white p-[1vw] rounded-[1vw]">
-      <QRCodeSVG
-        value={url}
-        size={256}
-        level="M"
-        marginSize={0}
-        className="w-[min(14vw,26vh)] h-[min(14vw,26vh)]"
-        title="Adomány QR-kód"
-      />
-    </div>
-  );
-}
-
-/**
- * Az oldalankénti rács elrendezése a tételszám szerint.
- *
- * Mindegyik változat hézagmentesen kitölti a területet -- üres cella sehol nem
- * marad, mert az kijelzőn hibának látszik. Az ötös eset hatoszlopos rácsot
- * használ: felül három elem 2-2 oszlopon, alul kettő 3-3 oszlopon.
- *
- * @param {number} count 1..6
- */
-function gridLayout(count) {
-  switch (count) {
-    case 1:
-      return { grid: 'grid-cols-1 grid-rows-1', span: () => '' };
-    case 2:
-      return { grid: 'grid-cols-2 grid-rows-1', span: () => '' };
-    case 3:
-      return { grid: 'grid-cols-3 grid-rows-1', span: () => '' };
-    case 4:
-      return { grid: 'grid-cols-2 grid-rows-2', span: () => '' };
-    case 5:
-      return {
-        grid: 'grid-cols-6 grid-rows-2',
-        span: (index) => (index < 3 ? 'col-span-2' : 'col-span-3'),
-      };
-    default:
-      return { grid: 'grid-cols-3 grid-rows-2', span: () => '' };
-  }
-}
 
 /**
  * Digitális kijelző (menu board) a KTSZE standjára.
@@ -107,10 +26,9 @@ function gridLayout(count) {
  *
  * 5. NINCS HOVER. Kijelzőn nincs egér.
  *
- * 6. ÁR SEHOL NEM JELENIK MEG. Ez nem stílus, hanem jogi követelmény: a
- *    standon nem értékesítés folyik, hanem adománygyűjtés. Kiírt ár mellett a
- *    tranzakció értékesítésnek látszana. A látogató annyit ad, amennyit akar,
- *    a QR-kódon keresztül.
+ * 6. NINCS ÁR ÉS NINCS QR-KÓD. A kijelző egyetlen dolgot csinál: megmutatja,
+ *    mi kapható. Semmilyen döntést nem kér a vendégtől, és nem küldi el a
+ *    telefonjához -- a pultnál a sor nem áll meg attól, hogy valaki olvas.
  */
 export default function SignageView({ targetExhibitorId }) {
   const { exhibitors, menuItems } = useOrsolya();
@@ -246,9 +164,6 @@ export default function SignageView({ targetExhibitorId }) {
     }
   };
 
-  // A pultnál kihelyezett QR ugyanoda visz, mint a plakáton lévő: az
-  // adományoldalra, ami külön, könnyű bundle-ként töltődik be.
-  const donationUrl = `${window.location.origin}/adomany`;
 
   const formattedTime = currentTime.toLocaleTimeString('hu-HU', {
     hour: '2-digit',
@@ -301,7 +216,6 @@ export default function SignageView({ targetExhibitorId }) {
         <p className="text-[clamp(1.5rem,3.5vw,4rem)] font-medium leading-tight text-white/80 text-balance">
           A kínálat hamarosan érkezik
         </p>
-        <QrPanelStandalone url={`${window.location.origin}/adomany`} />
       </div>
     );
   }
@@ -321,8 +235,7 @@ export default function SignageView({ targetExhibitorId }) {
     dishName: 'text-[clamp(1.15rem,2.6vw,3.2rem)]',
     badge: 'text-[clamp(0.6rem,0.85vw,1rem)]',
     heroName: 'text-[clamp(2rem,5.5vw,7rem)]',
-    qrTitle: 'text-[clamp(0.85rem,1.3vw,1.6rem)]',
-    qrHint: 'text-[clamp(0.65rem,0.95vw,1.1rem)]',
+    footer: 'text-[clamp(0.65rem,0.95vw,1.1rem)]',
   };
 
   return (
@@ -361,8 +274,8 @@ export default function SignageView({ targetExhibitorId }) {
       {/* Tartalom                                                            */}
       {/* ------------------------------------------------------------------ */}
       {activeMode === 'overview' ? (
-        <main className="flex-1 min-h-0 grid grid-cols-[1fr_minmax(0,17vw)] gap-[1.2vw] px-[2vw]">
-          <div className={`grid ${layout.grid} gap-[1.2vw] min-h-0`}>
+        <main className="flex-1 min-h-0 px-[2vw] grid">
+          <div className={`grid ${layout.grid} gap-[1.2vw] min-h-0 h-full`}>
             {pageItems.map((item, index) => {
               const badge = getStatusBadge(item);
               const soldOut = isSoldOut(item);
@@ -422,11 +335,10 @@ export default function SignageView({ targetExhibitorId }) {
             })}
           </div>
 
-          <QrPanel url={donationUrl} titleClass={T.qrTitle} hintClass={T.qrHint} />
         </main>
       ) : (
         /* Kiemelt mód: egy étel, nagyban */
-        <main className="flex-1 min-h-0 grid grid-cols-[1fr_minmax(0,17vw)] gap-[1.2vw] px-[2vw]">
+        <main className="flex-1 min-h-0 px-[2vw] grid">
           {featured && (
             <article
               key={featured.id}
@@ -452,7 +364,6 @@ export default function SignageView({ targetExhibitorId }) {
             </article>
           )}
 
-          <QrPanel url={donationUrl} titleClass={T.qrTitle} hintClass={T.qrHint} />
         </main>
       )}
 
@@ -473,7 +384,7 @@ export default function SignageView({ targetExhibitorId }) {
             ))}
         </div>
 
-        <span className={`${T.qrHint} font-medium text-white/25 uppercase tracking-[0.2em]`}>
+        <span className={`${T.footer} font-medium text-white/25 uppercase tracking-[0.2em]`}>
           Kóstold meg Kőszeg ízeit
         </span>
       </footer>

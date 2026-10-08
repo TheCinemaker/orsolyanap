@@ -1,18 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { ThumbsUp, Trophy, CupSoda, MapPin, CreditCard } from 'lucide-react';
-import { isKTSZEExhibitor } from '../lib/ktszeUtils';
-import DonationModal from './DonationModal';
+import { ThumbsUp, Trophy, CupSoda, MapPin } from 'lucide-react';
 
 export default function MenuItemCard({ item, exhibitor, onOpenLocationModal }) {
-  const [isDonationOpen, setIsDonationOpen] = useState(false);
   const { votedItemIds, voteForItem } = useOrsolya();
 
-  const isKTSZE = isKTSZEExhibitor(exhibitor);
-  // Javasolt adomány összege az űrlap előkitöltéséhez.
-  // FIGYELEM: ez sehol nem jelenik meg árként -- a standon adománygyűjtés
-  // folyik, nem értékesítés, ezért kiírt ár nem szerepelhet.
-  const suggestedAmount = parseInt(String(item.price || '').replace(/\D/g, ''), 10) || 2000;
 
   const isVoted = votedItemIds.includes(item.id);
   const isTopVoted = (item.votes || 0) >= 40;
@@ -158,28 +150,8 @@ export default function MenuItemCard({ item, exhibitor, onOpenLocationModal }) {
           </button>
         </div>
 
-        {/* KTSZE Card Payment Button (SimplePay & Qvik) */}
-        {isKTSZE && !isSoldOut && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsDonationOpen(true);
-            }}
-            className="w-full mt-1 py-2 px-3 bg-amber-800 hover:bg-amber-700 text-white font-extrabold text-xs rounded-md shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-amber-600/60"
-          >
-            <CreditCard className="w-3.5 h-3.5 text-amber-200" />
-            <span>Támogatom kártyával</span>
-          </button>
-        )}
       </div>
 
-      {/* KTSZE Donation Modal */}
-      <DonationModal
-        isOpen={isDonationOpen}
-        onClose={() => setIsDonationOpen(false)}
-        initialAmount={suggestedAmount}
-        title={`Fizetés / Adomány — ${item.name}`}
-      />
     </div>
   );
 }

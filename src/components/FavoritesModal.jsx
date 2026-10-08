@@ -2,7 +2,7 @@ import React from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
 import { X, Heart, MapPin, QrCode, Trash2, Map, Utensils, Store } from 'lucide-react';
 
-export default function FavoritesModal({ isOpen, onClose, onOpenScanner }) {
+export default function FavoritesModal({ isOpen, onClose }) {
   const {
     exhibitors,
     favoriteExhibitorIds,
@@ -37,20 +37,6 @@ export default function FavoritesModal({ isOpen, onClose, onOpenScanner }) {
             className="text-stone-400 hover:text-stone-700 p-1.5 rounded-full hover:bg-stone-100"
           >
             <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* QR Scanner Trigger */}
-        <div className="pt-3 pb-2">
-          <button
-            onClick={() => {
-              onClose();
-              onOpenScanner();
-            }}
-            className="w-full py-2.5 bg-amber-800 hover:bg-amber-700 text-white font-extrabold text-xs rounded-md shadow-xs flex items-center justify-center gap-2 transition-all"
-          >
-            <QrCode className="w-4 h-4 text-white" />
-            <span>Stand QR Kód Beolvasása Kamerával</span>
           </button>
         </div>
 

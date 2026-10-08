@@ -2,17 +2,6 @@
   publish = "dist"
   command = "npm run build"
 
-[functions]
-  # A fizetési függvények ESM-ben íródtak és a Node beépített fetch-ét
-  # használják, ezért nem kell HTTP könyvtárat bundle-ölni.
-  node_bundler = "esbuild"
-  # A netlify/lib alatti közös modulok bekerülnek a csomagba.
-  included_files = ["netlify/lib/**"]
-
-# A /api/payment/* útvonalakat maguk a függvények regisztrálják
-# (Netlify Functions 2.0, `export const config = { path: ... }`),
-# ezért ide nem kell külön redirect. Az alábbi SPA-fallback csak azután fut le.
-
 [[redirects]]
   from = "/*"
   to = "/index.html"

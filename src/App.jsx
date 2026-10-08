@@ -7,13 +7,10 @@ import FoodCatalogView from './components/FoodCatalogView';
 import EventProgramBook from './components/EventProgramBook';
 import ExhibitorDashboard from './components/ExhibitorAdmin/ExhibitorDashboard';
 import ExhibitorAuthPage from './components/ExhibitorAuthPage';
-import CartDrawer from './components/CartDrawer';
-import MyOrdersModal from './components/MyOrdersModal';
 import MapView from './components/MapView';
 import LiveReelBar from './components/LiveReelBar';
 import ReelsGallery from './components/ReelsGallery';
 import BackToTopButton from './components/BackToTopButton';
-import DonationResult from './components/DonationResult';
 import SignageView from './components/SignageView';
 import {
   Utensils,
@@ -34,19 +31,6 @@ import {
 import './App.css';
 
 function MainApp() {
-  const isDonationResult = window.location.pathname === '/adomany/visszajelzes';
-  const isSignageView = window.location.search.includes('view=signage');
-
-  if (isDonationResult) {
-    return <DonationResult onClose={() => window.location.assign('/')} />;
-  }
-
-  if (isSignageView) {
-    const params = new URLSearchParams(window.location.search);
-    const targetStand = params.get('stand') || params.get('exhibitor') || null;
-    return <SignageView targetExhibitorId={targetStand} onClose={() => window.location.assign('/')} />;
-  }
-
   const {
     activeView,
     exhibitors,
@@ -333,9 +317,6 @@ function MainApp() {
       {/* Floating Back To Top Button */}
       <BackToTopButton />
 
-      {/* Cart & Modals */}
-      <CartDrawer />
-      <MyOrdersModal />
 
       {/* Clean Footer (Item 9) */}
       <footer className="bg-white border-t border-stone-200/80 py-4 text-xs text-stone-600 mt-6 sm:mt-8 pb-20 md:pb-6">
@@ -373,9 +354,19 @@ function MainApp() {
 }
 
 export default function App() {
+  // A standra szánt kijelző (?view=signage) teljesen más felület, mint a
+  // látogatói app, ezért itt válik el -- és nem a MainApp belsejében egy korai
+  // return-nel, mert az feltételesen futtatná a MainApp hookjait.
+  //
+  // A döntés a Provider BELSEJÉBEN történik: a kijelzőnek is kell a context,
+  // mert onnan olvassa az élő étellistát.
+  const params = new URLSearchParams(window.location.search);
+  const isSignageView = params.has('view') && params.get('view') === 'signage';
+  const targetStand = params.get('stand') || params.get('exhibitor') || null;
+
   return (
     <OrsolyaProvider>
-      <MainApp />
+      {isSignageView ? <SignageView targetExhibitorId={targetStand} /> : <MainApp />}
     </OrsolyaProvider>
   );
 }

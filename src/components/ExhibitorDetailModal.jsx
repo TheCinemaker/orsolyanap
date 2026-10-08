@@ -1,11 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { X, MapPin, Phone, Mail, Heart, Utensils, Map, ThumbsUp, CupSoda, Calendar, Share2, CreditCard, ShieldCheck } from 'lucide-react';
-import { isKTSZEExhibitor } from '../lib/ktszeUtils';
-import DonationModal from './DonationModal';
+import { X, MapPin, Phone, Mail, Heart, Utensils, Map, ThumbsUp, CupSoda, Calendar, Share2 } from 'lucide-react';
 
 export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish }) {
-  const [isDonationOpen, setIsDonationOpen] = useState(false);
   const {
     menuItems,
     favoriteExhibitorIds,
@@ -111,21 +108,6 @@ export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish 
             </button>
           </div>
 
-          {/* SimplePay & Qvik Card Donation Button - EXCLUSIVELY for KTSZE */}
-          {isKTSZEExhibitor(exhibitor) ? (
-            <button
-              onClick={() => setIsDonationOpen(true)}
-              className="w-full mt-2 py-3 px-4 bg-gradient-to-r from-amber-700 via-amber-800 to-amber-900 hover:from-amber-600 hover:to-amber-800 text-white rounded-md text-xs font-black transition-all flex items-center justify-center gap-2 shadow-md border border-amber-600/50 cursor-pointer"
-            >
-              <CreditCard className="w-4 h-4 text-amber-300" />
-              <span>Támogatás / Adományozás Bankkártyával (SimplePay & Qvik)</span>
-            </button>
-          ) : (
-            <div className="bg-stone-50 border border-stone-200/80 p-2.5 rounded-md text-[11px] text-stone-500 flex items-start gap-2 mt-1">
-              <ShieldCheck className="w-4 h-4 text-stone-400 flex-shrink-0 mt-0.5" />
-              <span>Online bankkártyás fizetés és adományozás kizárólag a KTSZE egyesület oldalán és ételeinél érhető el. Ennél az árusnál a helyszínen, készpénzzel tudsz fizetni.</span>
-            </div>
-          )}
         </div>
 
         {/* Social Links & Contact Details */}
@@ -296,12 +278,6 @@ export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish 
         )}
       </div>
 
-      {/* KTSZE Donation Modal */}
-      <DonationModal
-        isOpen={isDonationOpen}
-        onClose={() => setIsDonationOpen(false)}
-        title={`Támogatás — ${exhibitor.name}`}
-      />
     </div>
   );
 }

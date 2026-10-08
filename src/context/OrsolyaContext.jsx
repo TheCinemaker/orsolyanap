@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { INITIAL_EXHIBITORS, INITIAL_MENU_ITEMS, INITIAL_ORDERS } from '../data/mockOrsolyaData';
+import { INITIAL_EXHIBITORS, INITIAL_MENU_ITEMS } from '../data/mockOrsolyaData';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 
 const OrsolyaContext = createContext();
@@ -16,10 +16,9 @@ export function OrsolyaProvider({ children }) {
   // Loading State for Supabase Initial Fetch
   const [isLoadingData, setIsLoadingData] = useState(true);
 
-  // State: Exhibitors, Menu Items, Orders, Reels (Default strictly to empty arrays; all data comes from Supabase)
+  // State: Exhibitors, Menu Items, Reels (Default strictly to empty arrays; all data comes from Supabase)
   const [exhibitors, setExhibitors] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
-  const [orders, setOrders] = useState([]);
   const [reels, setReels] = useState([]);
   const [events, setEvents] = useState([]);
 
@@ -31,12 +30,6 @@ export function OrsolyaProvider({ children }) {
 
   // Focused Exhibitor ID on Map
   const [focusedExhibitorIdOnMap, setFocusedExhibitorIdOnMap] = useState(null);
-
-  // Visitor Cart state (Portions reservation)
-  const [cart, setCart] = useState([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isMyOrdersOpen, setIsMyOrdersOpen] = useState(false);
-  const [myOrderIds, setMyOrderIds] = useState([]);
 
   // Public Voting system: voted item IDs persisted in LocalStorage
   const [votedItemIds, setVotedItemIds] = useState([]);
@@ -102,7 +95,9 @@ export function OrsolyaProvider({ children }) {
     try {
       localStorage.removeItem('orsolya_exhibitors');
       localStorage.removeItem('orsolya_menu_items');
+      // A kosar es a foglalasok megszuntek; a regi kulcsokat is kitakaritjuk.
       localStorage.removeItem('orsolya_orders');
+      localStorage.removeItem('orsolya_my_order_ids');
     } catch (e) {
       // ignore
     }
@@ -251,20 +246,12 @@ export function OrsolyaProvider({ children }) {
 
   // Sync to LocalStorage & cross-tab sync
   useEffect(() => {
-    // Exhibitors, menu items and orders are server state. Do not persist them in
+    // Exhibitors and menu items are server state. Do not persist them in
     // localStorage: menu item images are now Supabase Storage URLs and older
     // cached Base64 images can exceed the browser's ~5 MB storage quota.
     localStorage.removeItem('orsolya_exhibitors');
     localStorage.removeItem('orsolya_menu_items');
   }, [exhibitors, menuItems]);
-
-  useEffect(() => {
-    localStorage.setItem('orsolya_orders', JSON.stringify(orders));
-  }, [orders]);
-
-  useEffect(() => {
-    localStorage.setItem('orsolya_my_order_ids', JSON.stringify(myOrderIds));
-  }, [myOrderIds]);
 
   useEffect(() => {
     localStorage.setItem('orsolya_favorite_exhibitor_ids', JSON.stringify(favoriteExhibitorIds));
@@ -458,8 +445,6 @@ export function OrsolyaProvider({ children }) {
   const clearAllDatabaseData = async () => {
     setExhibitors([]);
     setMenuItems([]);
-    setOrders([]);
-    setCart([]);
     setFavoriteExhibitorIds([]);
     setFavoriteItemIds([]);
     setVotedItemIds([]);
@@ -784,71 +769,6 @@ export function OrsolyaProvider({ children }) {
     showToast('Étel eltávolítva.');
   };
 
-  // Cart operations (Portions reservation)
-  const addToCart = (item, quantity = 1) => {
-    setCart((prevCart) => {
-      const existing = prevCart.find((c) => c.item.id === item.id);
-      if (existing) {
-        return prevCart.map((c) =>
-          c.item.id === item.id ? { ...c, quantity: Math.min(item.stock, c.quantity + quantity) } : c
-        );
-      }
-      return [...prevCart, { item, quantity: Math.min(item.stock, quantity) }];
-    });
-    showToast(`"${item.name}" hozzáadva a kóstoló foglaláshoz!`, 'success');
-  };
-
-  const removeFromCart = (itemId) => {
-    setCart((prev) => prev.filter((c) => c.item.id !== itemId));
-  };
-
-  const clearCart = () => {
-    setCart([]);
-  };
-
-  // Order Placement
-  const placeOrder = (userName, userPhone, pickupTime, exhibitorId) => {
-    if (cart.length === 0) return null;
-
-    const exhibitorCartItems = cart.filter((c) => c.item.exhibitor_id === exhibitorId);
-    if (exhibitorCartItems.length === 0) return null;
-
-    const newOrder = {
-      id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
-      user_name: userName,
-      user_phone: userPhone,
-      exhibitor_id: exhibitorId,
-      items: exhibitorCartItems.map((c) => ({
-        id: c.item.id,
-        name: c.item.name,
-        quantity: c.quantity
-      })),
-      pickup_time: pickupTime,
-      status: 'pending',
-      created_at: new Date().toISOString()
-    };
-
-    // Deduct stock for ordered items
-    exhibitorCartItems.forEach((c) => {
-      updateItemStock(c.item.id, -c.quantity);
-    });
-
-    setOrders((prev) => [newOrder, ...prev]);
-    setMyOrderIds((prev) => [newOrder.id, ...prev]);
-    setCart((prev) => prev.filter((c) => c.item.exhibitor_id !== exhibitorId));
-
-    showToast(`Kóstoló foglalás elküldve! Azonosító: #${newOrder.id}`, 'success');
-    return newOrder;
-  };
-
-  // Update order status (by Exhibitor)
-  const updateOrderStatus = (orderId, newStatus) => {
-    setOrders((prev) =>
-      prev.map((ord) => (ord.id === orderId ? { ...ord, status: newStatus } : ord))
-    );
-    showToast(`Foglalás #${orderId} frissítve!`);
-  };
-
   // File to Base64 Image Conversion Helper with automatic Canvas compression (max 800px JPEG)
   const convertFileToBase64 = (file) => {
     return new Promise((resolve, reject) => {
@@ -958,21 +878,11 @@ export function OrsolyaProvider({ children }) {
         logoutExhibitor,
         exhibitors,
         menuItems,
-        orders,
         reels,
         events,
         postReel,
         likeReel,
         convertFileToBase64,
-        cart,
-        addToCart,
-        removeFromCart,
-        clearCart,
-        isCartOpen,
-        setIsCartOpen,
-        isMyOrdersOpen,
-        setIsMyOrdersOpen,
-        myOrderIds,
         favoriteExhibitorIds,
         addFavoriteExhibitor,
         toggleFavoriteExhibitor,
@@ -983,7 +893,6 @@ export function OrsolyaProvider({ children }) {
         updateExhibitorDrinks,
         votedItemIds,
         voteForItem,
-        placeOrder,
         updateItemStock,
         updateItemStatus,
         saveMenuItem,
@@ -995,7 +904,6 @@ export function OrsolyaProvider({ children }) {
         addExhibitorTeam,
         updateExhibitorPin,
         updateExhibitorProfile,
-        updateOrderStatus,
         selectedDay,
         setSelectedDay,
         selectedDietary,

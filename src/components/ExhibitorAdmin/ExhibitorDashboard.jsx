@@ -30,7 +30,6 @@ import {
   EyeOff,
   Monitor
 } from 'lucide-react';
-import ExhibitorQRCard from '../ExhibitorQRCard';
 
 export default function ExhibitorDashboard() {
   const {
@@ -692,9 +691,6 @@ export default function ExhibitorDashboard() {
           </div>
         )}
       </div>
-
-      {/* Stand QR Code & Printable Banner Section */}
-      <ExhibitorQRCard exhibitor={activeExhibitor} />
 
       {/* Super-Admin New Team Registration Modal */}
       {isTeamModalOpen && (
