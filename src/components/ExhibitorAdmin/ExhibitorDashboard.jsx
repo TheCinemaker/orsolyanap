@@ -477,7 +477,7 @@ export default function ExhibitorDashboard() {
         <div className="flex items-start gap-3">
           <EyeOff className="w-5 h-5 text-amber-800 flex-shrink-0 mt-0.5" />
           <div>
-            <span className="font-extrabold text-amber-950 text-xs block">🙈 Előzetes Menüfeltöltés (Rejtett Mód)</span>
+            <span className="font-extrabold text-amber-950 text-xs block">Előzetes Menüfeltöltés (Rejtett Mód)</span>
             <p className="text-amber-900 font-medium mt-0.5 text-[11px] leading-relaxed">
               Nyugodtan töltsétek fel az ételeiteket előre! Ha bepipáljátok a <strong>"Rejtett mód"</strong> opciót, az ételeteket péntek délig csak ti látjátok az admin felületen. <strong>Pénteken délben (12:00-kor) automatikusan mindenki előtt nyilvánossá válik a teljes menüsor!</strong>
             </p>
@@ -605,12 +605,12 @@ export default function ExhibitorDashboard() {
                           {item.is_hidden ? (
                             <>
                               <EyeOff className="w-3 h-3 text-amber-800" />
-                              <span>🙈 Rejtett (Péntek délig)</span>
+                              <span>Rejtett (Péntek délig)</span>
                             </>
                           ) : (
                             <>
                               <Eye className="w-3 h-3 text-emerald-700" />
-                              <span>👁️ Nyilvános</span>
+                              <span>Nyilvános</span>
                             </>
                           )}
                         </button>
@@ -993,7 +993,7 @@ export default function ExhibitorDashboard() {
                   <div>
                     <span className="text-xs font-extrabold text-amber-950 flex items-center gap-1">
                       <EyeOff className="w-3.5 h-3.5 text-amber-800" />
-                      <span>🙈 Rejtett mód (Péntek délig csapattagsági titok)</span>
+                      <span>Rejtett mód (Péntek délig csapattagsági titok)</span>
                     </span>
                     <span className="text-[10px] font-semibold text-amber-850 block mt-0.5 leading-tight">
                       Ha bepipálod, ezt az ételt a látogatók nem látják a vásári katalógusban péntek délig. Pénteken délben (12:00-kor) automatikusan mindenki előtt nyilvánossá válik!
