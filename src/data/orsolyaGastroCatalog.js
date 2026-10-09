@@ -156,5 +156,22 @@ export const ORSOLYA_GASTRO_CATALOG = [
       { name: 'Parázson sült padlizsánkrém', category: 'street_food', availableDay: 'both', tags: ['padlizsánkrém', 'parázson sült', 'krém', 'vegetáriánus'] },
       { name: 'Házi lekvárok', category: 'egyeb', availableDay: 'both', tags: ['lekvár', 'házi', 'kézműves'] }
     ]
+  },
+  {
+    exhibitorKey: 'arpad-hazi-szent-margit-ovoda',
+    exhibitorName: 'Árpád-házi Szent Margit Óvoda',
+    location: 'Diáksétány',
+    slogan: 'Gyere, kóstold meg a Csillagszemű juhász kedvenceit!',
+    notice: 'Szombaton a főétel mellé egy bojtárkupon is jár, amellyel a látogatók a külső várárokban kiállhatják a 3 próbát.',
+    image: '/logok/szent-margit-ovoda.jpg',
+    pin: '4832',
+    items: [
+      { name: 'Pásztortarhonya', description: 'Szombaton a főétel mellé bojtárkupon jár (3 próba a külső várárokban)', category: 'meleg_etel', availableDay: 'saturday', tags: ['tarhonya', 'pásztor', 'magyaros', 'házias'], image: '/etelek/pasztortarhonya.png' },
+      { name: 'Pásztorok húsos-babos káposztája', category: 'meleg_etel', availableDay: 'sunday', tags: ['káposzta', 'bab', 'húsos', 'magyaros', 'házias'], image: '/etelek/baboskaposzta.png' },
+      { name: 'Kézműves termékek', category: 'egyeb', availableDay: 'both', tags: ['kézműves', 'vásár'], image: '/etelek/kezmuves.png' },
+      { name: 'Sütemények, finomságok', category: 'sutemeny', availableDay: 'both', tags: ['sütemény', 'édes', 'házi'], image: '/etelek/sutemeny.png' },
+      { name: 'Zsákbamacska', category: 'egyeb', availableDay: 'both', tags: ['játék', 'nyeremény'], image: '/etelek/zsakbamacska.png' },
+      { name: '18+ zsákbamacska', category: 'egyeb', availableDay: 'both', tags: ['játék', 'felnőtt', 'nyeremény'], image: '/etelek/18plusz-zsakbamacska.png' }
+    ]
   }
 ];

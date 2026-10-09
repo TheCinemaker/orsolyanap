@@ -37,6 +37,7 @@ const getShortExhibitorName = (exhibitor) => {
   if (lower.includes('kovács miklós')) return 'Csendes Kovács';
   if (lower.includes('tűzoltó') || lower.includes('tuzolto')) return 'Ifj. Tűzoltók';
   if (lower.includes('hajnalcsillag')) return 'Hajnalcsillag';
+  if (lower.includes('szent margit') || lower.includes('margit óvoda')) return 'Szt. Margit Óvoda';
 
   if (name.length > 14) {
     const parts = name.split(' ');
