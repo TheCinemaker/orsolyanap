@@ -161,10 +161,13 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
 
         {/* Item Image */}
         {item.image ? (
-          <div className="w-full aspect-video rounded-md overflow-hidden my-1 border border-stone-200 bg-stone-950 flex items-center justify-center">
+          <div className="relative w-full aspect-video rounded-md overflow-hidden my-1 border border-stone-200 bg-stone-950 flex items-center justify-center">
             <img src={item.image} alt={item.name} loading="lazy"
               decoding="async"
               className="w-full h-full object-cover transition-transform duration-300 sm:group-hover:scale-105" />
+            <span className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-stone-950/70 text-[9px] font-bold uppercase tracking-wider text-white/90 pointer-events-none">
+              AI illusztráció
+            </span>
           </div>
         ) : (
           <div className="w-full aspect-video rounded-md my-1 border border-stone-200 bg-stone-100 flex items-center justify-center text-stone-400">

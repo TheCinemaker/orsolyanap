@@ -387,6 +387,12 @@ export default function SignageView({ targetExhibitorId }) {
         <span className={`${T.footer} font-medium text-white/25 uppercase tracking-[0.2em]`}>
           Kóstold meg Kőszeg ízeit
         </span>
+
+        {/* A fotók generált illusztrációk. A kijelzőn nem csempénként
+            jelöljük -- az szétverné a tábla képét -, hanem egyszer, itt. */}
+        <span className={`${T.footer} font-medium text-white/20`}>
+          Az ételfotók AI-illusztrációk, eltérhetnek a valóságtól
+        </span>
       </footer>
     </div>
   );

@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Calendar, Sparkles, Landmark, Leaf, Clock, Trophy, Phone } from 'lucide-react';
+import { X, Calendar, Sparkles, Landmark, Leaf, Clock, Trophy, Phone, ShoppingBasket, ImageOff } from 'lucide-react';
 import VisitKoszegLogo from './VisitKoszegLogo';
 
 export default function OrsolyaInfoModal({ isOpen, onClose }) {
@@ -72,6 +72,25 @@ export default function OrsolyaInfoModal({ isOpen, onClose }) {
             </p>
           </div>
 
+          {/* Kézműves vásár -- szándékosan csak említés.
+              Nem tartjuk nyilván a 150 vásárost és azt sem, ki mit árul:
+              évről évre változik, és a látogatónak nem is ez a kérdése.
+              Azt mondjuk meg, hol van. A pontos területe a térképen látszik. */}
+          <div className="bg-stone-50 border border-stone-200/80 rounded-md p-4 space-y-2">
+            <div className="flex items-center gap-2 font-bold text-sm text-stone-900">
+              <ShoppingBasket className="w-4 h-4 text-amber-800" />
+              <h3>Kézműves kirakodóvásár</h3>
+            </div>
+            <p>
+              A történelmi belváros terein és utcáin — a <strong>Fő téren és a Jurisics
+              téren</strong> — 150 vásáros kínálja portékáját: a Kőszeg-hegyaljai
+              települések kézművesei, borászok, méhészek, fafaragók és társaik.
+            </p>
+            <p className="text-stone-500 pt-1 font-medium">
+              A vásár területe a <strong>térképen</strong> is meg van jelölve.
+            </p>
+          </div>
+
           {/* Versenyek */}
           <div className="bg-stone-50 border border-stone-200/80 rounded-md p-4 space-y-2">
             <div className="flex items-center gap-2 font-bold text-sm text-stone-900">
@@ -140,6 +159,27 @@ export default function OrsolyaInfoModal({ isOpen, onClose }) {
                 <strong>Közösségi főzés:</strong> Hagyományos szabadtéri civil főzőverseny a Diáksétányon.
               </li>
             </ul>
+          </div>
+
+          {/* Az ételfotókról szóló tájékoztatás.
+              A képek generált illusztrációk. Ezt ki kell írni, különben a
+              látogató a fotót ígéretnek veszi, és joggal kér számon egy
+              tányért, ami sosem létezett. */}
+          <div className="bg-stone-50 border border-stone-200/80 rounded-md p-4 space-y-2">
+            <div className="flex items-center gap-2 font-bold text-sm text-stone-900">
+              <ImageOff className="w-4 h-4 text-amber-800" />
+              <h3>Az ételfotókról</h3>
+            </div>
+            <p>
+              Az appban látható <strong>ételfotók mesterséges intelligenciával készült
+              illusztrációk</strong>, nem a helyszínen készült felvételek. Az ételek
+              valódi megjelenése, adagja és tálalása ezért eltérhet a képeken
+              látottaktól.
+            </p>
+            <p className="text-stone-500 pt-1 font-medium">
+              A képek célja, hogy segítsenek választani — nem ígéret arra, hogy a
+              fogás pontosan így fog kinézni.
+            </p>
           </div>
 
           {/* Kapcsolat */}

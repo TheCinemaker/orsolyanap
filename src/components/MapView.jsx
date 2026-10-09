@@ -5,6 +5,26 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 // Helper function to shorten exhibitor names for clean map pills
+/**
+ * A kézműves kirakodóvásár területe a történelmi belvárosban.
+ *
+ * A sarokpontokat a szervező adta meg, ebben a bejárási sorrendben. A
+ * 2. és 6. pont 8 méterre van egymástól: ott szűkül össze a terület, ahol
+ * a Fő tér és a Jurisics tér egy keskeny utcán kapcsolódik. Nem hiba.
+ *
+ * Itt SZÁNDÉKOSAN nincsenek standok: a területen 150 vásáros árul, őket az
+ * app nem tartja nyilván - csak azt mutatjuk meg, hol keresd őket.
+ */
+const CRAFT_MARKET_AREA = [
+  [47.39003359665649, 16.539088249995245],
+  [47.389771564347036, 16.539819621629366],
+  [47.38862645881784, 16.541010216127287],
+  [47.38874895819742, 16.541316197101576],
+  [47.39023591742202, 16.54076463595943],
+  [47.389844333743405, 16.539820866892534],
+  [47.39007537893043, 16.539174983991717],
+];
+
 const getShortExhibitorName = (exhibitor) => {
   if (!exhibitor || !exhibitor.name) return '';
   if (exhibitor.short_name) return exhibitor.short_name;
@@ -93,6 +113,24 @@ export default function MapView() {
         maxNativeZoom: 19,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
       }).addTo(map);
+
+      // A kézműves vásár területe. Az inicializáló blokkban, mert az csak
+      // egyszer fut -- a lenti marker-takarítás csak L.Marker példányokat
+      // töröl, így ez a réteg megmarad.
+      L.polygon(CRAFT_MARKET_AREA, {
+        color: '#92400e',
+        weight: 2,
+        dashArray: '6 4',
+        fillColor: '#f59e0b',
+        fillOpacity: 0.12,
+      })
+        .addTo(map)
+        .bindTooltip('Kézműves vásár', {
+          permanent: true,
+          direction: 'center',
+          className: 'craft-market-label',
+        });
+
 
       leafletMapRef.current = map;
     }
@@ -241,6 +279,10 @@ export default function MapView() {
               <span className="w-2.5 h-2.5 rounded-full bg-amber-700 inline-block border border-amber-900"></span>
               Diáksétány Fesztiválterület
             </span>
+              <span className="font-bold text-amber-900 block flex items-center gap-1 mt-0.5">
+                <span className="w-2.5 h-2.5 rounded-sm bg-amber-500/40 inline-block border border-amber-800"></span>
+                Kézműves vásár – belváros
+              </span>
             <span className="text-[10px] text-stone-500 block">47.3889N - 47.3900N • 16.5379E - 16.5399E</span>
           </div>
         </div>

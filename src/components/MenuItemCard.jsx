@@ -64,7 +64,7 @@ export default function MenuItemCard({ item, exhibitor, onOpenLocationModal }) {
         {item.image && (
           <div
             onClick={() => onOpenLocationModal && onOpenLocationModal(item, exhibitor)}
-            className={`w-full aspect-video rounded-md overflow-hidden mb-3 border border-stone-200 bg-stone-950 flex items-center justify-center cursor-pointer ${isCooking ? 'saturate-50' : ''}`}
+            className={`relative w-full aspect-video rounded-md overflow-hidden mb-3 border border-stone-200 bg-stone-950 flex items-center justify-center cursor-pointer ${isCooking ? 'saturate-50' : ''}`}
           >
             <img
               src={item.image}
@@ -75,6 +75,9 @@ export default function MenuItemCard({ item, exhibitor, onOpenLocationModal }) {
               height="450"
               className="w-full h-full object-cover"
             />
+            <span className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-stone-950/70 text-[9px] font-bold uppercase tracking-wider text-white/90 pointer-events-none">
+              AI illusztráció
+            </span>
           </div>
         )}
 
