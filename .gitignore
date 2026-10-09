@@ -35,3 +35,6 @@ logok/
 
 # Etelfotok: a Supabase-be kerulnek, nem a repoba.
 etelfotok/
+
+# Helyszinen ellenorizendo, ideiglenes koordinatak.
+KOORDINATAK_ELLENORIZENDO.txt
