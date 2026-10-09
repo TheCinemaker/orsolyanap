@@ -30,7 +30,6 @@ const getShortExhibitorName = (exhibitor) => {
 export default function MapView() {
   const { exhibitors, menuItems, favoriteExhibitorIds, navigateToStand, showToast, focusedExhibitorIdOnMap } = useOrsolya();
   const [selectedExhibitorId, setSelectedExhibitorId] = useState(focusedExhibitorIdOnMap || exhibitors[0]?.id || null);
-  const [mapMode, setMapMode] = useState('gps');
   const [userLocation, setUserLocation] = useState(null);
   const [isLocating, setIsLocating] = useState(false);
 
@@ -77,7 +76,7 @@ export default function MapView() {
 
   // Initialize Leaflet Map
   useEffect(() => {
-    if (mapMode !== 'gps' || !mapContainerRef.current) return;
+    if (!mapContainerRef.current) return;
 
     if (!leafletMapRef.current) {
       const map = L.map(mapContainerRef.current, {
@@ -160,7 +159,7 @@ export default function MapView() {
       });
       userMarkerRef.current = L.marker(userLocation, { icon: userIcon }).addTo(map);
     }
-  }, [mapMode, exhibitors, selectedExhibitorId, favoriteExhibitorIds, userLocation]);
+  }, [exhibitors, selectedExhibitorId, favoriteExhibitorIds, userLocation]);
 
   // Handle Geolocation tracking & re-centering
   const handleGetLocation = () => {
@@ -222,33 +221,29 @@ export default function MapView() {
           </div>
 
           {/* User Location Button */}
-          {mapMode === 'gps' && (
-            <button
-              onClick={handleGetLocation}
-              disabled={isLocating}
-              className="px-4 py-2 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-md shadow-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer whitespace-nowrap"
-            >
-              <Navigation className="w-3.5 h-3.5 text-white" />
-              <span>{isLocating ? 'Helymeghatározás...' : 'Hol vagyok? (GPS)'}</span>
-            </button>
-          )}
+          <button
+            onClick={handleGetLocation}
+            disabled={isLocating}
+            className="px-4 py-2 bg-amber-800 hover:bg-amber-700 text-white font-bold text-xs rounded-md shadow-xs flex items-center justify-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer whitespace-nowrap"
+          >
+            <Navigation className="w-3.5 h-3.5 text-white" />
+            <span>{isLocating ? 'Helymeghatározás...' : 'Hol vagyok? (GPS)'}</span>
+          </button>
         </div>
 
-        {/* GPS Leaflet View */}
-        {mapMode === 'gps' && (
-          <div className="relative rounded-md overflow-hidden border border-stone-200 shadow-inner min-h-[380px] sm:min-h-[440px] z-10">
-            <div ref={mapContainerRef} className="w-full h-[380px] sm:h-[440px] bg-stone-100" />
-            
-            {/* Corner Legend Badge */}
-            <div className="absolute bottom-3 left-3 z-[1000] bg-white/95 backdrop-blur-md px-3 py-2 rounded-md border border-stone-200 shadow-md text-[11px] space-y-1">
-              <span className="font-extrabold text-stone-900 block flex items-center gap-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-700 inline-block border border-amber-900"></span>
-                Diáksétány Fesztiválterület
-              </span>
-              <span className="text-[10px] text-stone-500 block">47.3889N - 47.3900N • 16.5379E - 16.5399E</span>
-            </div>
+        {/* Leaflet térkép */}
+        <div className="relative rounded-md overflow-hidden border border-stone-200 shadow-inner min-h-[380px] sm:min-h-[440px] z-10">
+          <div ref={mapContainerRef} className="w-full h-[380px] sm:h-[440px] bg-stone-100" />
+          
+          {/* Corner Legend Badge */}
+          <div className="absolute bottom-3 left-3 z-[1000] bg-white/95 backdrop-blur-md px-3 py-2 rounded-md border border-stone-200 shadow-md text-[11px] space-y-1">
+            <span className="font-extrabold text-stone-900 block flex items-center gap-1">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-700 inline-block border border-amber-900"></span>
+              Diáksétány Fesztiválterület
+            </span>
+            <span className="text-[10px] text-stone-500 block">47.3889N - 47.3900N • 16.5379E - 16.5399E</span>
           </div>
-        )}
+        </div>
 
         {/* Selected Exhibitor Preview Box */}
         {selectedExhibitor && (

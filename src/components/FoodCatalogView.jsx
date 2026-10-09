@@ -43,8 +43,18 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
     isItemVisibleToVisitors
   } = useOrsolya();
 
-  // Collapsible section open/closed state (default: all open)
-  const [closedSections, setClosedSections] = useState({});
+  // Lenyíló szekciók állapota.
+  //
+  // ALAPBÓL CSUKVA: a csukott fejléc mutatja meg, hogy van mit kinyitni.
+  // Ha minden nyitva van, a felhasználó nem feltétlenül jön rá, hogy
+  // össze is lehet csukni.
+  //
+  // Három állapot: true = kézzel kinyitva, false = kézzel becsukva,
+  // undefined = nem nyúlt hozzá. Erre azért van szükség, mert keresés
+  // közben a találatokat NEM rejthetjük csukott szekciók mögé -- aki
+  // rákeresett a pörköltre, annak látnia kell -, de ha ott kézzel
+  // becsukja, az a döntése maradjon érvényben.
+  const [openSections, setOpenSections] = useState({});
   const [activeCategory, setActiveCategory] = useState(selectedCategory || 'all');
   const [activeTag, setActiveTag] = useState('all');
   const [showAllTags, setShowAllTags] = useState(false);
@@ -56,10 +66,10 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
     setActiveCategory(selectedCategory || 'all');
   }, [selectedCategory]);
 
-  const toggleSection = (catId) => {
-    setClosedSections((prev) => ({
+  const toggleSection = (catId, isOpenNow) => {
+    setOpenSections((prev) => ({
       ...prev,
-      [catId]: !prev[catId]
+      [catId]: !isOpenNow
     }));
   };
 
@@ -406,13 +416,19 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
             if (sectionItems.length === 0) return null;
 
             const IconComp = section.icon;
-            const isClosed = !!closedSections[section.id];
+            // Keresés közben nyitva, hacsak kézzel be nem csukták; egyébként
+            // csukva, amíg ki nem nyitják.
+            const searchActive = Boolean(searchQuery && searchQuery.trim());
+            const isOpen = searchActive
+              ? openSections[section.id] !== false
+              : openSections[section.id] === true;
+            const isClosed = !isOpen;
 
             return (
               <div key={section.id} className="bg-white border border-stone-200 rounded-md overflow-hidden shadow-2xs">
                 {/* Ultra-thin Header Bar (Szöveg ---------------- Lenyitás gomb) */}
                 <button
-                  onClick={() => toggleSection(section.id)}
+                  onClick={() => toggleSection(section.id, isOpen)}
                   className="w-full flex items-center justify-between py-2 px-3 sm:px-4 bg-stone-50 hover:bg-amber-50/80 transition-colors cursor-pointer border-b border-stone-200/60 group"
                 >
                   <div className="flex items-center gap-2">
