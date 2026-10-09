@@ -17,6 +17,7 @@ import {
   MapPin,
   Package
 } from 'lucide-react';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 export default function HamburgerMenuDrawer({
   isOpen,
@@ -38,6 +39,10 @@ export default function HamburgerMenuDrawer({
     navigateToStandFeed,
     setSearchQuery
   } = useOrsolya();
+
+  // A háttéroldal ne legyen görgethető, amíg ez nyitva van.
+  // A hook a korai return ELŐTT hívódik, különben feltételesen futna.
+  useScrollLock(isOpen);
 
   if (!isOpen) return null;
 

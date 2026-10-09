@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
 import VisitKoszegLogo from './VisitKoszegLogo';
 import { Key, ArrowRight, ArrowLeft, ShieldCheck, Copy, Check, Plus, X, Lock, Store, Utensils, Calendar } from 'lucide-react';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 export default function ExhibitorAuthPage() {
   const {
@@ -37,6 +38,9 @@ export default function ExhibitorAuthPage() {
     image: '',
     story: ''
   });
+
+  // A háttéroldal ne legyen görgethető, amíg bármelyik réteg nyitva van.
+  useScrollLock(Boolean(isRegisterModalOpen || isSuperAdmin));
 
   const handleImageFileChange = async (e) => {
     const file = e.target.files?.[0];

@@ -1,8 +1,13 @@
 import React from 'react';
 import { X, Calendar, Sparkles, Landmark, Leaf, Clock, Trophy, Phone, ShoppingBasket, ImageOff } from 'lucide-react';
 import VisitKoszegLogo from './VisitKoszegLogo';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 export default function OrsolyaInfoModal({ isOpen, onClose }) {
+  // A háttéroldal ne legyen görgethető, amíg ez nyitva van.
+  // A hook a korai return ELŐTT hívódik, különben feltételesen futna.
+  useScrollLock(isOpen);
+
   if (!isOpen) return null;
 
   return (

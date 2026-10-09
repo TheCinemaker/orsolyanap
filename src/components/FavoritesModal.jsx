@@ -1,6 +1,7 @@
 import React from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
 import { X, Heart, MapPin, QrCode, Trash2, Map, Utensils, Store } from 'lucide-react';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 export default function FavoritesModal({ isOpen, onClose }) {
   const {
@@ -12,6 +13,10 @@ export default function FavoritesModal({ isOpen, onClose }) {
     toggleFavoriteItem,
     focusExhibitorOnMap
   } = useOrsolya();
+
+  // A háttéroldal ne legyen görgethető, amíg ez nyitva van.
+  // A hook a korai return ELŐTT hívódik, különben feltételesen futna.
+  useScrollLock(isOpen);
 
   if (!isOpen) return null;
 

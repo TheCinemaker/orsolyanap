@@ -1,6 +1,7 @@
 import React from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
 import { X, MapPin, Phone, Mail, Heart, Utensils, Map, ThumbsUp, CupSoda, Calendar, Share2 } from 'lucide-react';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish }) {
   const {
@@ -16,6 +17,10 @@ export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish 
     navigateToFoodCatalog
   } = useOrsolya();
 
+  // A háttéroldal ne legyen görgethető, amíg ez nyitva van.
+  // A hook a korai return ELŐTT hívódik, különben feltételesen futna.
+  useScrollLock(Boolean(exhibitor));
+
   if (!exhibitor) return null;
 
   const items = menuItems.filter((i) => i.exhibitor_id === exhibitor.id);
@@ -29,8 +34,8 @@ export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish 
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-150">
-      <div className="bg-white border border-stone-200 rounded-t-2xl sm:rounded-md max-w-lg w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 shadow-2xl space-y-5 relative animate-in slide-in-from-bottom duration-200">
+    <div className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-3 sm:p-4 animate-in fade-in duration-150">
+      <div className="bg-white border border-stone-200 rounded-2xl sm:rounded-md max-w-lg w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 shadow-2xl space-y-5 relative animate-in slide-in-from-bottom duration-200">
         
         {/* 8.4 Floating Sticky Close Button */}
         <button

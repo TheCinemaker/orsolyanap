@@ -30,6 +30,7 @@ import {
   EyeOff,
   Monitor
 } from 'lucide-react';
+import { useScrollLock } from '../../hooks/useScrollLock';
 
 export default function ExhibitorDashboard() {
   const {
@@ -132,6 +133,10 @@ export default function ExhibitorDashboard() {
     is_hidden: false,
     image: ''
   });
+
+  // A háttéroldal ne legyen görgethető, amíg bármelyik modál nyitva van.
+  // Az összes hivatkozott állapot deklarációja UTÁN kell állnia.
+  useScrollLock(Boolean(isTeamModalOpen || createdTeamPinModal || isDishModalOpen));
 
   const handleProfileSave = (e) => {
     e.preventDefault();

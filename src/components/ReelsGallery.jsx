@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
 import { X, Heart, MapPin, ChevronDown } from 'lucide-react';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 export default function ReelsGallery() {
   const { reels, exhibitors, likeReel, setActiveView, focusExhibitorOnMap } = useOrsolya();
   
   const [likedReelIds, setLikedReelIds] = useState(() => {
+
     try { return JSON.parse(localStorage.getItem('orsolya_liked_reel_ids') || '[]'); } catch { return []; }
   });
+
+  // A háttéroldal ne legyen görgethető, amíg bármelyik réteg nyitva van.
+  useScrollLock(true);
 
   useEffect(() => {
     localStorage.setItem('orsolya_liked_reel_ids', JSON.stringify(likedReelIds));

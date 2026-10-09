@@ -3,6 +3,7 @@ import { useOrsolya } from '../context/OrsolyaContext';
 import { MapPin, X, ArrowRight, Store } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 export default function DishLocationModal({ item, exhibitor, onClose }) {
   const { focusExhibitorOnMap, setActiveView } = useOrsolya();
@@ -72,6 +73,10 @@ export default function DishLocationModal({ item, exhibitor, onClose }) {
       setActiveView('map');
     }
   };
+
+  // A háttéroldal ne legyen görgethető, amíg ez nyitva van.
+  // A hook a korai return ELŐTT hívódik, különben feltételesen futna.
+  useScrollLock(Boolean(item && exhibitor));
 
   if (!item || !exhibitor) return null;
 

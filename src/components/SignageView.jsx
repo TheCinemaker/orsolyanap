@@ -3,6 +3,7 @@ import { Maximize2, Minimize2, RefreshCw, Utensils } from 'lucide-react';
 import { useOrsolya } from '../context/OrsolyaContext';
 import { isKTSZEExhibitor } from '../lib/ktszeUtils';
 import { supabase } from '../lib/supabaseClient';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 /**
  * Digitális kijelző (menu board) a KTSZE standjára.
@@ -40,6 +41,9 @@ export default function SignageView({ targetExhibitorId }) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
+
+  // A kijelző teljes képernyős: a háttér ne legyen görgethető mögötte.
+  useScrollLock(true);
 
   const hideTimer = useRef(null);
 

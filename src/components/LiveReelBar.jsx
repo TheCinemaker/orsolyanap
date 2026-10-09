@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
 import { Plus, Camera, Heart, MapPin, X, Send, Sparkles, Check, User } from 'lucide-react';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 export default function LiveReelBar() {
   const {
@@ -25,8 +26,12 @@ export default function LiveReelBar() {
   const [imageInput, setImageInput] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [likedReelIds, setLikedReelIds] = useState(() => {
+
     try { return JSON.parse(localStorage.getItem('orsolya_liked_reel_ids') || '[]'); } catch { return []; }
   });
+
+  // A háttéroldal ne legyen görgethető, amíg bármelyik réteg nyitva van.
+  useScrollLock(Boolean(isAddModalOpen || activeStoryModal));
   useEffect(() => { localStorage.setItem('orsolya_liked_reel_ids', JSON.stringify(likedReelIds)); }, [likedReelIds]);
   const uniqueReels = Array.from(new Map(reels.map((reel) => [String(reel.id), reel])).values());
 
