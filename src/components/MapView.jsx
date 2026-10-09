@@ -235,7 +235,7 @@ export default function MapView() {
         </div>
 
         {/* GPS Leaflet View */}
-        {mapMode === 'gps' ? (
+        {mapMode === 'gps' && (
           <div className="relative rounded-md overflow-hidden border border-stone-200 shadow-inner min-h-[380px] sm:min-h-[440px] z-10">
             <div ref={mapContainerRef} className="w-full h-[380px] sm:h-[440px] bg-stone-100" />
             
