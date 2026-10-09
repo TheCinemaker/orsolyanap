@@ -12,6 +12,7 @@ export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish 
     toggleFavoriteItem,
     voteForItem,
     votedItemIds,
+    isVotingOpen,
     focusExhibitorOnMap,
     setActiveView,
     navigateToFoodCatalog
@@ -266,12 +267,15 @@ export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish 
                         className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-xs font-extrabold transition-all border ${
                           isSoldOut
                             ? 'bg-stone-200 text-stone-400 border-stone-300'
+                            : !isVotingOpen
+                            ? 'bg-stone-100 hover:bg-stone-200 text-stone-600 border-stone-200 cursor-pointer'
                             : isVoted
-                            ? 'bg-emerald-800 text-white border-emerald-800'
-                            : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-300'
+                            ? 'bg-emerald-800 text-white border-emerald-800 cursor-pointer'
+                            : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-300 cursor-pointer'
                         }`}
+                        title={!isVotingOpen ? 'A szavazás okt. 17-én nyílik meg' : undefined}
                       >
-                        <ThumbsUp className={`w-3.5 h-3.5 ${isVoted ? 'fill-white' : 'text-amber-800'}`} />
+                        <ThumbsUp className={`w-3.5 h-3.5 ${!isVotingOpen ? 'text-stone-400' : isVoted ? 'fill-white' : 'text-amber-800'}`} />
                         <span>{item.votes || 0}</span>
                       </button>
                     </div>

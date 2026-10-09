@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
 import DishLocationModal from './DishLocationModal';
 import {
@@ -16,7 +16,8 @@ import {
   Package,
   Sparkles,
   Heart,
-  X
+  X,
+  Shuffle
 } from 'lucide-react';
 
 const CATEGORY_SECTIONS = [
@@ -39,8 +40,27 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
     selectedDay,
     setSelectedDay,
     isLoadingData,
-    isItemVisibleToVisitors
+    isItemVisibleToVisitors,
+    isVotingOpen
   } = useOrsolya();
+
+  // Véletlenszerű kártyakeverés minden megnyitáskor:
+  // Nincs fix sorrend, minden látogatás új "kártyakeverés" -- egyetlen stand sincs előre sorolva!
+  const [shuffleKey, setShuffleKey] = useState(1);
+  const shuffleOrderMap = useRef(new Map());
+
+  const reShuffle = () => {
+    const newMap = new Map();
+    menuItems.forEach((item) => {
+      newMap.set(item.id, Math.random());
+    });
+    shuffleOrderMap.current = newMap;
+    setShuffleKey((prev) => prev + 1);
+  };
+
+  useEffect(() => {
+    reShuffle();
+  }, [menuItems]);
 
   // Lenyíló szekciók állapota.
   //
@@ -119,18 +139,19 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
     });
   }, [menuItems, exhibitors, searchQuery, selectedDay, activeCategory, activeTag, isItemVisibleToVisitors]);
 
-  // Stable ordering: first by category, then by exhibitor, then by dish name.
+  // Kártyasorrend: kategóriánként csoportosítva, de a kategóriákon belül
+  // TELJESEN VÉLETLENSZERŰ (kártyakeverés minden látogatáskor),
+  // így egyetlen kiállító sem élvez fix előnyt.
   const sortedItems = useMemo(() => {
     const categoryOrder = { meleg_etel: 1, street_food: 2, sutemeny: 3, italok: 4, ital: 4, hideg_etel: 5, egyeb: 6 };
     return [...filteredItems].sort((a, b) => {
       const cat = (categoryOrder[a.category] || 99) - (categoryOrder[b.category] || 99);
       if (cat !== 0) return cat;
-      const exA = exhibitors.find((ex) => ex.id === a.exhibitor_id)?.name || '';
-      const exB = exhibitors.find((ex) => ex.id === b.exhibitor_id)?.name || '';
-      const ex = exA.localeCompare(exB, 'hu');
-      return ex !== 0 ? ex : a.name.localeCompare(b.name, 'hu');
+      const orderA = shuffleOrderMap.current.get(a.id) ?? 0.5;
+      const orderB = shuffleOrderMap.current.get(b.id) ?? 0.5;
+      return orderA - orderB;
     });
-  }, [filteredItems, exhibitors]);
+  }, [filteredItems, shuffleKey]);
 
   const renderDishCard = (item) => {
     const exhibitor = exhibitors.find((ex) => ex.id === item.exhibitor_id);
@@ -270,15 +291,23 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
           <button
             onClick={() => voteForItem(item.id)}
             className={`h-9 flex-1 min-w-0 flex items-center justify-center gap-1.5 rounded text-xs font-extrabold border shadow-2xs transition-all cursor-pointer ${
-              isVoted
+              !isVotingOpen
+                ? 'bg-stone-100 hover:bg-stone-200 text-stone-600 border-stone-200'
+                : isVoted
                 ? 'bg-emerald-800 text-white border-emerald-800'
                 : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-300/80'
             }`}
-            title="Szavazok erre az ételre"
+            title={!isVotingOpen ? 'A szavazás okt. 17-én nyílik meg' : isVoted ? 'Leadott közönségszavazat' : 'Szavazok erre az ételre'}
             aria-pressed={isVoted}
           >
-            <ThumbsUp className={`w-4 h-4 shrink-0 ${isVoted ? 'fill-white' : 'text-amber-800'}`} />
-            <span className="truncate">{isVoted ? `Szavazva (${item.votes || 1})` : `Szavazok (${item.votes || 0})`}</span>
+            <ThumbsUp className={`w-4 h-4 shrink-0 ${!isVotingOpen ? 'text-stone-400' : isVoted ? 'fill-white' : 'text-amber-800'}`} />
+            <span className="truncate">
+              {!isVotingOpen
+                ? 'Szavazás: okt. 17-től'
+                : isVoted
+                ? `Szavazva (${item.votes || 1})`
+                : `Szavazok (${item.votes || 0})`}
+            </span>
           </button>
         </div>
       </div>
@@ -300,37 +329,48 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
             </h2>
           </div>
 
-          {/* Day Switcher Toggle */}
-          <div className="flex items-center bg-stone-100 p-1 rounded-md border border-stone-200 self-stretch sm:self-auto">
+          {/* Day Switcher Toggle & Shuffle Button */}
+          <div className="flex items-center gap-2 flex-wrap self-stretch sm:self-auto justify-between sm:justify-end">
+            <div className="flex items-center bg-stone-100 p-1 rounded-md border border-stone-200 flex-1 sm:flex-none">
+              <button
+                onClick={() => setSelectedDay('all')}
+                className={`flex-1 sm:flex-none px-3 py-1 rounded-md text-xs font-extrabold transition-all cursor-pointer ${
+                  selectedDay === 'all'
+                    ? 'bg-amber-900 text-white shadow-xs'
+                    : 'text-stone-600 hover:text-stone-900'
+                }`}
+              >
+                Mindkét nap
+              </button>
+              <button
+                onClick={() => setSelectedDay('saturday')}
+                className={`flex-1 sm:flex-none px-3 py-1 rounded-md text-xs font-extrabold transition-all cursor-pointer ${
+                  selectedDay === 'saturday'
+                    ? 'bg-amber-900 text-white shadow-xs'
+                    : 'text-stone-600 hover:text-stone-900'
+                }`}
+              >
+                Szombat
+              </button>
+              <button
+                onClick={() => setSelectedDay('sunday')}
+                className={`flex-1 sm:flex-none px-3 py-1 rounded-md text-xs font-extrabold transition-all cursor-pointer ${
+                  selectedDay === 'sunday'
+                    ? 'bg-amber-900 text-white shadow-xs'
+                    : 'text-stone-600 hover:text-stone-900'
+                }`}
+              >
+                Vasárnap
+              </button>
+            </div>
+
             <button
-              onClick={() => setSelectedDay('all')}
-              className={`flex-1 sm:flex-none px-3 py-1 rounded-md text-xs font-extrabold transition-all cursor-pointer ${
-                selectedDay === 'all'
-                  ? 'bg-amber-900 text-white shadow-xs'
-                  : 'text-stone-600 hover:text-stone-900'
-              }`}
+              onClick={reShuffle}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-extrabold bg-stone-100 hover:bg-amber-100 text-stone-700 hover:text-amber-950 border border-stone-200 transition-all cursor-pointer shadow-2xs"
+              title="Kártyák azonnali újrakeverése"
             >
-              Mindkét nap
-            </button>
-            <button
-              onClick={() => setSelectedDay('saturday')}
-              className={`flex-1 sm:flex-none px-3 py-1 rounded-md text-xs font-extrabold transition-all cursor-pointer ${
-                selectedDay === 'saturday'
-                  ? 'bg-amber-900 text-white shadow-xs'
-                  : 'text-stone-600 hover:text-stone-900'
-              }`}
-            >
-              Szombat
-            </button>
-            <button
-              onClick={() => setSelectedDay('sunday')}
-              className={`flex-1 sm:flex-none px-3 py-1 rounded-md text-xs font-extrabold transition-all cursor-pointer ${
-                selectedDay === 'sunday'
-                  ? 'bg-amber-900 text-white shadow-xs'
-                  : 'text-stone-600 hover:text-stone-900'
-              }`}
-            >
-              Vasárnap
+              <Shuffle className="w-3.5 h-3.5 text-amber-800" />
+              <span>Keverés</span>
             </button>
           </div>
         </div>

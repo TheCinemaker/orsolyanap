@@ -79,26 +79,24 @@ export default function ExhibitorDashboard() {
     setIsPostingReel(false);
   };
 
-  if (!activeExhibitor) return null;
-
-  const exhibitorItems = menuItems.filter((i) => i.exhibitor_id === activeExhibitor.id);
+  const exhibitorItems = activeExhibitor ? menuItems.filter((i) => i.exhibitor_id === activeExhibitor.id) : [];
 
   // Profile Form state
   const [profileData, setProfileData] = useState({
-    story: activeExhibitor.story || '',
-    cause: activeExhibitor.cause || '',
-    notice: activeExhibitor.notice || '',
-    location: activeExhibitor.location || '',
-    offerings: activeExhibitor.offerings || '',
-    hasDrinks: activeExhibitor.hasDrinks || false,
-    days: activeExhibitor.days || 'both',
-    phone: activeExhibitor.phone || '',
-    email: activeExhibitor.email || '',
-    facebook_url: activeExhibitor.facebook_url || '',
-    instagram_url: activeExhibitor.instagram_url || '',
-    name: activeExhibitor.name || '',
-    category: activeExhibitor.category || 'gasztro',
-    image: activeExhibitor.image || ''
+    story: activeExhibitor?.story || '',
+    cause: activeExhibitor?.cause || '',
+    notice: activeExhibitor?.notice || '',
+    location: activeExhibitor?.location || '',
+    offerings: activeExhibitor?.offerings || '',
+    hasDrinks: activeExhibitor?.hasDrinks || false,
+    days: activeExhibitor?.days || 'both',
+    phone: activeExhibitor?.phone || '',
+    email: activeExhibitor?.email || '',
+    facebook_url: activeExhibitor?.facebook_url || '',
+    instagram_url: activeExhibitor?.instagram_url || '',
+    name: activeExhibitor?.name || '',
+    category: activeExhibitor?.category || 'gasztro',
+    image: activeExhibitor?.image || ''
   });
 
   // Modal states for Super-Admin New Team Creation
@@ -135,8 +133,9 @@ export default function ExhibitorDashboard() {
   });
 
   // A háttéroldal ne legyen görgethető, amíg bármelyik modál nyitva van.
-  // Az összes hivatkozott állapot deklarációja UTÁN kell állnia.
   useScrollLock(Boolean(isTeamModalOpen || createdTeamPinModal || isDishModalOpen));
+
+  if (!activeExhibitor) return null;
 
   const handleProfileSave = (e) => {
     e.preventDefault();

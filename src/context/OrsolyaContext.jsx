@@ -53,9 +53,31 @@ export function OrsolyaProvider({ children }) {
   const [selectedDay, setSelectedDay] = useState('all'); // 'all' | 'saturday' | 'sunday'
   const [selectedDietary, setSelectedDietary] = useState('all'); // 'all' | 'gluten_free' | 'lactose_free' | 'sugar_free' | 'vegan'
 
-  // Main tab state: 'tents' | 'food'
-  const [mainTab, setMainTab] = useState('tents');
+  // Main tab state: 'food' | 'tents' | 'program' (Alapértelmezetten a gasztronómia / ételek nyílik meg)
+  const [mainTab, setMainTab] = useState('food');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Közönségszavazás időzítés: a rendezvény napján (2026. október 17. 08:00) nyílik meg
+  const FESTIVAL_VOTING_START = new Date('2026-10-17T08:00:00+02:00').getTime();
+  const [forceVotingOpen, setForceVotingOpen] = useState(() => {
+    return localStorage.getItem('orsolya_force_voting_open') === 'true';
+  });
+
+  const isVotingOpen = Boolean(forceVotingOpen || Date.now() >= FESTIVAL_VOTING_START);
+
+  const toggleForceVotingOpen = () => {
+    setForceVotingOpen((prev) => {
+      const next = !prev;
+      localStorage.setItem('orsolya_force_voting_open', String(next));
+      showToast(
+        next
+          ? '⚡ Szavazás tesztelése engedélyezve!'
+          : '🔒 Szavazás lezárva a rendezvény napjáig.',
+        'info'
+      );
+      return next;
+    });
+  };
 
   // Navigáció után mindig az új nézet tetejére állunk.
   // A scrollTo csak a kattintás pillanatában nem elég megbízható: a React
@@ -302,6 +324,11 @@ export function OrsolyaProvider({ children }) {
 
   // Vote for a dish / item with Supabase Realtime persistence
   const voteForItem = async (itemId) => {
+    if (!isVotingOpen) {
+      showToast('A közönségszavazás a rendezvény napján (október 17-én) nyílik meg!', 'info');
+      return false;
+    }
+
     if (votedItemIds.includes(itemId)) {
       showToast('Erre az ételre már leadtad a közönségszavazatodat!', 'error');
       return false;
@@ -986,6 +1013,8 @@ export function OrsolyaProvider({ children }) {
         updateExhibitorDrinks,
         votedItemIds,
         voteForItem,
+        isVotingOpen,
+        toggleForceVotingOpen,
         updateItemStock,
         updateItemStatus,
         saveMenuItem,

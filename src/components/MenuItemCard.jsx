@@ -3,7 +3,7 @@ import { useOrsolya } from '../context/OrsolyaContext';
 import { ThumbsUp, Trophy, CupSoda, MapPin } from 'lucide-react';
 
 export default function MenuItemCard({ item, exhibitor, onOpenLocationModal }) {
-  const { votedItemIds, voteForItem } = useOrsolya();
+  const { votedItemIds, voteForItem, isVotingOpen } = useOrsolya();
 
 
   const isVoted = votedItemIds.includes(item.id);
@@ -142,14 +142,16 @@ export default function MenuItemCard({ item, exhibitor, onOpenLocationModal }) {
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-extrabold transition-all border shadow-2xs cursor-pointer ${
               isSoldOut || isCooking
                 ? 'bg-stone-100 text-stone-400 border-stone-200 cursor-not-allowed pointer-events-none'
+                : !isVotingOpen
+                ? 'bg-stone-100 hover:bg-stone-200 text-stone-600 border-stone-200 cursor-pointer'
                 : isVoted
                 ? 'bg-emerald-800 text-white border-emerald-800'
                 : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-300/80'
             }`}
-            title={isCooking ? 'Főzés alatt - a szavazás hamarosan indul' : isVoted ? 'Leadott közönségszavazat' : 'Szavazok erre az ételre'}
+            title={!isVotingOpen ? 'A szavazás okt. 17-én indul' : isCooking ? 'Főzés alatt - a szavazás hamarosan indul' : isVoted ? 'Leadott közönségszavazat' : 'Szavazok erre az ételre'}
           >
-            <ThumbsUp className={`w-3.5 h-3.5 ${isVoted ? 'fill-white' : 'text-amber-800'}`} />
-            <span>{isVoted ? `Szavazva (${item.votes || 1})` : `Szavazok (${item.votes || 0})`}</span>
+            <ThumbsUp className={`w-3.5 h-3.5 ${!isVotingOpen ? 'text-stone-400' : isVoted ? 'fill-white' : 'text-amber-800'}`} />
+            <span>{!isVotingOpen ? 'Szavazás: okt. 17-től' : isVoted ? `Szavazva (${item.votes || 1})` : `Szavazok (${item.votes || 0})`}</span>
           </button>
         </div>
 
