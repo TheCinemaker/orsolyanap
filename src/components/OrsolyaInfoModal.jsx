@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Calendar, Sparkles, Landmark } from 'lucide-react';
+import { X, Calendar, Sparkles, Landmark, Leaf, Clock, Trophy, Phone } from 'lucide-react';
 import VisitKoszegLogo from './VisitKoszegLogo';
 
 export default function OrsolyaInfoModal({ isOpen, onClose }) {
@@ -27,13 +27,74 @@ export default function OrsolyaInfoModal({ isOpen, onClose }) {
               Orsolya-Napi Vásár – Natúrpark Ízei Gasztronómiai Fesztivál
             </h2>
             <p className="text-xs text-stone-500 font-medium">
-              Civil Ízek Utcája a Diáksétányon • Évszázados kereskedelmi hagyományoktól a modern gasztrofesztiválig.
+              <strong className="text-stone-700">2026. október 17–18. • 10:00–18:00 • ingyenes</strong>
+              <br />
+              Idén <strong className="text-stone-700">25. alkalommal</strong> • Civil Ízek Utcája a Diáksétányon
             </p>
           </div>
         </div>
 
         {/* Story Content Blocks */}
         <div className="space-y-4 text-xs text-stone-700 leading-relaxed">
+          {/* Kérés a vendégekhez -- a szervezők kiemelt felhívása.
+              Szándékosan ez az első és egyetlen amber kártya: ez az egyetlen
+              dolog a leírásban, amit a látogatónak MÉG INDULÁS ELŐTT kell
+              megtennie. */}
+          <div className="bg-amber-50 border border-amber-300/80 rounded-md p-4 space-y-2">
+            <div className="flex items-center gap-2 font-bold text-sm text-amber-950">
+              <Leaf className="w-4 h-4 text-amber-800" />
+              <h3>Egyél-igyál sajátból!</h3>
+            </div>
+            <p className="text-amber-950/90">
+              A szervezők kérik, hogy <strong>hozz magaddal saját, nem eldobható poharat,
+              tányért és evőeszközt!</strong> A megszokott, minőségi eszközökkel
+              gusztusosabb a kóstolás, kulturáltabb a fogyasztás, és nem terheled a
+              környezetet eldobható műanyaggal.
+            </p>
+          </div>
+
+          {/* Gyakorlati tudnivalók */}
+          <div className="bg-stone-50 border border-stone-200/80 rounded-md p-4 space-y-2">
+            <div className="flex items-center gap-2 font-bold text-sm text-stone-900">
+              <Clock className="w-4 h-4 text-amber-800" />
+              <h3>Jó tudni</h3>
+            </div>
+            <ul className="space-y-1.5 list-disc list-inside">
+              <li><strong>Mikor:</strong> 2026. október 17–18. (szombat–vasárnap), 10:00–18:00</li>
+              <li><strong>Belépés:</strong> ingyenes, mindkét napon</li>
+              <li><strong>Kézműves vásár:</strong> 150 vásáros a Fő téren és a Jurisics téren</li>
+              <li><strong>Civil Ízek Utcája:</strong> 40 civil szervezet főz a Diáksétányon</li>
+              <li><strong>Kulturális műsorok:</strong> délutántól a Fő téren és a Jurisics várban</li>
+            </ul>
+            <p className="text-stone-500 pt-1 font-medium">
+              A fesztivál 2009-ben elnyerte a <strong>Jó minősítésű gasztronómiai fesztivál</strong>
+              címet, és a Nyugat-Dunántúl kiemelt rendezvénye.
+            </p>
+          </div>
+
+          {/* Versenyek */}
+          <div className="bg-stone-50 border border-stone-200/80 rounded-md p-4 space-y-2">
+            <div className="flex items-center gap-2 font-bold text-sm text-stone-900">
+              <Trophy className="w-4 h-4 text-amber-800" />
+              <h3>Versenyek és kóstolók</h3>
+            </div>
+            <p>
+              <strong>Civil Főzőverseny</strong> — mindkét napon a Civil Ízek Utcájában,
+              délidőben kóstolóval. A szervezetek a közösségük céljaira gyűjtenek adományokat.
+            </p>
+            <p>
+              <strong>„Kőszegi Csemege"</strong> — szombaton a KÖSZHÁZ-ban (Jurisics vár külső
+              udvar), a Kőszegi Borbarát Hölgyek Egyesülete szervezésében. Nevezés 9:00–11:00,
+              kóstoló 12:30-tól támogatói jegy vásárlásával. Kőszeg és környéke természetes
+              anyagaiból készült édességek, sütemények, pogácsák.
+            </p>
+            <p className="text-stone-500 pt-1 font-medium">
+              <strong>Eredményhirdetés:</strong> mindkét verseny esetében vasárnap 16:00,
+              a belső várudvaron. A zsűriben Wächter Gyuláné, Zamody Gábor és Susánki Erika
+              nemzetközi gasztronómiai versenybírók, valamint Básthy Béla polgármester.
+            </p>
+          </div>
+
           {/* Card 1: Miért Orsolya-nap */}
           <div className="bg-stone-50 border border-stone-200/80 rounded-md p-4 space-y-2">
             <div className="flex items-center gap-2 font-bold text-sm text-stone-900">
@@ -79,6 +140,27 @@ export default function OrsolyaInfoModal({ isOpen, onClose }) {
                 <strong>Közösségi főzés:</strong> Hagyományos szabadtéri civil főzőverseny a Diáksétányon.
               </li>
             </ul>
+          </div>
+
+          {/* Kapcsolat */}
+          <div className="bg-stone-50 border border-stone-200/80 rounded-md p-4 space-y-1.5">
+            <div className="flex items-center gap-2 font-bold text-sm text-stone-900">
+              <Phone className="w-4 h-4 text-amber-800" />
+              <h3>Információ</h3>
+            </div>
+            <p className="font-semibold text-stone-800">
+              Jurisics-vár Művelődési Központ és Várszínház
+            </p>
+            <p className="text-stone-600">9730 Kőszeg, Rajnis utca 9.</p>
+            <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1 font-semibold">
+              <a href="tel:+3694360113" className="text-amber-800 hover:underline">94/360-113</a>
+              <a href="mailto:jurisics@koszeg.hu" className="text-amber-800 hover:underline">jurisics@koszeg.hu</a>
+              <a href="https://www.koszeg.hu" target="_blank" rel="noopener noreferrer" className="text-amber-800 hover:underline">koszeg.hu</a>
+              <a href="https://www.facebook.com/OrsolyaNapiVasar/" target="_blank" rel="noopener noreferrer" className="text-amber-800 hover:underline">facebook</a>
+            </div>
+            <p className="text-stone-500 pt-1 font-medium">
+              Támogató: Kőszeg Város Önkormányzata
+            </p>
           </div>
         </div>
 
