@@ -143,6 +143,18 @@ export const ORSOLYA_GASTRO_CATALOG = [
       { name: 'Töltött káposzta', category: 'meleg_etel', availableDay: 'saturday', tags: ['töltött káposzta', 'magyaros', 'házias'] },
       { name: 'Csülökpörkölt nokedlivel', category: 'meleg_etel', availableDay: 'sunday', tags: ['csülök', 'pörkölt', 'nokedli'] }
     ]
+  },
+  {
+    exhibitorKey: 'hajnalcsillag-neptancegyuttes',
+    exhibitorName: 'Hajnalcsillag Néptáncegyüttes',
+    location: 'Chernel utca',
+    items: [
+      { name: 'Cifra rotyogós', description: 'Vörösboros csülkös sertéslapocka nokedlivel, uborkával', category: 'meleg_etel', availableDay: 'saturday', tags: ['csülök', 'sertéslapocka', 'pörkölt', 'nokedli', 'magyaros', 'házias'] },
+      { name: 'Fordított élvezet', description: 'Fordított lacipecsenye, sült paprika ágyon', category: 'meleg_etel', availableDay: 'sunday', tags: ['lacipecsenye', 'sült paprika', 'húsos', 'magyaros', 'házias'] },
+      { name: 'Házi krémes', category: 'sutemeny', availableDay: 'both', tags: ['krémes', 'sütemény', 'édes', 'házi'] },
+      { name: 'Sós sütemények', category: 'sutemeny', availableDay: 'both', tags: ['sós sütemény', 'pogácsa', 'házi'] },
+      { name: 'Parázson sült padlizsánkrém', category: 'street_food', availableDay: 'both', tags: ['padlizsánkrém', 'parázson sült', 'krém', 'vegetáriánus'] },
+      { name: 'Házi lekvárok', category: 'egyeb', availableDay: 'both', tags: ['lekvár', 'házi', 'kézműves'] }
+    ]
   }
-
 ];

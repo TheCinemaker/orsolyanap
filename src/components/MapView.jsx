@@ -35,8 +35,8 @@ const getShortExhibitorName = (exhibitor) => {
   if (lower.includes('fitt-box') || lower.includes('fitt box')) return 'Fitt-Box';
   if (lower.includes('turisztikai')) return 'KTSZE';
   if (lower.includes('kovács miklós')) return 'Csendes Kovács';
-  if (lower.includes('sütiarcok') || lower.includes('sutiarcok')) return 'Sütiarcok';
   if (lower.includes('tűzoltó') || lower.includes('tuzolto')) return 'Ifj. Tűzoltók';
+  if (lower.includes('hajnalcsillag')) return 'Hajnalcsillag';
 
   if (name.length > 14) {
     const parts = name.split(' ');
