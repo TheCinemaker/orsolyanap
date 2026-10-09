@@ -146,7 +146,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
         {/* Stand Info Badge & Top Voted */}
         {exhibitor && (
           <div className="flex items-center justify-between gap-1.5">
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-800 bg-amber-100/80 px-2.5 py-0.5 rounded-full border border-amber-300/60 inline-flex items-center gap-1 truncate max-w-[70%]">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-amber-800 bg-amber-100/80 px-2.5 py-0.5 rounded-full border border-amber-300/60 inline-flex items-center gap-1 truncate max-w-[70%]">
               <MapPin className="w-2.5 h-2.5 text-amber-700 flex-shrink-0" />
               <span className="truncate">{exhibitor.name}</span>
             </span>
@@ -188,30 +188,30 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
               </span>
             ) : null}
 
-            <span className="text-[9px] font-bold text-stone-500 bg-stone-100 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] font-bold text-stone-500 bg-stone-100 px-1.5 py-0.5 rounded">
               {item.available_day === 'saturday' ? 'Szombat' : item.available_day === 'sunday' ? 'Vasárnap' : 'Mindkét nap'}
             </span>
             {item.is_gluten_free && (
-              <span className="text-[9px] font-extrabold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-200">
+              <span className="text-[10px] font-extrabold text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-200">
                 GM
               </span>
             )}
             {item.is_lactose_free && (
-              <span className="text-[9px] font-extrabold text-cyan-800 bg-cyan-100 px-1.5 py-0.5 rounded border border-cyan-200">
+              <span className="text-[10px] font-extrabold text-cyan-800 bg-cyan-100 px-1.5 py-0.5 rounded border border-cyan-200">
                 LM
               </span>
             )}
           </div>
 
           <div className="flex items-start justify-between gap-2">
-            <h3 className={`font-extrabold text-xs sm:text-sm leading-snug transition-colors ${
+            <h3 className={`font-extrabold text-sm sm:text-base leading-snug transition-colors ${
               item.status === 'sold_out' || item.stock === 0 ? 'text-stone-400 line-through' : 'text-stone-900 group-hover:text-amber-800'
             }`}>
               {item.name}
             </h3>
           </div>
           {item.description && (
-            <p className={`text-[11px] line-clamp-2 leading-relaxed font-medium ${
+            <p className={`text-xs line-clamp-2 leading-relaxed font-medium ${
               item.status === 'sold_out' || item.stock === 0 ? 'text-stone-400' : 'text-stone-500'
             }`}>
               {item.description}
@@ -223,53 +223,58 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
         {item.tags && item.tags.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {item.tags.map((t) => (
-              <span key={t} className="text-[9px] text-stone-500 bg-stone-100 px-1.5 py-0.5 rounded font-semibold">
+              <span key={t} className="text-[10px] text-stone-500 bg-stone-100 px-1.5 py-0.5 rounded font-semibold">
                 #{t}
               </span>
             ))}
           </div>
         )}
 
-        {/* Footer Action Bar: Hol találom, Heart Favorite & Vote Buttons */}
-        <div className="pt-2 border-t border-stone-100 flex items-center justify-between gap-1.5 flex-wrap">
-          <div className="flex items-center gap-1.5">
-            {/* Hol találom? Button */}
-            <button
-              onClick={() => setSelectedLocationModalData({ item, exhibitor })}
-              className="min-h-10 flex items-center gap-1 px-2.5 py-1.5 rounded text-xs font-extrabold bg-stone-100 hover:bg-amber-100 text-stone-800 hover:text-amber-950 border border-stone-200 hover:border-amber-300 transition-all cursor-pointer"
-              title="Stand helyszínének megjelenítése kis térképen"
-            >
-              <MapPin className="w-3.5 h-3.5 text-amber-700 shrink-0" />
-              <span>Hol találom?</span>
-            </button>
+        {/* Művelet-sor: egy sorban, nem tördel.
+            A két ikonos gomb felirat nélkül négyzet -- a "Hol találom?" és a
+            "Kedvenchez" szöveg nem mondott többet, mint az ikon, viszont
+            elvitte a helyet, és a szavazás gomb emiatt a következő sorba
+            csúszott. A szavazatszám marad kiírva: az tényleges információ,
+            nem dísz. */}
+        <div className="pt-2 border-t border-stone-100 flex items-center gap-1.5">
+          {/* Hol találom? */}
+          <button
+            onClick={() => setSelectedLocationModalData({ item, exhibitor })}
+            className="h-9 w-9 shrink-0 flex items-center justify-center rounded bg-stone-100 hover:bg-amber-100 text-stone-700 border border-stone-200 shadow-2xs transition-all cursor-pointer"
+            title="Hol találom? – stand helye a térképen"
+            aria-label="Hol találom? A stand helye a térképen"
+          >
+            <MapPin className="w-4 h-4 text-amber-700" />
+          </button>
 
-            {/* Heart / Favorite Button */}
-            <button
-              onClick={() => toggleFavoriteItem(item.id)}
-              className={`min-h-10 flex items-center gap-1 px-2.5 py-1.5 rounded text-xs font-extrabold transition-all border shadow-2xs cursor-pointer ${
-                isFavItem
-                  ? 'bg-rose-100 text-rose-800 border-rose-300'
-                  : 'bg-stone-50 hover:bg-rose-50 text-stone-600 hover:text-rose-700 border-stone-200'
-              }`}
-              title={isFavItem ? 'Eltávolítás a kedvencekből' : 'Étel hozzáadása a kedvencekhez'}
-            >
-              <Heart className={`w-3.5 h-3.5 ${isFavItem ? 'fill-rose-700 text-rose-700' : 'text-stone-400'}`} />
-              <span>{isFavItem ? 'Kedvenc' : 'Kedvenchez'}</span>
-            </button>
-          </div>
+          {/* Kedvenc */}
+          <button
+            onClick={() => toggleFavoriteItem(item.id)}
+            className={`h-9 w-9 shrink-0 flex items-center justify-center rounded border shadow-2xs transition-all cursor-pointer ${
+              isFavItem
+                ? 'bg-rose-100 text-rose-800 border-rose-300'
+                : 'bg-stone-50 hover:bg-rose-50 text-stone-600 border-stone-200'
+            }`}
+            title={isFavItem ? 'Eltávolítás a kedvencekből' : 'Hozzáadás a kedvencekhez'}
+            aria-label={isFavItem ? 'Eltávolítás a kedvencekből' : 'Hozzáadás a kedvencekhez'}
+            aria-pressed={isFavItem}
+          >
+            <Heart className={`w-4 h-4 ${isFavItem ? 'fill-rose-700 text-rose-700' : 'text-stone-400'}`} />
+          </button>
 
-          {/* Vote Button */}
+          {/* Szavazás -- a maradék helyet kapja */}
           <button
             onClick={() => voteForItem(item.id)}
-            className={`min-h-10 flex items-center gap-1 px-3 py-1.5 rounded text-xs font-extrabold transition-all border shadow-2xs cursor-pointer ${
+            className={`h-9 flex-1 min-w-0 flex items-center justify-center gap-1.5 rounded text-xs font-extrabold border shadow-2xs transition-all cursor-pointer ${
               isVoted
                 ? 'bg-emerald-800 text-white border-emerald-800'
                 : 'bg-amber-100 hover:bg-amber-200 text-amber-900 border-amber-300/80'
             }`}
             title="Szavazok erre az ételre"
+            aria-pressed={isVoted}
           >
-            <ThumbsUp className={`w-3.5 h-3.5 ${isVoted ? 'fill-white' : 'text-amber-800'}`} />
-            <span>{isVoted ? `Szavazva (${item.votes || 1})` : `Szavazok (${item.votes || 0})`}</span>
+            <ThumbsUp className={`w-4 h-4 shrink-0 ${isVoted ? 'fill-white' : 'text-amber-800'}`} />
+            <span className="truncate">{isVoted ? `Szavazva (${item.votes || 1})` : `Szavazok (${item.votes || 0})`}</span>
           </button>
         </div>
       </div>
