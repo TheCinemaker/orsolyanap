@@ -33,8 +33,8 @@ VALUES (
     'both',
     true,
     '„Gyere, kóstold meg a Csillagszemű juhász kedvenceit!”',
-    'Szombaton a főétel mellé egy bojtárkupon is jár, amellyel a látogatók a külső várárokban kiállhatják a 3 próbát.',
-    '/logok/szent-margit-ovoda.jpg'
+    'Szombaton a főétel mellé egy bojtárkupon is jár, amethyllyel a látogatók a külső várárokban kiállhatják a 3 próbát.',
+    'https://qceznytdsqdcodgrgoxd.supabase.co/storage/v1/object/public/logok/szent-margit-ovoda.jpg'
 )
 ON CONFLICT (id) DO UPDATE SET
     name = EXCLUDED.name,
@@ -70,7 +70,7 @@ VALUES
     'meleg_etel',
     'saturday',
     ARRAY['tarhonya', 'pásztor', 'magyaros', 'házias'],
-    '/etelek/pasztortarhonya.png',
+    'https://qceznytdsqdcodgrgoxd.supabase.co/storage/v1/object/public/etelek/pasztortarhonya.png',
     50, 50, 'ready'
 ),
 (
@@ -80,7 +80,7 @@ VALUES
     'meleg_etel',
     'sunday',
     ARRAY['káposzta', 'bab', 'húsos', 'magyaros', 'házias'],
-    '/etelek/baboskaposzta.png',
+    'https://qceznytdsqdcodgrgoxd.supabase.co/storage/v1/object/public/etelek/baboskaposzta.png',
     50, 50, 'ready'
 ),
 (
@@ -90,7 +90,7 @@ VALUES
     'egyeb',
     'both',
     ARRAY['kézműves', 'vásár'],
-    '/etelek/kezmuves.png',
+    'https://qceznytdsqdcodgrgoxd.supabase.co/storage/v1/object/public/etelek/kezmuves.png',
     50, 50, 'ready'
 ),
 (
@@ -100,7 +100,7 @@ VALUES
     'sutemeny',
     'both',
     ARRAY['sütemény', 'édes', 'házi'],
-    '/etelek/sutemeny.png',
+    'https://qceznytdsqdcodgrgoxd.supabase.co/storage/v1/object/public/etelek/sutemeny.png',
     50, 50, 'ready'
 ),
 (
@@ -110,7 +110,7 @@ VALUES
     'egyeb',
     'both',
     ARRAY['játék', 'nyeremény'],
-    '/etelek/zsakbamacska.png',
+    'https://qceznytdsqdcodgrgoxd.supabase.co/storage/v1/object/public/etelek/zsakbamacska.png',
     50, 50, 'ready'
 ),
 (
@@ -120,6 +120,6 @@ VALUES
     'egyeb',
     'both',
     ARRAY['játék', 'felnőtt', 'nyeremény'],
-    '/etelek/18plusz-zsakbamacska.png',
+    'https://qceznytdsqdcodgrgoxd.supabase.co/storage/v1/object/public/etelek/18plusz-zsakbamacska.png',
     50, 50, 'ready'
 );
