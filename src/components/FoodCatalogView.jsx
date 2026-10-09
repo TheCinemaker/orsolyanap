@@ -16,7 +16,6 @@ import {
   Package,
   Sparkles,
   Heart,
-  Search,
   X
 } from 'lucide-react';
 
@@ -325,22 +324,15 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
         </div>
       </div>
 
-      {/* Search and filter controls */}
+        {/* Szűrők.
+            Kereső MÁR NINCS itt: a fejlécben van egy, ugyanerre a
+            searchQuery állapotra kötve, azonnali találati listával. Két
+            egymás alatti kereső ugyanarra a célra csak zavar.
+
+            A SZŰRŐ LOGIKA viszont marad (matchesSearch, feljebb) -- azt
+            hajtja a fejléc keresője. Egy korábbi próbálkozás a logikát is
+            kivette a mezővel együtt, amitől a fejlécből nem szűrt semmi. */}
       <div className="bg-white border border-stone-200/90 rounded-md p-3 sm:p-4 shadow-2xs space-y-3">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
-          <input
-            value={searchQuery || ''}
-            onChange={(e) => setSearchQuery && setSearchQuery(e.target.value)}
-            placeholder="Étel, ital vagy árus keresése..."
-            className="w-full h-10 pl-9 pr-9 rounded-md border border-stone-200 bg-stone-50 text-sm font-medium text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-400"
-          />
-          {searchQuery && (
-            <button onClick={() => setSearchQuery && setSearchQuery('')} className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-stone-400 hover:text-stone-800" title="Keresés törlése">
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
 
         <div className="flex gap-2 overflow-x-auto pb-1">
           <button onClick={() => { setActiveCategory('all'); if (setSelectedCategory) setSelectedCategory('all'); }} className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-extrabold border transition-all ${activeCategory === 'all' ? 'bg-amber-900 text-white border-amber-900' : 'bg-stone-50 text-stone-600 border-stone-200 hover:border-amber-300'}`}>Minden</button>
