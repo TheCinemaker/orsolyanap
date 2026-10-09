@@ -7,7 +7,15 @@ const DAY_LABELS = {
   '2026-10-18': 'Október 18. • Vasárnap'
 };
 
-const LOCATION_ORDER = ['Fő tér', 'Jurisics vár', 'Civil Ízek Utcája – Diáksétány', 'KÖSZHÁZ – Jurisics vár külső udvar'];
+const LOCATION_ORDER = [
+  // Az egész vásárra szóló tételek elöl: ez a keret, amin belül a
+  // színpadi programok zajlanak.
+  'Belváros – Jurisics tér',
+  'Fő tér',
+  'Jurisics vár',
+  'Civil Ízek Utcája – Diáksétány',
+  'KÖSZHÁZ – Jurisics vár külső udvar',
+];
 
 function iconFor(category) {
   if (category === 'gasztro program') return Utensils;
