@@ -23,15 +23,20 @@ export const ORSOLYA_GASTRO_CATALOG = [
     ]
   },
   {
-    exhibitorKey: 'beszedgyogyitas-alapitvany',
-    exhibitorName: 'Dr. Nagy László EGYMI',
-    location: 'Diáksétány',
+    exhibitorKey: 'dr-nagy-laszlo-egymi-szakiskola',
+    exhibitorName: 'Dr. Nagy László EGYMI Szakiskola',
+    location: 'Civil Ízek Utcája, Diáksétány',
+    slogan: 'A Dr. Nagy László EGYMI Szakiskola standján szombaton tárkonyos, tejszínes gombás sertéspörköltet kínálnak galuskával, desszertként pedig palacsintát. Vasárnap a módos gazda babos káposztáját kóstolhatjátok meg szarvaskolbásszal.',
+    image: '/logok/dr-nagy-laszlo-egymi.png',
+    pin: '5731',
     items: [
-      { name: 'Töltött káposzta', category: 'meleg_etel', availableDay: 'saturday', tags: ['káposzta', 'magyaros', 'házias'] },
-      { name: 'Pizza a’la Beszédjavító', category: 'street_food', availableDay: 'saturday', tags: ['pizza'] },
-      { name: 'Házi sütemények', category: 'sutemeny', availableDay: 'both', tags: ['édes', 'házi'] },
-      { name: 'Hentesmester káposztája', category: 'meleg_etel', availableDay: 'sunday', tags: ['káposzta', 'házias'] },
-      { name: 'Lángos', category: 'street_food', availableDay: 'sunday', tags: ['street food', 'magyaros'] }
+      { name: 'Tárkonyos, tejszínes gombás sertéspörkölt galuskával', category: 'meleg_etel', availableDay: 'saturday', tags: ['pörkölt', 'sertés', 'gombás', 'tárkonyos', 'galuska', 'magyaros'], image: '/etelek/egymi-gombas-porkolt.png' },
+      { name: 'Desszert: palacsinta', category: 'sutemeny', availableDay: 'saturday', tags: ['palacsinta', 'desszert', 'édes', 'házi'], image: '/etelek/egymi-palacsinta.png' },
+      { name: 'Módos gazda babos káposztája szarvaskolbásszal', category: 'meleg_etel', availableDay: 'sunday', tags: ['káposzta', 'bab', 'szarvaskolbász', 'magyaros', 'házias'], image: '/etelek/egymi-babos-kaposzta.png' },
+      { name: 'Retro szendvics', category: 'street_food', availableDay: 'both', tags: ['retro', 'szendvics', 'street food'], image: '/etelek/egymi-retro-szendvics.png' },
+      { name: 'Sütemények', category: 'sutemeny', availableDay: 'both', tags: ['sütemény', 'édes', 'házi'], image: '/etelek/egymi-sutemenyek.png' },
+      { name: 'Lekvárok', category: 'egyeb', availableDay: 'both', tags: ['lekvár', 'házi', 'kézműves'], image: '/etelek/egymi-lekvarok.png' },
+      { name: 'Kézműves termékek', category: 'egyeb', availableDay: 'both', tags: ['kézműves', 'vásár'], image: '/etelek/egymi-kezmuves.png' }
     ]
   },
   {
