@@ -143,16 +143,20 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
         key={item.id}
         className="bg-white border border-stone-200/90 rounded-md p-3.5 shadow-2xs hover:border-amber-500/60 transition-all flex flex-col justify-between space-y-2.5 relative group"
       >
-        {/* Stand Info Badge & Top Voted */}
+        {/* Stand neve: teljes szélességű sáv, csak kicsit lekerekítve.
+            A pill alak kicsi, kerek szigetet csinált belőle a kártya tetején;
+            így egy fejléc-sávként olvasódik. A "Kedvenc" jelvény mellé kerül,
+            amikor van -- az ritka (40 szavazat felett), tehát a sáv a legtöbb
+            kártyán tényleg a teljes szélességet kapja. */}
         {exhibitor && (
-          <div className="flex items-center justify-between gap-1.5">
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-amber-800 bg-amber-100/80 px-2.5 py-0.5 rounded-full border border-amber-300/60 inline-flex items-center gap-1 truncate max-w-[70%]">
+          <div className="flex items-center gap-1.5">
+            <span className="flex-1 min-w-0 text-[11px] font-extrabold uppercase tracking-wider text-amber-800 bg-amber-100/80 px-2.5 py-1 rounded border border-amber-300/60 inline-flex items-center gap-1">
               <MapPin className="w-2.5 h-2.5 text-amber-700 flex-shrink-0" />
               <span className="truncate">{exhibitor.name}</span>
             </span>
 
             {isTopVoted && (
-              <span className="text-[9px] font-extrabold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full flex items-center gap-1 border border-amber-300">
+              <span className="shrink-0 text-[10px] font-extrabold text-amber-900 bg-amber-100 px-2 py-1 rounded flex items-center gap-1 border border-amber-300">
                 <Trophy className="w-2.5 h-2.5 text-amber-700" /> Kedvenc
               </span>
             )}
