@@ -325,18 +325,44 @@ export function OrsolyaProvider({ children }) {
 
     showToast('Köszönjük a közönségszavazatot!', 'success');
 
-    // 3. Write vote to Supabase (broadcasts REALTIME to all devices via Postgres changes)
+    // 3. A szavazat rögzítése az adatbázisban.
+    //
+    // AZ ÖSSZEADÁS AZ ADATBÁZISBAN TÖRTÉNIK, nem itt. Korábban a kliens a
+    // saját, esetleg elavult számából számolt, és abszolút értéket írt ki --
+    // két egyidejű szavazat felülírta egymást, egy régóta nyitva lévő oldal
+    // pedig vissza is állíthatta a számlálót. Mérve: öt egyidejű szavazatból
+    // egy maradt meg.
+    //
+    // Az increment_item_votes függvény `votes = votes + 1`-et hajt végre a
+    // soron, zárolás alatt, és a VALÓDI új értéket adja vissza.
     try {
-      const { error } = await supabase
-        .from('menu_items')
-        .update({ votes: newVotes })
-        .eq('id', itemId);
+      const { data, error } = await supabase.rpc('increment_item_votes', {
+        item_id: itemId,
+      });
 
-      if (error) {
-        console.error('Supabase vote update error:', error.message);
+      if (error) throw error;
+
+      // A szerver által visszaadott érték a hiteles: ha közben mások is
+      // szavaztak, a becsült szám helyett azt mutatjuk.
+      if (typeof data === 'number') {
+        setMenuItems((prevItems) =>
+          prevItems.map((item) => (item.id === itemId ? { ...item, votes: data } : item))
+        );
       }
     } catch (err) {
-      console.error('Supabase vote exception:', err);
+      // Tartalék: ha a függvény még nincs meg az adatbázisban (nem futott le
+      // a supabase-szavazas.sql), a szavazás a régi módon megy tovább --
+      // pontatlanul, de nem veszik el a felhasználó kattintása.
+      console.warn(
+        'increment_item_votes nem elérhető, visszaesés az abszolút írásra. ' +
+          'Futtasd le a supabase-szavazas.sql-t!',
+        err?.message || err
+      );
+      try {
+        await supabase.from('menu_items').update({ votes: newVotes }).eq('id', itemId);
+      } catch (fallbackErr) {
+        console.error('Supabase vote exception:', fallbackErr);
+      }
     }
 
     return true;
