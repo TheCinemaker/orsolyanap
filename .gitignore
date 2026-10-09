@@ -32,3 +32,6 @@ KIALLITO_PIN_KODOK.txt
 
 # Kiallitoi logok: a Supabase-be kerulnek, nem a repoba.
 logok/
+
+# Etelfotok: a Supabase-be kerulnek, nem a repoba.
+etelfotok/
