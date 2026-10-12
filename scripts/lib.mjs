@@ -334,10 +334,14 @@ export function metres(a, b) {
  */
 export function freeEstimatedSpot(existing) {
   const pts = existing.filter(Array.isArray);
+  // A racs 3,3 meterenkent ad helyet, es 3,2 meteres tavolsagot ker. Eloszor 6
+  // metert kert, de abbol a setany ket oldalan csak ~20 hely jott ki, es 40
+  // kiallito van: a 21. standtol kezdve nem talalt volna helyet. A satrak 3x3
+  // m-esek es szorosan allnak, szoval 3 meter a valosaghoz kozelebb is van.
   for (const lon of [16.53893, 16.53951]) {
-    for (let lat = 47.38922; lat <= 47.38996; lat += 0.00003) {
+    for (let lat = 47.38918; lat <= 47.39002; lat += 0.00003) {
       const v = Number(lat.toFixed(5));
-      if (pts.every((c) => metres([v, lon], c) > 6)) return [v, lon];
+      if (pts.every((c) => metres([v, lon], c) > 3.2)) return [v, lon];
     }
   }
   return null;
