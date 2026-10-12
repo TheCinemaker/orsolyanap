@@ -44,7 +44,7 @@ export default function ExhibitorDashboard() {
     updateExhibitorProfile,
     addExhibitorTeam,
     postReel,
-    convertFileToBase64,
+    uploadImage,
     isSaturdayActive,
     toggleSaturdayActivation,
     toggleItemHiddenStatus,
@@ -60,8 +60,8 @@ export default function ExhibitorDashboard() {
     const file = e.target.files?.[0];
     if (file) {
       try {
-        const base64 = await convertFileToBase64(file);
-        setReelImage(base64);
+        const url = await uploadImage(file, 'reel');
+        setReelImage(url);
       } catch (err) {
         console.error('File conversion error', err);
       }
@@ -310,7 +310,7 @@ export default function ExhibitorDashboard() {
                   <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
                     const file = e.target.files?.[0];
                     if (file) {
-                      try { setProfileData({ ...profileData, image: await convertFileToBase64(file) }); }
+                      try { setProfileData({ ...profileData, image: await uploadImage(file, 'logo') }); }
                       catch (err) { console.error('Profile image conversion error', err); }
                     }
                   }} />
@@ -1075,7 +1075,7 @@ export default function ExhibitorDashboard() {
                     <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        try { setDishForm({ ...dishForm, image: await convertFileToBase64(file) }); }
+                        try { setDishForm({ ...dishForm, image: await uploadImage(file, 'etel') }); }
                         catch (err) { console.error('Dish image conversion error', err); }
                       }
                     }} />

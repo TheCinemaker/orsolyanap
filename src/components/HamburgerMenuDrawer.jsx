@@ -234,14 +234,8 @@ export default function HamburgerMenuDrawer({
               </span>
             </button>
 
-            <button
-              onClick={() => handleSelectCategory('hideg_etel')}
-              className="w-full flex items-center justify-between px-3.5 py-2 rounded-md text-xs font-semibold text-stone-700 hover:bg-stone-100 transition-all cursor-pointer"
-            >
-              <span className="flex items-center gap-2">
-                <Utensils className="w-3.5 h-3.5 text-stone-700" /> Hideg ételek
-              </span>
-            </button>
+            {/* "Hideg ételek" kivéve: egyetlen étel sem tartozik ide, a menüpont
+                üres listára vitte a látogatót. */}
 
             <button
               onClick={() => handleSelectCategory('sutemeny')}

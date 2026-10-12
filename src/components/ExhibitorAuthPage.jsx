@@ -15,7 +15,7 @@ export default function ExhibitorAuthPage() {
     exhibitors,
     updateExhibitorPin,
     addExhibitorTeam,
-    convertFileToBase64,
+    uploadImage,
     showToast
   } = useOrsolya();
 
@@ -47,8 +47,8 @@ export default function ExhibitorAuthPage() {
     const file = e.target.files?.[0];
     if (file) {
       try {
-        const base64 = await convertFileToBase64(file);
-        setRegForm((prev) => ({ ...prev, image: base64 }));
+        const url = await uploadImage(file, 'logo');
+        setRegForm((prev) => ({ ...prev, image: url }));
         showToast('Csapat fotó feltöltve!', 'success');
       } catch (err) {
         showToast('Hiba a kép feldolgozásakor', 'error');

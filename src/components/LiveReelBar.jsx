@@ -10,7 +10,7 @@ export default function LiveReelBar() {
     activeExhibitor,
     postReel,
     likeReel,
-    convertFileToBase64,
+    uploadImage,
     focusExhibitorOnMap,
     showToast,
     setActiveView,
@@ -39,8 +39,8 @@ export default function LiveReelBar() {
     const file = e.target.files?.[0];
     if (file) {
       try {
-        const base64 = await convertFileToBase64(file);
-        setImageInput(base64);
+        const url = await uploadImage(file, 'reel');
+        setImageInput(url);
         showToast('📸 Fotó kiválasztva!', 'success');
       } catch (err) {
         showToast('Hiba a fotó feldolgozásakor', 'error');

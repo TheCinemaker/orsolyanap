@@ -223,8 +223,11 @@ export default function ReelsGallery() {
               data-index={index}
               className="snap-start snap-always w-full h-[100dvh] relative flex items-center justify-center bg-black overflow-hidden"
             >
-              {/* Elmosott háttér ugyanabból a képből: így az álló fotó mellett
-                  sem fekete sáv van, hanem a kép saját színei. */}
+              {/* A fotó TELJES EGÉSZÉBEN látszik: `object-contain`, tehát semmit
+                  nem vágunk le belőle — egy fekvő kép is egészben van ott.
+                  A képernyő maradékát ugyanaz a kép tölti ki elmosva, nem fekete
+                  sáv: így nincs vágás, és mégsem néz ki félkésznek. Pontosan ezt
+                  csinálja az Instagram is a nem négyzetes képekkel. */}
               <img
                 src={reel.image}
                 alt=""
@@ -237,7 +240,7 @@ export default function ReelsGallery() {
                 alt={reel.caption || reel.exhibitor_name || ''}
                 loading={kozel ? 'eager' : 'lazy'}
                 decoding="async"
-                className="relative w-full h-full object-cover"
+                className="relative w-full h-full object-contain"
               />
 
               <div

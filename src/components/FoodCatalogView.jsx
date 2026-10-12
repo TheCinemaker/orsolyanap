@@ -34,7 +34,6 @@ const SHOW_TAG_FILTER = false;
 
 const CATEGORY_SECTIONS = [
   { id: 'meleg_etel', title: 'Meleg ételek', icon: Flame },
-  { id: 'hideg_etel', title: 'Hideg ételek', icon: Utensils },
   { id: 'sutemeny', title: 'Sütemény / Édesség', icon: Cake },
   { id: 'street_food', title: 'Street Food', icon: Cookie },
   { id: 'italok', title: 'Italok', icon: CupSoda },

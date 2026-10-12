@@ -1020,38 +1020,101 @@ export function OrsolyaProvider({ children }) {
   };
 
   // File to Base64 Image Conversion Helper with automatic Canvas compression (max 800px JPEG)
-  const convertFileToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
+  /**
+   * Feltoltott kep elokeszitese es feltoltese a Storage-ba.
+   *
+   * Ket dolgot old meg egyszerre:
+   *
+   * MINOSEG. Korabban minden kep 800 pixelre zsugorodott, JPEG 0.82-vel. Egy
+   * mai telefon kijelzoje 1080-1290 pixel szeles, tehat a teljes kepernyos
+   * fotofolyamban ez lathatoan mosodott. A reel most 1440 pixel es WebP:
+   * ugyanakkora fajlmeretbol a WebP erezhetoen tobbet hoz ki, mint a JPEG.
+   *
+   * SULY. A kep nem az adatbazis soraban utazik tobbe. A base64 minden
+   * latogatonak lejott minden megnyitaskor, mielott barmit latott volna --
+   * egyetlen 3 MB-os kep egyszer mar tizennegyszeresere hizlalta az indulast.
+   * Storage-bol a kep kulon, lustan, gyorsitotarazva jon.
+   *
+   * Ha a feltoltes nem megy (nincs halozat, nem futott le a
+   * supabase-kepfeltoltes.sql), base64-re esunk vissza: jobb egy nehez kep,
+   * mint egy stand, aki nem tudja menteni a fotojat.
+   */
+  const KEP_BEALLITAS = {
+    reel: { bucket: 'reels', maxDim: 1440, quality: 0.85 },
+    etel: { bucket: 'etelek', maxDim: 1000, quality: 0.84 },
+    logo: { bucket: 'logok', maxDim: 600, quality: 0.84 },
+  };
+
+  /** Atmeretezes es WebP-be tomorites a bongeszoben. */
+  const kepElokeszites = (file, spec) =>
+    new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.readAsDataURL(file);
+      reader.onerror = reject;
       reader.onload = (e) => {
         const img = new Image();
-        img.src = e.target.result;
+        img.onerror = () => reject(new Error('A kep nem olvashato.'));
         img.onload = () => {
-          const maxDim = 800;
           let w = img.width;
           let h = img.height;
-          if (w > maxDim || h > maxDim) {
-            if (w > h) {
-              h = Math.round((h * maxDim) / w);
-              w = maxDim;
-            } else {
-              w = Math.round((w * maxDim) / h);
-              h = maxDim;
-            }
+          // Csak kicsinyitunk. Egy kis kepet felnagyitani nem javit rajta,
+          // csak nagyobb fajlt csinal belole.
+          if (w > spec.maxDim || h > spec.maxDim) {
+            const arany = spec.maxDim / Math.max(w, h);
+            w = Math.round(w * arany);
+            h = Math.round(h * arany);
           }
           const canvas = document.createElement('canvas');
           canvas.width = w;
           canvas.height = h;
           const ctx = canvas.getContext('2d');
+          // Jobb minosegu atmeretezes: enelkul a lekicsinyites recesre huzza
+          // a reszleteket.
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
           ctx.drawImage(img, 0, 0, w, h);
-          resolve(canvas.toDataURL('image/jpeg', 0.82));
+          canvas.toBlob(
+            (blob) => (blob ? resolve(blob) : reject(new Error('A tomorites nem sikerult.'))),
+            'image/webp',
+            spec.quality
+          );
         };
-        img.onerror = () => resolve(e.target.result);
+        img.src = e.target.result;
       };
-      reader.onerror = (error) => reject(error);
+      reader.readAsDataURL(file);
     });
+
+  const blobBase64 = (blob) =>
+    new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result);
+      r.onerror = reject;
+      r.readAsDataURL(blob);
+    });
+
+  const uploadImage = async (file, kind = 'etel') => {
+    const spec = KEP_BEALLITAS[kind] || KEP_BEALLITAS.etel;
+    const blob = await kepElokeszites(file, spec);
+
+    if (!isSupabaseConfigured) return blobBase64(blob);
+
+    try {
+      // A `feltoltes/` mappa szandekos: a bongeszo csak ide irhat, igy egy
+      // kitalalt nevvel nem lehet felulirni egy stand logojat vagy egy etel
+      // fotojat.
+      const nev = `feltoltes/${Date.now()}-${Math.random().toString(36).slice(2, 10)}.webp`;
+      const { error } = await supabase.storage
+        .from(spec.bucket)
+        .upload(nev, blob, { contentType: 'image/webp', upsert: false });
+      if (error) throw error;
+      const { data } = supabase.storage.from(spec.bucket).getPublicUrl(nev);
+      if (!data?.publicUrl) throw new Error('Nincs publikus URL.');
+      return data.publicUrl;
+    } catch (err) {
+      console.warn('Storage feltoltes nem sikerult, base64-re esunk vissza:', err?.message || err);
+      return blobBase64(blob);
+    }
   };
+
 
   // Post a new live Reel / Story (by Exhibitor OR Visitor)
   const postReel = async (caption, image, customName = null, exhibitorId = null) => {
@@ -1170,7 +1233,7 @@ export function OrsolyaProvider({ children }) {
         events,
         postReel,
         likeReel,
-        convertFileToBase64,
+        uploadImage,
         favoriteExhibitorIds,
         addFavoriteExhibitor,
         toggleFavoriteExhibitor,
