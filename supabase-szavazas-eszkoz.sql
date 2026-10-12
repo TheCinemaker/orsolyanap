@@ -184,6 +184,41 @@ begin
 end $$;
 
 -- ---------------------------------------------------------------------------
+--  3c. A valodi allas kiolvasasa
+--
+--  A szervezoi nezetnek a NAPLOBOL kell olvasnia, nem a menu_items.votes
+--  oszlopbol: azt a standok szerkeszto felulete is irhatja az anon kulccsal.
+--
+--  Ezek a fuggvenyek az anon szerepnek is meg vannak adva, es ez szandekos: a
+--  szavazatszamok amugy is lathatoak minden etelkartyan, tehat nem titok. A
+--  keszulekazonositok maradnak zarva -- csak darabszam megy ki, soha nem az,
+--  hogy melyik keszulek mire szavazott.
+-- ---------------------------------------------------------------------------
+create or replace function vote_standings()
+returns table (item_id text, votes bigint)
+language sql
+security definer
+set search_path = public
+as $$
+  select item_id, count(*)::bigint from item_votes group by item_id;
+$$;
+
+create or replace function vote_totals()
+returns json
+language sql
+security definer
+set search_path = public
+as $$
+  select json_build_object(
+    'votes',   (select count(*) from item_votes),
+    'devices', (select count(distinct device_id) from item_votes)
+  );
+$$;
+
+grant execute on function vote_standings() to anon, authenticated;
+grant execute on function vote_totals()    to anon, authenticated;
+
+-- ---------------------------------------------------------------------------
 --  4. Újraszámolás a naplóból
 --
 --  A menu_items.votes oszlopot a standok szerkesztő felülete is írhatja az

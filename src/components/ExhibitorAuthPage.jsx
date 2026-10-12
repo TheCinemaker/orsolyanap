@@ -3,6 +3,7 @@ import { useOrsolya } from '../context/OrsolyaContext';
 import VisitKoszegLogo from './VisitKoszegLogo';
 import { Key, ArrowRight, ArrowLeft, ShieldCheck, Copy, Check, Plus, X, Lock, Store, Utensils, Calendar } from 'lucide-react';
 import { useScrollLock } from '../hooks/useScrollLock';
+import SzavazasPanel from './ExhibitorAdmin/SzavazasPanel';
 
 export default function ExhibitorAuthPage() {
   const {
@@ -429,6 +430,10 @@ export default function ExhibitorAuthPage() {
                 <span>Új Csapat</span>
               </button>
             </div>
+
+            {/* A szavazás állása a PIN-jegyzék ELŐTT: a rendezvény alatt ez az,
+                amit a szervező folyamatosan néz, a PIN-eket meg keresi, ha kell. */}
+            <SzavazasPanel />
 
             {exhibitors.length === 0 ? (
               <div className="p-6 text-center text-stone-500 bg-stone-50 rounded-md">
