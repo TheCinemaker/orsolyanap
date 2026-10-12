@@ -747,11 +747,15 @@ export function OrsolyaProvider({ children }) {
     );
   };
 
-  // Save/Add menu item dynamically (with Allergen flags, Available day, Hidden mode, and optional Price)
+  // Étel mentése / felvétele (allergén jelölések, nap, rejtett mód).
+  //
+  // ÁR NINCS: a vásáron nem értékesítés folyik, hanem adománygyűjtés, ezért
+  // árat sehol nem tartunk nyilván. A menu_items táblában nincs is price
+  // oszlop -- ha a payload mégis tartalmazza, a Supabase PGRST204 hibával
+  // elutasítja az egész mentést, és a standos nem tud ételt szerkeszteni.
   const saveMenuItem = async (itemData) => {
     const formattedItem = {
       ...itemData,
-      price: itemData.price !== undefined ? itemData.price : '',
       is_gluten_free: !!itemData.is_gluten_free,
       is_lactose_free: !!itemData.is_lactose_free,
       is_sugar_free: !!itemData.is_sugar_free,
@@ -771,8 +775,7 @@ export function OrsolyaProvider({ children }) {
           description: formattedItem.description || '',
           initial_stock: Number(formattedItem.initial_stock) || 30,
           category: formattedItem.category,
-          price: formattedItem.price || null,
-          tags: formattedItem.tags || [],
+            tags: formattedItem.tags || [],
           available_day: formattedItem.available_day,
           is_gluten_free: formattedItem.is_gluten_free,
           is_lactose_free: formattedItem.is_lactose_free,
@@ -829,7 +832,6 @@ export function OrsolyaProvider({ children }) {
           status: newItem.status,
           votes: 0,
           category: newItem.category || 'meleg_etel',
-          price: newItem.price || null,
           available_day: newItem.available_day || 'both',
           is_gluten_free: newItem.is_gluten_free,
           is_lactose_free: newItem.is_lactose_free,
@@ -1046,16 +1048,6 @@ export function OrsolyaProvider({ children }) {
   );
 }
 
-export const formatPrice = (price) => {
-  if (price === undefined || price === null || String(price).trim() === '') {
-    return 'Adományos';
-  }
-  const pStr = String(price).trim();
-  if (pStr === '0' || pStr.toLowerCase() === 'ingyenes') return 'Ingyenes / Adományos';
-  if (!isNaN(Number(pStr))) return `${Number(pStr).toLocaleString('hu-HU')} Ft`;
-  if (pStr.toLowerCase().includes('ft')) return pStr;
-  return `${pStr} Ft`;
-};
 
 export function useOrsolya() {
   const context = useContext(OrsolyaContext);
