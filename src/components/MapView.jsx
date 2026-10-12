@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { MapPin, ArrowRight, Compass, Heart, Navigation, Car } from 'lucide-react';
+import { MapPin, ArrowRight, Heart, Navigation, Car } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
@@ -37,39 +37,21 @@ const CRAFT_MARKET_AREA = [
 /** A parkolo-nezethez: a fesztival ES a parkolok egyszerre latszodjanak. */
 const PARKING_LOTS = poisOfKind('parkolo');
 
-const getShortExhibitorName = (exhibitor) => {
-  if (!exhibitor || !exhibitor.name) return '';
-  if (exhibitor.short_name) return exhibitor.short_name;
-
-  const name = exhibitor.name.trim();
-  const lower = name.toLowerCase();
-
-  if (lower.includes('fitt-box') || lower.includes('fitt box')) return 'Fitt-Box';
-  if (lower.includes('turisztikai')) return 'KTSZE';
-  if (lower.includes('kovács miklós')) return 'Csendes Kovács';
-  if (lower.includes('tűzoltó') || lower.includes('tuzolto')) return 'Ifj. Tűzoltók';
-  if (lower.includes('hajnalcsillag')) return 'Hajnalcsillag';
-  if (lower.includes('szent margit') || lower.includes('margit óvoda')) return 'Szt. Margit Óvoda';
-  // A sorrend szamit: a 'szakiskola' teszt a general 'egymi' ELOTT all,
-  // kulonben mindkét EGYMI stand ugyanazt a feliratot kapna a terkepen.
-  if (lower.includes('szakiskola')) return 'EGYMI Szakiskola';
-  if (lower.includes('egymi')) return 'EGYMI';
-  // A pinen rovid felirat kell: a teljes nevek 27-55 karakteresek, azok
-  // egymasra csusznanak a terkepen.
-  if (lower.includes('fúvószenekar') || lower.includes('fuvoszenekar')) return 'Fúvószenekar';
-  if (lower.includes('kőszegfalvi') || lower.includes('koszegfalvi')) return 'Kőszegfalvi Óvoda';
-  if (lower.includes('meseváros') || lower.includes('felsővárosi')) return 'Felsővárosi Óvoda';
-  if (lower.includes('borbarát') || lower.includes('borbarat')) return 'Borbarát Hölgyek';
-  if (lower.includes('tézsula') || lower.includes('tezsula')) return 'Tézsula';
-  if (lower.includes('nagycsaládosok') || lower.includes('nagycsaladosok')) return 'NOE Kőszeg';
-
-  if (name.length > 14) {
-    const parts = name.split(' ');
-    if (parts.length > 1) {
-      return `${parts[0]} ${parts[1].charAt(0)}.`;
-    }
-  }
-  return name;
+/**
+ * Stand-sorszámok.
+ *
+ * Harmincnyolc sátor áll egymás mellett 3 méterre: a nevek — még rövidítve is
+ * — egymásra csúsztak a térképen. Egy szám elfér egy apropó pinben, a nevet
+ * pedig a térkép alatti jegyzékben olvassa a látogató.
+ *
+ * A számozás NÉV SZERINTI és nem a sétány mentén futó: a gyakoribb kérdés az,
+ * hogy egy ismert csapat hol van, nem az, hogy ez itt melyik sátor — arra ott a
+ * koppintás. Név szerint a jegyzék átfutható, és ugyanez a számozás mehet a
+ * helyszíni táblára is.
+ */
+const numberExhibitors = (exhibitors) => {
+  const sorted = [...exhibitors].sort((a, b) => (a.name || '').localeCompare(b.name || '', 'hu'));
+  return new Map(sorted.map((x, i) => [x.id, i + 1]));
 };
 
 export default function MapView() {
@@ -119,6 +101,8 @@ export default function MapView() {
       }
     }
   }, [focusedExhibitorIdOnMap, exhibitors]);
+
+  const numbers = useMemo(() => numberExhibitors(exhibitors), [exhibitors]);
 
   const selectedExhibitor = exhibitors.find((ex) => ex.id === selectedExhibitorId);
   const selectedItems = menuItems.filter((i) => i.exhibitor_id === selectedExhibitorId);
@@ -221,12 +205,12 @@ export default function MapView() {
         ? 'bg-rose-800 text-white font-extrabold border-rose-900 shadow-2xs hover:bg-rose-700'
         : 'bg-amber-800 text-amber-50 font-bold border-amber-900 shadow-2xs hover:bg-amber-700';
 
-      const shortName = getShortExhibitorName(ex);
+      const num = numbers.get(ex.id) ?? '?';
 
       const customHtml = `
         <div class="relative group cursor-pointer">
-          <div class="px-1.5 py-0.5 rounded-xs ${pinBg} text-[10px] flex items-center justify-center border border-white whitespace-nowrap tracking-tight">
-            <span>${shortName}</span>
+          <div class="w-6 h-6 rounded-full ${pinBg} text-[11px] flex items-center justify-center border-2 border-white leading-none" title="${ex.name.replace(/"/g, '&quot;')}">
+            <span>${num}</span>
           </div>
         </div>
       `;
@@ -234,8 +218,8 @@ export default function MapView() {
       const icon = L.divIcon({
         html: customHtml,
         className: 'custom-leaflet-pin',
-        iconSize: [90, 24],
-        iconAnchor: [45, 12]
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
       });
 
       const marker = L.marker(ex.coordinates, { icon }).addTo(map);
@@ -261,7 +245,7 @@ export default function MapView() {
       });
       userMarkerRef.current = L.marker(userLocation, { icon: userIcon }).addTo(map);
     }
-  }, [exhibitors, selectedExhibitorId, favoriteExhibitorIds, userLocation, showPois]);
+  }, [exhibitors, selectedExhibitorId, favoriteExhibitorIds, userLocation, showPois, numbers]);
 
   // Handle Geolocation tracking & re-centering
   const handleGetLocation = () => {
@@ -329,7 +313,7 @@ export default function MapView() {
               <option value="" disabled>-- Válassz kiállítót a megtekintéshez --</option>
               {exhibitors.map((ex) => (
                 <option key={ex.id} value={ex.id}>
-                  {ex.name} ({getShortExhibitorName(ex)})
+                  {numbers.get(ex.id)}. {ex.name}
                 </option>
               ))}
             </select>
@@ -380,7 +364,7 @@ export default function MapView() {
           <div className="absolute bottom-3 left-3 z-[1000] bg-white/95 backdrop-blur-md px-3 py-2 rounded-md border border-stone-200 shadow-md text-[11px] space-y-1">
             <span className="font-extrabold text-stone-900 block flex items-center gap-1">
               <span className="w-2.5 h-2.5 rounded-full bg-amber-700 inline-block border border-amber-900"></span>
-              Diáksétány Fesztiválterület
+              Diáksétány — számozott standok
             </span>
               <span className="font-bold text-amber-900 block flex items-center gap-1 mt-0.5">
                 <span className="w-2.5 h-2.5 rounded-sm bg-amber-500/40 inline-block border border-amber-800"></span>
@@ -397,6 +381,41 @@ export default function MapView() {
               {showPois ? `${POINTS_OF_INTEREST.length} helyszín megjelölve` : 'Helyszínek elrejtve'}
             </span>
           </div>
+        </div>
+
+        {/* Standjegyzék. A térképen csak szám fér el, a név itt van — és innen
+            egy koppintással a térkép is rááll. */}
+        <div className="bg-stone-50 border border-stone-200/80 rounded-md p-3 sm:p-4">
+          <h3 className="text-xs font-bold text-stone-500 uppercase tracking-wider mb-2">
+            Standjegyzék ({exhibitors.length})
+          </h3>
+          <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-0.5">
+            {[...exhibitors]
+              .sort((a, b) => (numbers.get(a.id) || 0) - (numbers.get(b.id) || 0))
+              .map((ex) => {
+                const kivalasztott = ex.id === selectedExhibitorId;
+                const kedvenc = favoriteExhibitorIds.includes(ex.id);
+                return (
+                  <li key={ex.id}>
+                    <button
+                      onClick={() => handleSelectExhibitorChange(ex.id)}
+                      className={`w-full text-left flex items-baseline gap-1.5 py-1 px-1 rounded transition-colors cursor-pointer ${
+                        kivalasztott ? 'bg-amber-100' : 'hover:bg-white'
+                      }`}
+                    >
+                      <span
+                        className={`shrink-0 w-5 text-right text-[11px] font-black ${
+                          kedvenc ? 'text-rose-700' : 'text-amber-800'
+                        }`}
+                      >
+                        {numbers.get(ex.id)}.
+                      </span>
+                      <span className="text-xs font-bold text-stone-800 leading-snug">{ex.name}</span>
+                    </button>
+                  </li>
+                );
+              })}
+          </ol>
         </div>
 
         {/* Selected Exhibitor Preview Box */}
