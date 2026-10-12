@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { X, Heart, MapPin, ChevronDown, Share2 } from 'lucide-react';
+import { X, Heart, MapPin, ChevronDown, Share2, ArrowUp } from 'lucide-react';
 import { useScrollLock } from '../hooks/useScrollLock';
 
 /**
@@ -48,6 +48,18 @@ export default function ReelsGallery() {
   const ABLAK = 2;
 
   const [activeIndex, setActiveIndex] = useState(0);
+
+  /* A megjelenített sorrendet a folyám MAGÁNAK tartja nyilván, id-k listáján.
+     Közben érkező új fotó a közös listában előre kerül -- ha ezt átvennénk,
+     a tartalom elcsúszna a vendég ujja alatt, és hirtelen más képet nézne,
+     mint az előbb. Az új fotók ezért várakoznak, amíg rá nem koppint. */
+  const [sorrend, setSorrend] = useState(() => reels.map((r) => r.id));
+  const [varakozo, setVarakozo] = useState([]);
+
+  /* A kirajzolt lista: saját sorrend, de MINDIG a friss adattal. Így a
+     kedvelések száma élőben változik anélkül, hogy a sorrend megmozdulna. */
+  const reelById = new Map(reels.map((r) => [r.id, r]));
+  const lista = sorrend.map((id) => reelById.get(id)).filter(Boolean);
   /** Hol és melyik fotón pattanjon fel a szív. */
   const [burst, setBurst] = useState(null);
   const [expandedId, setExpandedId] = useState(null);
@@ -57,16 +69,46 @@ export default function ReelsGallery() {
 
   useScrollLock(true);
 
+  useEffect(() => {
+    if (reels.length === 0) return;
+    // Első betöltés: amit kapunk, az a sorrend.
+    if (sorrend.length === 0) {
+      setSorrend(reels.map((r) => r.id));
+      return;
+    }
+    const ismert = new Set(sorrend);
+    const ujak = reels.filter((r) => !ismert.has(r.id));
+    if (ujak.length === 0) return;
+
+    // A lapozásból jövők a lista VÉGÉRE kerülnek, tehát a vendég alatt —
+    // azokat nyugodtan hozzáfűzhetjük, nem mozdítanak el semmit.
+    const utolsoIdx = reels.findIndex((r) => r.id === sorrend[sorrend.length - 1]);
+    const alulrol = utolsoIdx >= 0 ? reels.slice(utolsoIdx + 1).map((r) => r.id) : [];
+    const alulrolSet = new Set(alulrol);
+    const felulrol = ujak.filter((r) => !alulrolSet.has(r.id)).map((r) => r.id);
+
+    if (alulrol.length) setSorrend((elozo) => [...elozo, ...alulrol.filter((id) => !new Set(elozo).has(id))]);
+    if (felulrol.length) setVarakozo((elozo) => [...new Set([...elozo, ...felulrol])]);
+  }, [reels]);
+
+  /** Az új fotók bevállalása: innentől a friss sorrend érvényes. */
+  const ujakatMutat = () => {
+    setSorrend(reels.map((r) => r.id));
+    setVarakozo([]);
+    setActiveIndex(0);
+    scrollerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   /* Arra a fotóra állítunk, amire a vendég a sávban koppintott. Ugrással,
      nem görgetéssel: a feed nem futhat végig előtte tizenöt képen. */
   useEffect(() => {
-    if (!reelStartId || reels.length === 0) return;
-    const i = reels.findIndex((r) => r.id === reelStartId);
+    if (!reelStartId || lista.length === 0) return;
+    const i = lista.findIndex((r) => r.id === reelStartId);
     if (i < 0) return;
     setActiveIndex(i);
     const el = scrollerRef.current?.querySelector(`[data-index="${i}"]`);
     if (el) el.scrollIntoView({ block: 'start', behavior: 'instant' });
-  }, [reelStartId, reels.length]);
+  }, [reelStartId, lista.length]);
 
   /* Melyik fotó van épp a képernyőn. Ebből tudjuk, mit kell előretölteni.
      Figyelő, nem görgetés-számolás: az utóbbi minden eszközön máshogy
@@ -87,7 +129,7 @@ export default function ReelsGallery() {
     );
     root.querySelectorAll('[data-index]').forEach((el) => megfigyelo.observe(el));
     return () => megfigyelo.disconnect();
-  }, [reels.length]);
+  }, [lista.length]);
 
   /* A kedvelés valtó: második koppintásra visszavonja. Az adatbázis tartja
      nyilván, melyik készülék melyik reelt kedvelte, tehát egy oldalfrissítés
@@ -97,9 +139,9 @@ export default function ReelsGallery() {
   /* Utántöltés. Három fotóval a vége előtt szólunk, hogy mire a vendég
      odaerül, már ott legyen a folytatás — így nem áll meg a görgetés. */
   useEffect(() => {
-    if (reels.length === 0) return;
-    if (activeIndex >= reels.length - 3) loadMoreReels();
-  }, [activeIndex, reels.length]);
+    if (lista.length === 0) return;
+    if (activeIndex >= lista.length - 3) loadMoreReels();
+  }, [activeIndex, lista.length]);
 
   /* Dupla koppintás kézzel. A két koppintás között 300 ms-ot engedünk, és
      csak akkor fogadjuk el, ha a két érintés egymáshoz közel esett -- így a
@@ -160,9 +202,9 @@ export default function ReelsGallery() {
       <div className="absolute top-0 left-0 right-0 p-4 z-50 flex items-center justify-between bg-gradient-to-b from-black/80 to-transparent pointer-events-none">
         <h2 className="text-sm font-black tracking-widest text-white drop-shadow-md">
           FOTÓK
-          {reels.length > 0 && (
+          {lista.length > 0 && (
             <span className="ml-2 font-bold text-white/70">
-              {activeIndex + 1}/{reels.length}
+              {activeIndex + 1}/{lista.length}
               {hasMoreReels && '+'}
             </span>
           )}
@@ -183,19 +225,31 @@ export default function ReelsGallery() {
         ref={scrollerRef}
         className="flex-1 overflow-y-auto snap-y snap-mandatory scrollbar-none h-full w-full bg-stone-950 overscroll-contain"
       >
-        {reels.length > 0 && loadingMoreReels && (
+        {/* Új fotók pirula. Nem rendezzük át a folyámot magunktól — a vendég
+            dönti el, mikor ugrik az elejére. Ugyanez a szokás az Instagramon. */}
+        {varakozo.length > 0 && (
+          <button
+            onClick={ujakatMutat}
+            className="absolute top-14 left-1/2 -translate-x-1/2 z-50 bg-white text-stone-900 px-4 py-1.5 rounded-full text-xs font-black shadow-xl flex items-center gap-1.5 active:scale-95 transition-transform cursor-pointer"
+          >
+            <ArrowUp className="w-3.5 h-3.5" strokeWidth={3} />
+            {varakozo.length} új fotó
+          </button>
+        )}
+
+        {lista.length > 0 && loadingMoreReels && (
           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-40 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-white/80 pointer-events-none">
             További fotók betöltése…
           </div>
         )}
 
-        {reels.length === 0 && (
+        {lista.length === 0 && (
           <div className="flex items-center justify-center h-full text-white/50 text-sm font-bold">
             Még nincsenek fotók.
           </div>
         )}
 
-        {reels.map((reel, index) => {
+        {lista.map((reel, index) => {
           const exhibitor = exhibitors.find((e) => e.id === reel.exhibitor_id);
           const isLiked = likedReelIds.includes(reel.id);
           // A szomszédos fotók azonnal, a tobbi lustan: igy a kovetkezo
@@ -345,7 +399,7 @@ export default function ReelsGallery() {
                   )}
                 </div>
 
-                {index < reels.length - 1 && (
+                {index < lista.length - 1 && (
                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 animate-bounce opacity-60 pointer-events-none">
                     <ChevronDown className="w-6 h-6 text-white drop-shadow-md" />
                   </div>
