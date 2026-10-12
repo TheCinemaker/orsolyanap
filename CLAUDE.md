@@ -194,10 +194,18 @@ A `description` nullable, és a legtöbb ételnek nincs leírása — egy nyers
 `.toLowerCase()` az első leütött karakternél elhasalt és magával vitte az
 egész nézetet.
 
-**Szavazás.** Az összeadás az adatbázisban történik, az
-`increment_item_votes(item_id)` függvénnyel. Soha ne írj abszolút
-`votes` értéket: két egyidejű szavazat felülírná egymást. Mérve: öt
-szavazatból négy elveszett.
+**Szavazás.** Egy készülék egy ételre egyszer. Mindent a
+`vote_for_item(p_item_id, p_device_id)` függvény végez: naplóba ír
+(`item_votes`), és az adatbázis zárja ki a második szavazatot — nem a kliens
+jóindulata. A készülékazonosító a `src/lib/eszkoz.js`-ben készül.
+
+Soha ne írj abszolút `votes` értéket és ne készíts tartalék útvonalat a
+függvény megkerülésére: két egyidejű szavazat felülírná egymást (mérve: ötből
+négy elveszett), és a készülékenkénti korlát is kiesne. A régi
+`increment_item_votes` már nem hívható a böngészőből, pont ezért.
+
+A `menu_items.votes` oszlop csak **gyorsítótár** a naplón. Ha elcsúszik, a
+`recount_votes()` (csak service_role) visszaállítja a valódi állást.
 
 **Modálok.** Minden `fixed inset-0` réteg hívja a `useScrollLock`-ot, a
 komponens korai `return null`-ja **előtt**, különben feltételes hook lesz.

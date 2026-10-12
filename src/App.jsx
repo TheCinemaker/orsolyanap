@@ -26,7 +26,8 @@ import {
   Package,
   Loader2,
   Shuffle,
-  ArrowDownAZ
+  ArrowDownAZ,
+  Eye
 } from 'lucide-react';
 import './App.css';
 
@@ -42,7 +43,8 @@ function MainApp() {
     searchQuery,
     setSearchQuery,
     navigateToFoodCatalog,
-    navigateToStandFeed
+    navigateToStandFeed,
+    visitStats
   } = useOrsolya();
 
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -340,6 +342,18 @@ function MainApp() {
             <span className="font-medium text-stone-500 text-[11px]">
               © 2026 • Civil Ízek Utcája • Orsolya-Napi Vásár
             </span>
+            {/* Látogatásszámláló. Két szám, mert együtt mondanak valamit: 4000
+                megnyitás 300 készülékről más, mint 4000 megnyitás 3500-ról.
+                Csak akkor látszik, ha a szerver válaszolt -- egy "0 megnyitás"
+                felirat rosszabb a semminél. */}
+            {visitStats && (
+              <span className="font-bold text-stone-500 text-[11px] inline-flex items-center gap-1.5">
+                <Eye className="w-3 h-3 text-amber-700" />
+                {visitStats.opens?.toLocaleString('hu-HU')} megnyitás
+                <span className="text-stone-300">•</span>
+                {visitStats.devices?.toLocaleString('hu-HU')} készülék
+              </span>
+            )}
           </div>
 
           <div className="text-[10px] text-stone-400 font-medium pt-0.5">

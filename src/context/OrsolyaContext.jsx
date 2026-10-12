@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { INITIAL_EXHIBITORS, INITIAL_MENU_ITEMS } from '../data/mockOrsolyaData';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
+import { deviceId } from '../lib/eszkoz';
 
 /**
  * Szervezői PIN kód.
@@ -48,6 +49,8 @@ export function OrsolyaProvider({ children }) {
 
   // Public Voting system: voted item IDs persisted in LocalStorage
   const [votedItemIds, setVotedItemIds] = useState([]);
+  // Hányszor nyílt meg az app, és hány különböző készülékről.
+  const [visitStats, setVisitStats] = useState(null);
 
   // Global Visitor Filter States (Day & Dietary Preferences)
   const [selectedDay, setSelectedDay] = useState('all'); // 'all' | 'saturday' | 'sunday'
@@ -316,6 +319,41 @@ export function OrsolyaProvider({ children }) {
     localStorage.setItem('orsolya_voted_item_ids', JSON.stringify(votedItemIds));
   }, [votedItemIds]);
 
+  /* Megnyitás rögzítése és a már leadott szavazatok visszaolvasása.
+     Egyszer fut, az app betöltésekor.
+
+     A szavazatokat a szerverről kérdezzük, nem csak a böngésző tárolójából:
+     így a gomb egy tároló-törlés vagy másik lapfül után is "Szavazva"
+     állapotban marad, és nem kínal fel egy második szavazatot, amit az
+     adatbázis amúgy is visszautasítana. */
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+    let eldobva = false;
+
+    (async () => {
+      try {
+        const { data } = await supabase.rpc('register_visit', { p_device_id: deviceId() });
+        if (!eldobva && data) setVisitStats({ opens: data.opens, devices: data.devices });
+      } catch (err) {
+        // A számláló soha ne akadályozza az app használatát.
+        console.warn('register_visit nem elérhető:', err?.message || err);
+      }
+
+      try {
+        const { data } = await supabase.rpc('votes_by_device', { p_device_id: deviceId() });
+        if (!eldobva && Array.isArray(data) && data.length > 0) {
+          setVotedItemIds((prev) => [...new Set([...prev, ...data])]);
+        }
+      } catch (err) {
+        console.warn('votes_by_device nem elérhető:', err?.message || err);
+      }
+    })();
+
+    return () => {
+      eldobva = true;
+    };
+  }, []);
+
   // Focus exhibitor on map
   const focusExhibitorOnMap = (exhibitorId) => {
     setFocusedExhibitorIdOnMap(exhibitorId);
@@ -334,62 +372,62 @@ export function OrsolyaProvider({ children }) {
       return false;
     }
 
-    // 1. Mark device as voted in LocalStorage
+    // 1. A gomb azonnal átvált, hogy ne lehessen többször rákoppintani,
+    //    amíg a kérés út van.
     setVotedItemIds((prev) => [...prev, itemId]);
 
-    // 2. Optimistic UI update
     const targetItem = menuItems.find((i) => i.id === itemId);
-    const newVotes = (targetItem?.votes || 0) + 1;
-
     setMenuItems((prevItems) =>
-      prevItems.map((item) => {
-        if (item.id === itemId) {
-          return { ...item, votes: newVotes };
-        }
-        return item;
-      })
+      prevItems.map((item) =>
+        item.id === itemId ? { ...item, votes: (targetItem?.votes || 0) + 1 } : item
+      )
     );
 
-    showToast('Köszönjük a közönségszavazatot!', 'success');
-
-    // 3. A szavazat rögzítése az adatbázisban.
+    // 2. A szavazat rögzítése.
     //
-    // AZ ÖSSZEADÁS AZ ADATBÁZISBAN TÖRTÉNIK, nem itt. Korábban a kliens a
-    // saját, esetleg elavult számából számolt, és abszolút értéket írt ki --
-    // két egyidejű szavazat felülírta egymást, egy régóta nyitva lévő oldal
-    // pedig vissza is állíthatta a számlálót. Mérve: öt egyidejű szavazatból
-    // egy maradt meg.
+    // AZ ÖSSZEADÁS ÉS A KORLÁTOZÁS IS AZ ADATBÁZISBAN TÖRTÉNIK.
     //
-    // Az increment_item_votes függvény `votes = votes + 1`-et hajt végre a
-    // soron, zárolás alatt, és a VALÓDI új értéket adja vissza.
+    // Korábban a "már szavaztam" csak a böngésző tárolójában élt, tehát a
+    // szerver mindent elfogadott: egy oldalfrissítés után újra lehetett
+    // szavazni ugyanarra az ételre. A vote_for_item függvény naplóba írja a
+    // készülék és az étel párosát, és a második próbálkozást az adatbázis
+    // zárja ki, nem a kliens jóindulata.
     try {
-      const { data, error } = await supabase.rpc('increment_item_votes', {
-        item_id: itemId,
+      const { data, error } = await supabase.rpc('vote_for_item', {
+        p_item_id: itemId,
+        p_device_id: deviceId(),
       });
 
       if (error) throw error;
 
-      // A szerver által visszaadott érték a hiteles: ha közben mások is
-      // szavaztak, a becsült szám helyett azt mutatjuk.
-      if (typeof data === 'number') {
+      // A szerver száma a hiteles: ha közben mások is szavaztak, azt mutatjuk.
+      if (data && typeof data.votes === 'number') {
         setMenuItems((prevItems) =>
-          prevItems.map((item) => (item.id === itemId ? { ...item, votes: data } : item))
+          prevItems.map((item) => (item.id === itemId ? { ...item, votes: data.votes } : item))
         );
       }
-    } catch (err) {
-      // Tartalék: ha a függvény még nincs meg az adatbázisban (nem futott le
-      // a supabase-szavazas.sql), a szavazás a régi módon megy tovább --
-      // pontatlanul, de nem veszik el a felhasználó kattintása.
-      console.warn(
-        'increment_item_votes nem elérhető, visszaesés az abszolút írásra. ' +
-          'Futtasd le a supabase-szavazas.sql-t!',
-        err?.message || err
-      );
-      try {
-        await supabase.from('menu_items').update({ votes: newVotes }).eq('id', itemId);
-      } catch (fallbackErr) {
-        console.error('Supabase vote exception:', fallbackErr);
+
+      if (data && data.accepted === false) {
+        // A napló szerint erről a készülékről már jött szavazat erre az ételre.
+        // A gomb marad "Szavazva", csak nem számolunk hozzá újat.
+        showToast('Erre az ételre már leadtad a szavazatodat.', 'info');
+        return false;
       }
+
+      showToast('Köszönjük a közönségszavazatot!', 'success');
+    } catch (err) {
+      // Nincs tartalék abszolút írásra. Az kikerülte volna a készülékenkénti
+      // korlátot és feltülrírta volna mások szavazatát -- inkább vesszen el ez
+      // az egy kattintás, mint hogy a végeredmény megbízhatatlan legyen.
+      console.error('vote_for_item hiba:', err?.message || err);
+      setVotedItemIds((prev) => prev.filter((id) => id !== itemId));
+      setMenuItems((prevItems) =>
+        prevItems.map((item) =>
+          item.id === itemId ? { ...item, votes: targetItem?.votes || 0 } : item
+        )
+      );
+      showToast('A szavazat most nem ment át. Próbáld újra.', 'error');
+      return false;
     }
 
     return true;
@@ -1015,6 +1053,7 @@ export function OrsolyaProvider({ children }) {
         updateExhibitorDrinks,
         votedItemIds,
         voteForItem,
+        visitStats,
         isVotingOpen,
         toggleForceVotingOpen,
         updateItemStock,
