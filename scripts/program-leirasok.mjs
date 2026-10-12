@@ -14,6 +14,11 @@
  * Ha egy cím mindkét napon szerepel (Orsolya-napi Vásár, Civil Ízek Utcája,
  * Örökbefogadó Nap), mindkettő megkapja ugyanazt a leírást.
  *
+ * `null` érték TÖRLI a leírást. Erre azért van szükség, mert a szervező
+ * visszavonhat egy szöveget ("amíg nincs ellenőrzött információ"), és ilyenkor
+ * a programnak név, időpont és helyszín nélkül kell maradnia — nem egy
+ * korábbi, immár meg nem erősített állítással.
+ *
  * CSAK a leírást írja át. Az időpontot, a helyszínt, a címet és a kategóriát
  * nem bántja: azokat a szervező adta, és egy elcsúszott kezdés rosszabb, mint
  * egy hiányzó leírás.
@@ -43,7 +48,9 @@ for (const [title, description] of Object.entries(mapping)) {
     unknown.push(title);
     continue;
   }
-  for (const e of hits) plan.push({ e, description });
+  // A null szandekosan torles, nem "hianyzo ertek".
+  const value = description === null || description === '' ? null : description;
+  for (const e of hits) plan.push({ e, description: value });
 }
 
 const untouched = events.filter((e) => !plan.some((p) => p.e.id === e.id));
@@ -53,11 +60,12 @@ console.log(`  ${events.length} program, ${plan.length} kap új leírást`);
 console.log('');
 
 for (const p of plan) {
-  const same = (p.e.description || '') === p.description;
-  const jel = same ? 'változatlan' : p.e.description ? 'felülírás' : 'új';
+  const same = (p.e.description || null) === p.description;
+  const jel = same ? 'változatlan' : p.description === null ? 'TÖRLÉS' : p.e.description ? 'felülírás' : 'új';
   console.log(`    ${p.e.event_date}  ${(p.e.start_time || '--:--').slice(0, 5)}  ${p.e.title}   [${jel}]`);
   if (!same && p.e.description) console.log(`        eddig: "${p.e.description}"`);
-  if (!same) console.log(`        mostantól: "${p.description}"`);
+  if (!same && p.description !== null) console.log(`        mostantól: "${p.description}"`);
+  if (!same && p.description === null) console.log('        mostantól: nincs leírás, csak név / időpont / helyszín');
 }
 
 if (unknown.length) {
@@ -79,7 +87,7 @@ if (dryRun) {
 } else {
   let n = 0;
   for (const p of plan) {
-    if ((p.e.description || '') === p.description) continue;
+    if ((p.e.description || null) === p.description) continue;
     await db.patch('events', p.e.id, { description: p.description });
     n++;
   }
