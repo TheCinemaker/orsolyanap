@@ -17,8 +17,20 @@ import {
   Sparkles,
   Heart,
   X,
-  Shuffle
 } from 'lucide-react';
+
+/**
+ * A "jelleg" szűrősor (Összes jelleg + címkék) egyelőre ki van kapcsolva.
+ *
+ * A kategóriák (meleg étel, sütemény, italok…) mellett egy második szűrősor is
+ * állt, az ételek címkéivel. Kevésnek látszott a haszna ahhoz, hogy helyet
+ * vegyen el a katalógus tetejéről.
+ *
+ * A kód SZÁNDÉKOSAN itt marad, nincs letörölve: egy `true` visszahozza. A
+ * szűrés logikája (`activeTag`) amúgy is a helyén van, és a „Szűrők törlése"
+ * is számol vele, tehát a visszakapcsolás egy karakter.
+ */
+const SHOW_TAG_FILTER = false;
 
 const CATEGORY_SECTIONS = [
   { id: 'meleg_etel', title: 'Meleg ételek', icon: Flame },
@@ -325,11 +337,13 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
             </span>
             <h2 className="text-base font-extrabold text-stone-900 mt-0.5 flex items-center gap-2">
               <Utensils className="w-4 h-4 text-amber-700" />
-              <span>Civil Ízek Utcája • Ételek és italok ({sortedItems.length} találat)</span>
+              <span>Ételek és italok: {sortedItems.length} találat</span>
             </h2>
           </div>
 
-          {/* Day Switcher Toggle & Shuffle Button */}
+          {/* Napválasztó. Keverő gomb szándékosan nincs: a lista MINDEN
+              megnyitásnál újra keverődik, így egyetlen stand sincs előre
+              sorolva. Egy gomb ugyanezt adná mégegyszer, csak helyet foglalva. */}
           <div className="flex items-center gap-2 flex-wrap self-stretch sm:self-auto justify-between sm:justify-end">
             <div className="flex items-center bg-stone-100 p-1 rounded-md border border-stone-200 flex-1 sm:flex-none">
               <button
@@ -363,15 +377,6 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
                 Vasárnap
               </button>
             </div>
-
-            <button
-              onClick={reShuffle}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-extrabold bg-stone-100 hover:bg-amber-100 text-stone-700 hover:text-amber-950 border border-stone-200 transition-all cursor-pointer shadow-2xs"
-              title="Kártyák azonnali újrakeverése"
-            >
-              <Shuffle className="w-3.5 h-3.5 text-amber-800" />
-              <span>Keverés</span>
-            </button>
           </div>
         </div>
       </div>
@@ -396,7 +401,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
           })}
         </div>
 
-        {availableTags.length > 0 && (
+        {SHOW_TAG_FILTER && availableTags.length > 0 && (
           <div className="flex gap-1.5 overflow-x-auto pb-1">
             <button onClick={() => setActiveTag('all')} className={`shrink-0 px-2.5 py-1 rounded-md text-[11px] font-bold border transition-all ${activeTag === 'all' ? 'bg-stone-800 text-white border-stone-800' : 'bg-white text-stone-500 border-stone-200 hover:border-stone-400'}`}>Összes jelleg</button>
             {visibleTags.map(([tag]) => (
@@ -404,7 +409,7 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
             ))}
           </div>
         )}
-        {availableTags.length > 8 && (
+        {SHOW_TAG_FILTER && availableTags.length > 8 && (
           <button onClick={() => setShowAllTags((v) => !v)} className="text-[11px] font-bold text-stone-500 hover:text-stone-900">
             {showAllTags ? 'Kevesebb szűrő' : `További szűrők (${availableTags.length - 8})`}
           </button>

@@ -68,14 +68,14 @@ export default function Header({
     <>
       <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-stone-200/80 shadow-xs">
         {/* Event Banner */}
-        <div className="bg-gradient-to-r from-amber-800 via-amber-900 to-amber-950 text-amber-50 text-[10px] sm:text-[11px] font-bold px-3 py-1 flex items-center justify-between shadow-inner">
+        <div className="bg-gradient-to-r from-amber-800 via-amber-900 to-amber-950 text-amber-50 text-xs sm:text-sm font-bold px-3 py-0.5 flex items-center justify-between shadow-inner">
           <div className="flex items-center gap-1.5 overflow-hidden">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />
             <span className="truncate uppercase tracking-wider font-extrabold text-amber-100">ORSOLYA-NAPI VÁSÁR – NATÚRPARK ÍZEI • CIVIL ÍZEK UTCÁJA</span>
           </div>
-          <div className="hidden sm:flex items-center gap-3 opacity-90 text-[11px]">
-            <span className="flex items-center gap-1"><Calendar className="w-3 h-3 text-amber-300" /> Natúrpark Ízei</span>
-            <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-amber-300" /> 09:00 - 20:00</span>
+          <div className="hidden sm:flex items-center gap-3 opacity-90 text-xs whitespace-nowrap">
+            <span className="flex items-center gap-1"><Calendar className="w-3 h-3 text-amber-300" /> okt. 17–18.</span>
+            <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-amber-300" /> 10:00–18:00</span>
           </div>
         </div>
 
@@ -83,12 +83,16 @@ export default function Header({
         <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 flex items-center justify-between gap-2">
           {/* Left Group: Clean Hamburger Button & Logo */}
           <div className="flex items-center gap-2">
+            {/* A puszta ikonrol nem derult ki, hogy menut nyit -- ezert van
+                mellette a felirat is. Harom karakter, de ez donti el, hogy a
+                latogato egyaltalan megtalalja-e a terkepet es a kedvenceit. */}
             <button
               onClick={() => setIsHamburgerOpen(true)}
-              className="p-2 rounded-md bg-white hover:bg-stone-100 text-stone-900 transition-all border border-stone-300 shadow-2xs"
+              className="pl-2 pr-2.5 py-2 rounded-md bg-white hover:bg-stone-100 text-stone-900 transition-all border border-stone-300 shadow-2xs flex items-center gap-1.5 cursor-pointer"
               title="Menü megnyitása"
             >
               <Menu className="w-5 h-5 text-stone-900" />
+              <span className="text-xs font-extrabold">Menü</span>
             </button>
             <VisitKoszegLogo
               onClick={handleStandClick}
