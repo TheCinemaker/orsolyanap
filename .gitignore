@@ -38,3 +38,7 @@ etelfotok/
 
 # Helyszinen ellenorizendo, ideiglenes koordinatak.
 KOORDINATAK_ELLENORIZENDO.txt
+
+# Eredeti etelfoto PNG-k: a tomoritett valtozat a Supabase Storage-ban van,
+# ezek csak helyi forrasok. 36 MB-ot vinnenek a buildbe.
+public/etelek/
