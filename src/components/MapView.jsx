@@ -3,7 +3,15 @@ import { useOrsolya } from '../context/OrsolyaContext';
 import { MapPin, ArrowRight, Compass, Heart, Navigation, Car } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { mappedParkingLots, directionsUrl } from '../data/parkolas';
+import {
+  POINTS_OF_INTEREST,
+  POI_KINDS,
+  FESTIVAL_CENTRE,
+  poisOfKind,
+  metresFromCentre,
+  humanDistance,
+  directionsUrl,
+} from '../data/helyszinek';
 
 // Helper function to shorten exhibitor names for clean map pills
 /**
@@ -26,15 +34,8 @@ const CRAFT_MARKET_AREA = [
   [47.39007537893043, 16.539174983991717],
 ];
 
-/**
- * A Diaksetany kozepe. A terkep innen indul, es a parkolo-nezet is ehhez
- * igazodik: a latogatonak a parkolo ES a fesztival egyszerre kell latszodjon,
- * kulonben nem tudja megiteleni, mennyit kell gyalogolnia.
- */
-const FESTIVAL_CENTRE = [47.38936, 16.53894];
-
-/** Csak azok a parkolok, amiknek mar van valodi pontjuk. */
-const PARKING_ON_MAP = mappedParkingLots();
+/** A parkolo-nezethez: a fesztival ES a parkolok egyszerre latszodjanak. */
+const PARKING_LOTS = poisOfKind('parkolo');
 
 const getShortExhibitorName = (exhibitor) => {
   if (!exhibitor || !exhibitor.name) return '';
@@ -60,6 +61,7 @@ const getShortExhibitorName = (exhibitor) => {
   if (lower.includes('meseváros') || lower.includes('felsővárosi')) return 'Felsővárosi Óvoda';
   if (lower.includes('borbarát') || lower.includes('borbarat')) return 'Borbarát Hölgyek';
   if (lower.includes('tézsula') || lower.includes('tezsula')) return 'Tézsula';
+  if (lower.includes('nagycsaládosok') || lower.includes('nagycsaladosok')) return 'NOE Kőszeg';
 
   if (name.length > 14) {
     const parts = name.split(' ');
@@ -75,6 +77,10 @@ export default function MapView() {
   const [selectedExhibitorId, setSelectedExhibitorId] = useState(focusedExhibitorIdOnMap || exhibitors[0]?.id || null);
   const [userLocation, setUserLocation] = useState(null);
   const [isLocating, setIsLocating] = useState(false);
+  // A helyszin-pinek alapbol LATSZANAK: a vendegnek a mosdo es a szinpad
+  // ugyanolyan fontos, mint a stand. Aki zsufoltnak talalja, egy koppintassal
+  // elrejti.
+  const [showPois, setShowPois] = useState(true);
 
   const mapContainerRef = useRef(null);
   const leafletMapRef = useRef(null);
@@ -167,6 +173,41 @@ export default function MapView() {
       }
     });
 
+    // Helyszinek: szinpad, mosdo, parkolo, versenyhelyszin. A stand-markerek
+    // ELOTT kerulnek fel, hogy azok maradjanak felul: az app elsosorban a
+    // standokrol szol, a helyszin a kontextus hozza.
+    if (showPois) {
+      POINTS_OF_INTEREST.forEach((poi) => {
+        const kind = POI_KINDS[poi.kind];
+        const poiHtml = `
+          <div class="relative cursor-pointer">
+            <div class="px-1.5 py-0.5 rounded-xs ${kind.pill} text-white font-bold border border-white shadow-2xs text-[10px] flex items-center justify-center whitespace-nowrap tracking-tight">
+              <span>${poi.label}</span>
+            </div>
+          </div>
+        `;
+        const icon = L.divIcon({
+          html: poiHtml,
+          className: 'custom-leaflet-pin',
+          iconSize: [110, 22],
+          iconAnchor: [55, 11],
+        });
+
+        // A latogatonak nem a helyszin neve a kerdese, hanem hogy mennyit kell
+        // odagyalogolnia. Legvonal, de a dontes meghozatalahoz eleg.
+        const walk = humanDistance(metresFromCentre(poi.coordinates));
+
+        L.marker(poi.coordinates, { icon })
+          .addTo(map)
+          .bindPopup(
+            `<strong>${poi.title}</strong>` +
+              (poi.hint ? `<br>${poi.hint}` : '') +
+              `<br>Kb. ${walk} a Diáksétánytól` +
+              `<br><a href="${directionsUrl(poi.coordinates)}" target="_blank" rel="noopener noreferrer">Útvonal ide</a>`
+          );
+      });
+    }
+
     // Add Exhibitor Markers (Compact pills with sharp minimal corners & shortened names)
     exhibitors.forEach((ex) => {
       if (!ex.coordinates) return;
@@ -205,32 +246,6 @@ export default function MapView() {
       });
     });
 
-    // Parkolok. Szandekosan kek es "P" jelu, hogy a latogato ne nezze standnak:
-    // a kozlekedesi tablak ugyanezt a jelet hasznaljak.
-    PARKING_ON_MAP.forEach((lot) => {
-      const parkingHtml = `
-        <div class="relative cursor-pointer">
-          <div class="px-1.5 py-0.5 rounded-xs bg-sky-800 text-white font-bold border border-white shadow-2xs text-[10px] flex items-center gap-1 whitespace-nowrap tracking-tight hover:bg-sky-700">
-            <span class="font-black">P</span>
-            <span>${lot.name}</span>
-          </div>
-        </div>
-      `;
-      const icon = L.divIcon({
-        html: parkingHtml,
-        className: 'custom-leaflet-pin',
-        iconSize: [120, 24],
-        iconAnchor: [60, 12],
-      });
-
-      L.marker(lot.coordinates, { icon })
-        .addTo(map)
-        .bindPopup(
-          `<strong>${lot.name}</strong><br>${lot.hint}<br>` +
-            `<a href="${directionsUrl(lot.coordinates)}" target="_blank" rel="noopener noreferrer">Utvonal ide</a>`
-        );
-    });
-
     // Add user location marker if available (solid blue marker, no flashing)
     if (userLocation) {
       const userHtml = `
@@ -246,7 +261,7 @@ export default function MapView() {
       });
       userMarkerRef.current = L.marker(userLocation, { icon: userIcon }).addTo(map);
     }
-  }, [exhibitors, selectedExhibitorId, favoriteExhibitorIds, userLocation]);
+  }, [exhibitors, selectedExhibitorId, favoriteExhibitorIds, userLocation, showPois]);
 
   // Handle Geolocation tracking & re-centering
   const handleGetLocation = () => {
@@ -281,8 +296,9 @@ export default function MapView() {
    */
   const handleShowParking = () => {
     const map = leafletMapRef.current;
-    if (!map || PARKING_ON_MAP.length === 0) return;
-    const points = [...PARKING_ON_MAP.map((lot) => lot.coordinates), FESTIVAL_CENTRE];
+    if (!map || PARKING_LOTS.length === 0) return;
+    if (!showPois) setShowPois(true);
+    const points = [...PARKING_LOTS.map((lot) => lot.coordinates), FESTIVAL_CENTRE];
     map.fitBounds(L.latLngBounds(points).pad(0.18));
   };
 
@@ -330,7 +346,7 @@ export default function MapView() {
           </button>
 
           {/* Csak akkor van gomb, ha van is mit megmutatni. */}
-          {PARKING_ON_MAP.length > 0 && (
+          {PARKING_LOTS.length > 0 && (
             <button
               onClick={handleShowParking}
               className="px-4 py-2 bg-sky-800 hover:bg-sky-700 text-white font-bold text-xs rounded-md shadow-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer whitespace-nowrap"
@@ -339,6 +355,21 @@ export default function MapView() {
               <span>Parkolók</span>
             </button>
           )}
+
+          {/* A pinek elrejtése. Szűk helyen 19 helyszin + 20 stand sűrű lehet,
+              de a döntést a látogató hozza meg, nem mi rejtünk el infot. */}
+          <button
+            onClick={() => setShowPois((v) => !v)}
+            aria-pressed={showPois}
+            className={`px-4 py-2 font-bold text-xs rounded-md shadow-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer whitespace-nowrap border ${
+              showPois
+                ? 'bg-emerald-800 hover:bg-emerald-700 text-white border-emerald-900'
+                : 'bg-white hover:bg-stone-50 text-stone-600 border-stone-300'
+            }`}
+          >
+            <MapPin className="w-3.5 h-3.5" />
+            <span>Helyszínek ({POINTS_OF_INTEREST.length})</span>
+          </button>
         </div>
 
         {/* Leaflet térkép */}
@@ -355,13 +386,16 @@ export default function MapView() {
                 <span className="w-2.5 h-2.5 rounded-sm bg-amber-500/40 inline-block border border-amber-800"></span>
                 Kézműves vásár – belváros
               </span>
-            {PARKING_ON_MAP.length > 0 && (
-              <span className="font-bold text-sky-900 block flex items-center gap-1 mt-0.5">
-                <span className="w-2.5 h-2.5 rounded-xs bg-sky-800 inline-block border border-sky-900"></span>
-                Ingyenes parkolók
-              </span>
-            )}
-            <span className="text-[10px] text-stone-500 block">47.3889N - 47.3900N • 16.5379E - 16.5399E</span>
+            {showPois &&
+              Object.entries(POI_KINDS).map(([key, kind]) => (
+                <span key={key} className="font-bold text-stone-700 block flex items-center gap-1 mt-0.5">
+                  <span className={`w-2.5 h-2.5 rounded-xs inline-block border ${kind.swatch}`}></span>
+                  {kind.legend}
+                </span>
+              ))}
+            <span className="text-[10px] text-stone-500 block pt-0.5">
+              {showPois ? `${POINTS_OF_INTEREST.length} helyszín megjelölve` : 'Helyszínek elrejtve'}
+            </span>
           </div>
         </div>
 

@@ -1,8 +1,8 @@
 import React from 'react';
-import { X, Calendar, Sparkles, Landmark, Leaf, Clock, Trophy, Phone, ShoppingBasket, ImageOff, Car } from 'lucide-react';
+import { X, Calendar, Sparkles, Landmark, Leaf, Clock, Trophy, Phone, ShoppingBasket, ImageOff, Car, MapPinned } from 'lucide-react';
 import VisitKoszegLogo from './VisitKoszegLogo';
 import { useScrollLock } from '../hooks/useScrollLock';
-import { PARKING_NOTICE, PARKING_LOTS, mappedParkingLots } from '../data/parkolas';
+import { PARKING_NOTICE, parkingRange, poiSummary, humanDistance } from '../data/helyszinek';
 
 export default function OrsolyaInfoModal({ isOpen, onClose }) {
   // A háttéroldal ne legyen görgethető, amíg ez nyitva van.
@@ -10,6 +10,11 @@ export default function OrsolyaInfoModal({ isOpen, onClose }) {
   useScrollLock(isOpen);
 
   if (!isOpen) return null;
+
+  // Számított, nem kézzel írt: a tájékoztató így nem tud elcsúszni a
+  // térképtől. Egy hibás szám miatt joggal kérnék számon minket.
+  const parking = parkingRange();
+  const places = poiSummary();
 
   return (
     <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-sm flex items-center justify-center p-4">
@@ -68,18 +73,43 @@ export default function OrsolyaInfoModal({ isOpen, onClose }) {
               <h3>Parkolás — ingyenes, de a város szélén</h3>
             </div>
             <p className="text-amber-950/90">{PARKING_NOTICE}</p>
-            <ul className="space-y-1 list-disc list-inside text-amber-950/90 pt-0.5">
-              {PARKING_LOTS.map((lot) => (
-                <li key={lot.id}>
-                  <strong>{lot.name}</strong> — {lot.hint}
+            {parking && (
+              <p className="text-amber-950/90">
+                A térképen <strong>{parking.count} ingyenes parkoló</strong> van megjelölve.
+                A legközelebbi kb. <strong>{humanDistance(parking.nearest)}</strong>, a
+                legtávolabbi kb. <strong>{humanDistance(parking.farthest)}</strong> a
+                Diáksétánytól — a térképen minden parkolónál ott a távolság és egy
+                útvonaltervő link is.
+              </p>
+            )}
+          </div>
+
+          {/* Mi van a térképen. A lista az adatból számolt: ha egy pont bejön
+              vagy kiesik, ez magatól követi. */}
+          <div className="bg-stone-50 border border-stone-200/80 rounded-md p-4 space-y-2">
+            <div className="flex items-center gap-2 font-bold text-sm text-stone-900">
+              <MapPinned className="w-4 h-4 text-amber-800" />
+              <h3>Mit találsz a térképen?</h3>
+            </div>
+            <ul className="space-y-1.5">
+              {places.map((place) => (
+                <li key={place.title} className="flex gap-2">
+                  <span className="font-bold text-stone-900 whitespace-nowrap">
+                    {place.count}×
+                  </span>
+                  <span>
+                    <strong>{place.title}</strong>
+                    {place.hints.length > 0 && (
+                      <span className="text-stone-600"> — {place.hints.join('; ')}</span>
+                    )}
+                  </span>
                 </li>
               ))}
             </ul>
-            {mappedParkingLots().length > 0 && (
-              <p className="text-amber-900/70 pt-1 font-medium">
-                A parkolók a <strong>térképen</strong> is meg vannak jelölve.
-              </p>
-            )}
+            <p className="text-stone-500 pt-1 font-medium">
+              Ezen kívül minden stand saját pint kap, a kézműves vásár területe pedig
+              be van rajzolva. A helyszín-pinek egy koppintással elrejthetők.
+            </p>
           </div>
 
           {/* Gyakorlati tudnivalók */}
