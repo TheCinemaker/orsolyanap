@@ -38,7 +38,17 @@ const getShortExhibitorName = (exhibitor) => {
   if (lower.includes('tűzoltó') || lower.includes('tuzolto')) return 'Ifj. Tűzoltók';
   if (lower.includes('hajnalcsillag')) return 'Hajnalcsillag';
   if (lower.includes('szent margit') || lower.includes('margit óvoda')) return 'Szt. Margit Óvoda';
+  // A sorrend szamit: a 'szakiskola' teszt a general 'egymi' ELOTT all,
+  // kulonben mindkét EGYMI stand ugyanazt a feliratot kapna a terkepen.
+  if (lower.includes('szakiskola')) return 'EGYMI Szakiskola';
   if (lower.includes('egymi')) return 'EGYMI';
+  // A pinen rovid felirat kell: a teljes nevek 27-55 karakteresek, azok
+  // egymasra csusznanak a terkepen.
+  if (lower.includes('fúvószenekar') || lower.includes('fuvoszenekar')) return 'Fúvószenekar';
+  if (lower.includes('kőszegfalvi') || lower.includes('koszegfalvi')) return 'Kőszegfalvi Óvoda';
+  if (lower.includes('meseváros') || lower.includes('felsővárosi')) return 'Felsővárosi Óvoda';
+  if (lower.includes('borbarát') || lower.includes('borbarat')) return 'Borbarát Hölgyek';
+  if (lower.includes('tézsula') || lower.includes('tezsula')) return 'Tézsula';
 
   if (name.length > 14) {
     const parts = name.split(' ');
