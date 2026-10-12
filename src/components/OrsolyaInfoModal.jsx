@@ -161,10 +161,11 @@ export default function OrsolyaInfoModal({ isOpen, onClose }) {
               délidőben kóstolóval. A szervezetek a közösségük céljaira gyűjtenek adományokat.
             </p>
             <p>
-              <strong>„Kőszegi Csemege"</strong> — szombaton a KÖSZHÁZ-ban (Jurisics vár külső
-              udvar), a Kőszegi Borbarát Hölgyek Egyesülete szervezésében. Nevezés 9:00–11:00,
+              <strong>„Kőszegi Csemege"</strong> — szombaton a <strong>KÖSZHÁZ-ban</strong>,
+              a Kőszegi Borbarát Hölgyek Egyesülete szervezésében. Nevezés 9:00–11:00,
               kóstoló 12:30-tól támogatói jegy vásárlásával. Kőszeg és környéke természetes
-              anyagaiból készült édességek, sütemények, pogácsák.
+              anyagaiból készült édességek, sütemények, pogácsák. A KÖSZHÁZ a
+              <strong>térképen</strong> meg van jelölve.
             </p>
             <p className="text-stone-500 pt-1 font-medium">
               <strong>Eredményhirdetés:</strong> mindkét verseny esetében vasárnap 16:00,

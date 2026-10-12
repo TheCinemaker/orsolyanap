@@ -70,7 +70,7 @@ export const POINTS_OF_INTEREST = [
     kind: 'programhelyszin',
     label: 'Kőszegi Csemege',
     title: 'Kőszegi Csemege verseny',
-    hint: 'Szombat: nevezés 9:00-11:00, kóstoló 12:30-tól',
+    hint: 'KÖSZHÁZ — szombat: nevezés 9:00-11:00, kóstoló 12:30-tól',
     coordinates: [47.389566386935066, 16.539153347587437],
   },
   {
