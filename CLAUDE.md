@@ -51,6 +51,7 @@ node scripts/kepek-feltoltese.mjs "Stand" # a stand ételfotói
 node scripts/kepek-feltoltese.mjs --mind  # minden stand új fotói
 node scripts/kepek-feltoltese.mjs --logok # logók a logok/ mappából
 node scripts/koordinatak.mjs pontok.txt   # bemért stand-koordináták beírása
+node scripts/program-leirasok.mjs x.json  # programleírások a szervező szövegéből
 node scripts/pin-lista.mjs                # PIN-lista és koordináta-állapot
 ```
 
@@ -120,6 +121,29 @@ ne tippelj — egy allergénes tétel mellé rossz képet tenni rosszabb, mint k
 nélkül hagyni.
 
 Már feltöltött képet nem ír felül. Szándékos csere: `FORCE=1`.
+
+Ahol tippelni nem szabad, ott `parositas.json` kerül a képek mappájába:
+
+```json
+{ "NOE.png": "Nagycsaládosok Országos Egyesületének Kőszeg és Kőszeghegyalja Szervezete" }
+{ "italok.png": ["Kávé", "Tea", "Üdítő"] }
+```
+
+Két eset van rá: **rövidítés**, amit semmilyen hasonlóság nem köt a teljes
+névhez (`NOE.png`), és **egy kép több tételhez** (egy italos fotó a kávéhoz,
+teához, üdítőhöz). Amit itt megadsz, az pontos egyezés, a szkript nem bírálja
+felül.
+
+### Programok
+
+A füzér a Supabase `events` táblájából jön. A szervező szövegéből csak a
+**leírás** frissül; az időpontot, a helyszínt és a címet nem bántjuk, mert egy
+elcsúszott kezdés rosszabb, mint egy hiányzó leírás.
+
+A szervezői szöveg gyakran **nekünk szóló megjegyzést** is tartalmaz („a pontos
+műfajt a szervezővel ellenőrizni kell"). Az ilyen mondat NEM mehet az appba: a
+látogató értelmetlennek látja. Csak az igazolt, neki szóló rész kerül be, a
+többi marad rövid.
 
 ---
 

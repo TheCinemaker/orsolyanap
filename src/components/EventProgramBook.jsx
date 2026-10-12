@@ -124,7 +124,11 @@ export default function EventProgramBook() {
                         {event.performer && event.performer !== event.title && (
                           <p className="mt-1 text-sm font-bold text-amber-900">{event.performer}</p>
                         )}
-                        {event.description && event.description !== 'Zenei program' && (
+                        {/* A "Zenei program" helykitöltőt korábban külön ki
+                            kellett szűrni, mert a legtöbb fellépőnél az állt.
+                            Minden programnak saját leírása van, így a szűrő
+                            csak egy valódi leírást tudna véletlenül elrejteni. */}
+                        {event.description && (
                           <p className="mt-1 text-xs sm:text-sm text-stone-500 leading-relaxed">{event.description}</p>
                         )}
                       </div>
