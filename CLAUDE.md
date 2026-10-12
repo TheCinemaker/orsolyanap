@@ -50,6 +50,7 @@ node scripts/stand-felvetel.mjs uj.json   # új stand ételekkel, PIN-nel, pinne
 node scripts/kepek-feltoltese.mjs "Stand" # a stand ételfotói
 node scripts/kepek-feltoltese.mjs --mind  # minden stand új fotói
 node scripts/kepek-feltoltese.mjs --logok # logók a logok/ mappából
+node scripts/koordinatak.mjs pontok.txt   # bemért stand-koordináták beírása
 node scripts/pin-lista.mjs                # PIN-lista és koordináta-állapot
 ```
 
@@ -80,6 +81,26 @@ a sétány mentén, és figyelmeztet, hogy a helyszínen pontosítani kell.
 Kategóriák: `meleg_etel`, `street_food`, `sutemeny`, `italok`, `egyeb`.
 A szkript tippel a név alapján — **ellenőrizd a kiírt listát**, mert ez
 dönti el, melyik katalógus-szekcióba kerül az étel.
+
+### Koordináták
+
+A helyszíni körön mért pontokat ne kézzel írd be. Egy szövegfájlba jönnek,
+soronként egy stand, akármilyen formában:
+
+```
+Hajnalcsillag: 47.38919270798614, 16.539153584867744
+KTSZE stand 47.38986871225532, 16.539555530929338
+```
+
+```bash
+node scripts/koordinatak.mjs pontok.txt --proba   # elobb mutasd meg
+node scripts/koordinatak.mjs pontok.txt           # aztan irja be
+```
+
+A szkript négy dolgot utasít el, mert mind a négy rossz sátorhoz vinné a
+látogatót: kétértelmű standnév, Kőszegen kívüli pont (ez fogja meg a
+felcserélt szélesség/hosszúságot), hat tizedesjegynél pontatlanabb szám
+(csonkult beillesztés), és ugyanannak a pontnak a kétszeri megadása.
 
 ### Képek
 
@@ -117,6 +138,7 @@ src/components/
   SignageView.jsx        a standra kitett kijelző  (?view=signage)
   ExhibitorAdmin/        standosok felülete
 scripts/                 adatkezelő szkriptek (lásd fent)
+src/data/helyszinek.js   színpadok, mosdók, parkolók — a fix infrastruktúra
 supabase-*.sql           séma- és migrációs szkriptek
 ```
 
@@ -191,15 +213,13 @@ előtt. Nem egysoros javítás, mert a `profileData` kezdőértéke
 
 ## Ami nyitott
 
-- **A parkolók koordinátája hiányzik.** A szöveges tájékoztató él, de a
-  `src/data/parkolas.js`-ben még `coordinates: null` áll. Amint megjön a pont,
-  oda kell beírni — a térkép-pin, a „Parkolók" gomb, a jelmagyarázat és a
-  tájékoztató „a térképen is meg van jelölve" mondata maguktól megjelennek.
-  Koordinátát **ne tippelj**: egy rossz helyre tett parkoló-pin rosszabb, mint
-  a semmi, mert a látogató elhiszi és odamegy.
-- **13 stand térkép-pinje becsült.** A helyszíni körön kell pontosítani,
-  a `KOORDINATAK_ELLENORIZENDO.txt` listázza őket. A fájl a tizedesjegyek
-  száma alapján válogat, tehát magától frissül.
+- **14 stand térkép-pinje becsült** (21 standból). A helyszíni körön kell
+  pontosítani a `koordinatak.mjs`-szel; a `KOORDINATAK_ELLENORIZENDO.txt`
+  listázza őket. A fájl a tizedesjegyek száma alapján válogat, tehát
+  magától frissül.
+- **A helyszíni pontok (színpad, mosdó, parkoló) készen vannak**, a szervező
+  mérte be mind a 19-et. Ezek a `src/data/helyszinek.js`-ben vannak és nem az
+  adatbázisban, mert a rendezvény fix infrastruktúrája. Újat egy sor felvenni.
 - **A Fitt-Box Egyesületnek nincs étele** felvéve, így a katalógusban nem
   jelenik meg. Nem hiba, hanem hiányzó étlap.
 - **A standos felület base64-be ír képet**, nem Storage-ba. Ha egy standos
