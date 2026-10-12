@@ -55,10 +55,19 @@ export function api(e) {
   const HJ = { ...H, 'Content-Type': 'application/json' };
 
   const req = async (url, opts = {}) => {
-    const r = await fetch(url, opts);
-    const text = await r.text();
-    if (!r.ok) throw new Error(`HTTP ${r.status} — ${text.slice(0, 200)}`);
-    return text ? JSON.parse(text) : null;
+    let lastErr;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const r = await fetch(url, opts);
+        const text = await r.text();
+        if (!r.ok) throw new Error(`HTTP ${r.status} — ${text.slice(0, 200)}`);
+        return text ? JSON.parse(text) : null;
+      } catch (err) {
+        lastErr = err;
+        if (attempt < 2) await new Promise((res) => setTimeout(res, 600 * (attempt + 1)));
+      }
+    }
+    throw lastErr;
   };
 
   return {
