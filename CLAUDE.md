@@ -68,6 +68,8 @@ node scripts/kepek-feltoltese.mjs --mind  # minden stand új fotói
 node scripts/kepek-feltoltese.mjs --logok # logók a logok/ mappából
 node scripts/koordinatak.mjs pontok.txt   # bemért stand-koordináták beírása
 node scripts/program-leirasok.mjs x.json  # programleírások a szervező szövegéből
+node scripts/stand-leirasok.mjs x.json    # standok bemutatkozó szövege
+node scripts/szavazatok.mjs               # szavazás valódi állása a naplóból
 node scripts/pin-lista.mjs                # PIN-lista és koordináta-állapot
 ```
 
