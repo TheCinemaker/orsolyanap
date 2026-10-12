@@ -14,6 +14,7 @@ const LOCATION_ORDER = [
   'Fő tér',
   'Jurisics vár',
   'Civil Ízek Utcája – Diáksétány',
+  'Jurisics vár – belső várudvar',
   'KÖSZHÁZ – Jurisics vár külső udvar',
 ];
 
