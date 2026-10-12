@@ -32,6 +32,22 @@ publikus URL kerül.
 logó 400px széles WebP. Így egy kép 30–60 kB. Tömörítés nélkül 2,5–3 MB
 darabonként, ami egy zsúfolt fesztiválhálózaton használhatatlan.
 
+**Platformspecifikus bináris nem kerülhet a `dependencies`-be.** A Netlify
+linux-x64-en épít. Ha egy `@rolldown/binding-darwin-arm64`, `*-win32-*` vagy
+hasonló csomag bekerül a `package.json`-ba, az npm ott `EBADPLATFORM`-mal eláll,
+és a **deploy el sem jut az építésig**. Ez egyszer már megtörtént, és három napig
+a régi oldal ment ki — nem tűnt fel, mert a Supabase-adat (új standok, képek,
+leírások) közben látszódott, csak a kódváltozások nem.
+
+A natív binárist **soha ne tedd be kézzel**: a vite és a rolldown mind a 15
+platformváltozatot opcionális függőségként hirdeti, minden gép a sajátját veszi.
+Ha hiányzik, a megoldás a `node_modules` törlése és `npm install`, nem egy új sor
+a `package.json`-ban. Ellenőrzés, ahogy a Netlify látja:
+
+```bash
+npm ci --dry-run --os=linux --cpu=x64
+```
+
 **PIN kódot ne írj a kimenetre.** Éles belépési adatok: naplóba,
 képernyőképbe és beszélgetés-előzménybe nem kerülhetnek. A
 `scripts/pin-lista.mjs` fájlba írja őket.
