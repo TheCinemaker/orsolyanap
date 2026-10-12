@@ -1,22 +1,123 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { X, Heart, MapPin, ChevronDown } from 'lucide-react';
+import { X, Heart, MapPin, ChevronDown, Share2 } from 'lucide-react';
 import { useScrollLock } from '../hooks/useScrollLock';
 
+/**
+ * Teljes képernyős fotófolyam, Instagram/Facebook Reels mintájára.
+ *
+ * Négy dolog választja el egy görgethető képlistát attól, hogy Reelsnek
+ * érződjön — mind a négy itt van megoldva:
+ *
+ * 1. TELJES KITÖLTÉS. A kép `object-cover`, tehát kitölti a képernyőt, és
+ *    mögötte ugyanaz a kép elmosva adja a hátteret. Korábban `object-contain`
+ *    volt: egy álló fotó mellett két fekete sáv állt, ami azonnal elárulja,
+ *    hogy ez egy weboldal, nem egy feed.
+ *
+ * 2. DUPLA KOPPINTÁS. Az `onDoubleClick` egérre szól; telefonon vagy nem
+ *    sül el, vagy a böngésző ráközelít helyette. Itt a koppintásokat magunk
+ *    figyeljük, és a szív ott pattan fel, ahol a vendég megütötte a képet.
+ *
+ * 3. ELŐRETÖLTÉS. A következő és az előző kép már letöltve várakozik, mert
+ *    különben minden görgetésnél egy fekete képernyőt bámul az ember. Ami
+ *    messzebb van, az lustán töltődik: nem szedjük le az összes fotót elöl.
+ *
+ * 4. A GÖRGETÉS NEM SZÖKIK KI. `overscroll-contain`: az utolsó fotónál nem
+ *    kezd el rugózni az alatta lévő oldal.
+ */
 export default function ReelsGallery() {
-  const { reels, exhibitors, likeReel, setActiveView, focusExhibitorOnMap } = useOrsolya();
-  
+  const { reels, exhibitors, likeReel, setActiveView, focusExhibitorOnMap, showToast } = useOrsolya();
+
   const [likedReelIds, setLikedReelIds] = useState(() => {
-
-    try { return JSON.parse(localStorage.getItem('orsolya_liked_reel_ids') || '[]'); } catch { return []; }
+    try {
+      return JSON.parse(localStorage.getItem('orsolya_liked_reel_ids') || '[]');
+    } catch {
+      return [];
+    }
   });
+  const [activeIndex, setActiveIndex] = useState(0);
+  /** Hol és melyik fotón pattanjon fel a szív. */
+  const [burst, setBurst] = useState(null);
+  const [expandedId, setExpandedId] = useState(null);
 
-  // A háttéroldal ne legyen görgethető, amíg bármelyik réteg nyitva van.
+  const scrollerRef = useRef(null);
+  const lastTapRef = useRef({ id: null, time: 0 });
+
   useScrollLock(true);
 
   useEffect(() => {
     localStorage.setItem('orsolya_liked_reel_ids', JSON.stringify(likedReelIds));
   }, [likedReelIds]);
+
+  /* Melyik fotó van épp a képernyőn. Ebből tudjuk, mit kell előretölteni.
+     Figyelő, nem görgetés-számolás: az utóbbi minden eszközön máshogy
+     kerekít, és a snap közben félúton rossz értéket ad. */
+  useEffect(() => {
+    const root = scrollerRef.current;
+    if (!root) return;
+    const megfigyelo = new IntersectionObserver(
+      (bejegyzesek) => {
+        for (const b of bejegyzesek) {
+          if (b.isIntersecting && b.intersectionRatio > 0.6) {
+            const i = Number(b.target.dataset.index);
+            if (!Number.isNaN(i)) setActiveIndex(i);
+          }
+        }
+      },
+      { root, threshold: [0.6] }
+    );
+    root.querySelectorAll('[data-index]').forEach((el) => megfigyelo.observe(el));
+    return () => megfigyelo.disconnect();
+  }, [reels.length]);
+
+  const like = useCallback(
+    (id) => {
+      if (likedReelIds.includes(id)) return false;
+      setLikedReelIds((prev) => [...prev, id]);
+      likeReel(id);
+      return true;
+    },
+    [likedReelIds, likeReel]
+  );
+
+  /* Dupla koppintás kézzel. A két koppintás között 300 ms-ot engedünk, és
+     csak akkor fogadjuk el, ha a két érintés egymáshoz közel esett -- így a
+     gyors görgetés nem számít kedvelésnek. */
+  const koppintas = (event, reel) => {
+    const most = Date.now();
+    const elozo = lastTapRef.current;
+    const pont = event.changedTouches ? event.changedTouches[0] : event;
+
+    if (elozo.id === reel.id && most - elozo.time < 300) {
+      lastTapRef.current = { id: null, time: 0 };
+      const doboz = event.currentTarget.getBoundingClientRect();
+      setBurst({ id: reel.id, x: pont.clientX - doboz.left, y: pont.clientY - doboz.top, kulcs: most });
+      like(reel.id);
+      // A szív a felpattanás után eltűnik; a kulcs biztosítja, hogy egymás
+      // utáni koppintásoknál újrainduljon az animáció.
+      setTimeout(() => setBurst((b) => (b && b.kulcs === most ? null : b)), 900);
+      return;
+    }
+    lastTapRef.current = { id: reel.id, time: most };
+  };
+
+  const megosztas = async (reel) => {
+    const adat = {
+      title: 'Orsolya-napi Vásár',
+      text: reel.caption ? `${reel.caption} — ${reel.exhibitor_name}` : reel.exhibitor_name,
+      url: window.location.href,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(adat);
+        return;
+      }
+      await navigator.clipboard.writeText(`${adat.text}\n${adat.url}`);
+      showToast('A link a vágólapra került.', 'success');
+    } catch {
+      // A megosztás megszakítása nem hiba, nem szólunk érte.
+    }
+  };
 
   const formatTimeShort = (isoString) => {
     if (!isoString) return 'Éppen most';
@@ -30,29 +131,32 @@ export default function ReelsGallery() {
     return `${date.getMonth() + 1}.${date.getDate()}.`;
   };
 
-  const handleLike = (id) => {
-    if (likedReelIds.includes(id)) return;
-    setLikedReelIds(prev => [...prev, id]);
-    likeReel(id);
-  };
-
   return (
     <div className="fixed inset-0 z-[60] bg-black text-white flex flex-col h-[100dvh] overflow-hidden">
-      {/* Top Header / Close Button */}
+      {/* Fejléc. A sorszám azt mondja meg, mennyi van még -- enélkül nem
+          tudja az ember, hogy érdemes-e tovább görgetni. */}
       <div className="absolute top-0 left-0 right-0 p-4 z-50 flex items-center justify-between bg-gradient-to-b from-black/80 to-transparent pointer-events-none">
         <h2 className="text-sm font-black tracking-widest text-white drop-shadow-md">
-          ÖSSZES FOTÓ
+          FOTÓK
+          {reels.length > 0 && (
+            <span className="ml-2 font-bold text-white/70">
+              {activeIndex + 1}/{reels.length}
+            </span>
+          )}
         </h2>
         <button
           onClick={() => setActiveView('visitor')}
           className="p-2 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-full text-white transition-colors cursor-pointer shadow-lg pointer-events-auto"
+          aria-label="Bezárás"
         >
           <X className="w-6 h-6" />
         </button>
       </div>
 
-      {/* Vertical Snap Scroll Container (TikTok style) */}
-      <div className="flex-1 overflow-y-auto snap-y snap-mandatory scrollbar-none h-full w-full bg-stone-950">
+      <div
+        ref={scrollerRef}
+        className="flex-1 overflow-y-auto snap-y snap-mandatory scrollbar-none h-full w-full bg-stone-950 overscroll-contain"
+      >
         {reels.length === 0 && (
           <div className="flex items-center justify-center h-full text-white/50 text-sm font-bold">
             Még nincsenek fotók.
@@ -62,74 +166,114 @@ export default function ReelsGallery() {
         {reels.map((reel, index) => {
           const exhibitor = exhibitors.find((e) => e.id === reel.exhibitor_id);
           const isLiked = likedReelIds.includes(reel.id);
+          // A szomszédos fotók azonnal, a tobbi lustan: igy a kovetkezo
+          // gorgetesnel mar kesz a kep, de nem toltunk le mindent elore.
+          const kozel = Math.abs(index - activeIndex) <= 1;
+          const nyitottSzoveg = expandedId === reel.id;
 
           return (
-            <div key={reel.id} className="snap-start snap-always w-full h-[100dvh] relative flex items-center justify-center bg-black">
-              
-              {/* Background Fullscreen Image */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <img
-                  src={reel.image}
-                  alt={reel.caption}
-                  className="w-full h-full object-contain"
-                />
-              </div>
+            <div
+              key={reel.id}
+              data-index={index}
+              className="snap-start snap-always w-full h-[100dvh] relative flex items-center justify-center bg-black overflow-hidden"
+            >
+              {/* Elmosott háttér ugyanabból a képből: így az álló fotó mellett
+                  sem fekete sáv van, hanem a kép saját színei. */}
+              <img
+                src={reel.image}
+                alt=""
+                aria-hidden="true"
+                loading={kozel ? 'eager' : 'lazy'}
+                className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-50"
+              />
+              <img
+                src={reel.image}
+                alt={reel.caption || reel.exhibitor_name || ''}
+                loading={kozel ? 'eager' : 'lazy'}
+                decoding="async"
+                className="relative w-full h-full object-cover"
+              />
 
-              {/* Interaction Overlay Layer */}
-              <div 
-                className="absolute inset-0 z-10"
-                onDoubleClick={() => handleLike(reel.id)}
+              <div
+                className="absolute inset-0 z-10 select-none"
+                onTouchEnd={(e) => koppintas(e, reel)}
+                onDoubleClick={(e) => {
+                  // Asztali gépen az egér duplakattintása is kedvelés.
+                  const doboz = e.currentTarget.getBoundingClientRect();
+                  const most = Date.now();
+                  setBurst({ id: reel.id, x: e.clientX - doboz.left, y: e.clientY - doboz.top, kulcs: most });
+                  like(reel.id);
+                  setTimeout(() => setBurst((b) => (b && b.kulcs === most ? null : b)), 900);
+                }}
               >
-                {/* Gradient at bottom for text readability */}
+                {/* A felpattanó szív a koppintás helyén. */}
+                {burst && burst.id === reel.id && (
+                  <Heart
+                    key={burst.kulcs}
+                    className="absolute w-24 h-24 fill-rose-500 text-rose-500 drop-shadow-2xl pointer-events-none reel-burst"
+                    style={{ left: burst.x - 48, top: burst.y - 48 }}
+                  />
+                )}
+
                 <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-black via-black/40 to-transparent pointer-events-none" />
-                
-                {/* Floating Right Actions Menu */}
-                <div className="absolute right-4 bottom-24 flex flex-col items-center gap-6 pointer-events-auto">
-                  
-                  {/* Like Button */}
+
+                <div className="absolute right-4 bottom-24 flex flex-col items-center gap-5 pointer-events-auto">
                   <div className="flex flex-col items-center gap-1">
-                    <button 
-                      onClick={() => handleLike(reel.id)}
-                      className={`p-3 rounded-full backdrop-blur-md transition-transform shadow-lg cursor-pointer ${isLiked ? 'bg-rose-500/20' : 'bg-white/10 hover:bg-white/20'}`}
+                    <button
+                      onClick={() => like(reel.id)}
+                      className={`p-3 rounded-full backdrop-blur-md transition-all active:scale-90 shadow-lg cursor-pointer ${
+                        isLiked ? 'bg-rose-500/20' : 'bg-white/10 hover:bg-white/20'
+                      }`}
+                      aria-label="Kedvelés"
                     >
-                      <Heart className={`w-8 h-8 transition-colors ${isLiked ? 'fill-rose-500 text-rose-500' : 'text-white'}`} />
+                      <Heart
+                        className={`w-8 h-8 transition-colors ${
+                          isLiked ? 'fill-rose-500 text-rose-500' : 'text-white'
+                        }`}
+                      />
                     </button>
-                    <span className="text-white text-xs font-bold drop-shadow-md">
-                      {reel.likes || 0}
-                    </span>
+                    <span className="text-white text-xs font-bold drop-shadow-md">{reel.likes || 0}</span>
                   </div>
 
-                  {/* Exhibitor Map Button */}
+                  <div className="flex flex-col items-center gap-1">
+                    <button
+                      onClick={() => megosztas(reel)}
+                      className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md transition-all active:scale-90 shadow-lg cursor-pointer"
+                      aria-label="Megosztás"
+                    >
+                      <Share2 className="w-7 h-7 text-white" />
+                    </button>
+                    <span className="text-white text-xs font-bold drop-shadow-md">Megosztás</span>
+                  </div>
+
                   {exhibitor && (
                     <div className="flex flex-col items-center gap-1">
-                      <button 
+                      <button
                         onClick={() => {
                           setActiveView('map');
                           setTimeout(() => focusExhibitorOnMap(exhibitor.id), 100);
                         }}
-                        className="p-3 rounded-full bg-amber-500/90 hover:bg-amber-400 backdrop-blur-md text-stone-950 transition-transform shadow-lg cursor-pointer"
+                        className="p-3 rounded-full bg-amber-500/90 hover:bg-amber-400 backdrop-blur-md text-stone-950 transition-all active:scale-90 shadow-lg cursor-pointer"
+                        aria-label="Stand a térképen"
                       >
-                        <MapPin className="w-8 h-8" />
+                        <MapPin className="w-7 h-7" />
                       </button>
-                      <span className="text-white text-xs font-bold drop-shadow-md">
-                        Stand
-                      </span>
+                      <span className="text-white text-xs font-bold drop-shadow-md">Stand</span>
                     </div>
                   )}
                 </div>
 
-                {/* Bottom Info Section */}
                 <div className="absolute bottom-6 left-4 right-20 space-y-2 pointer-events-auto">
                   <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 rounded-full bg-amber-500 text-stone-950 font-black text-sm flex items-center justify-center border-2 border-white shadow-lg overflow-hidden">
+                    <div className="w-10 h-10 rounded-full bg-amber-500 text-stone-950 font-black text-sm flex items-center justify-center border-2 border-white shadow-lg overflow-hidden shrink-0">
                       {exhibitor?.image ? (
                         <img src={exhibitor.image} alt="" className="w-full h-full object-contain bg-white" />
                       ) : (
                         <span>{reel.exhibitor_name?.substring(0, 2).toUpperCase() || 'LÁ'}</span>
                       )}
                     </div>
-                    <div>
-                      <h3 className="font-extrabold text-white text-sm drop-shadow-md">
+                    <div className="min-w-0">
+                      <h3 className="font-extrabold text-white text-sm drop-shadow-md truncate">
                         {reel.exhibitor_name}
                       </h3>
                       <p className="text-xs text-white/80 font-bold drop-shadow-md">
@@ -137,15 +281,19 @@ export default function ReelsGallery() {
                       </p>
                     </div>
                   </div>
-                  
+
                   {reel.caption && (
-                    <p className="text-sm font-medium text-white line-clamp-3 drop-shadow-md pr-4">
+                    <p
+                      onClick={() => setExpandedId(nyitottSzoveg ? null : reel.id)}
+                      className={`text-sm font-medium text-white drop-shadow-md pr-4 cursor-pointer ${
+                        nyitottSzoveg ? '' : 'line-clamp-2'
+                      }`}
+                    >
                       {reel.caption}
                     </p>
                   )}
                 </div>
 
-                {/* Scroll Indicator */}
                 {index < reels.length - 1 && (
                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 animate-bounce opacity-60 pointer-events-none">
                     <ChevronDown className="w-6 h-6 text-white drop-shadow-md" />
