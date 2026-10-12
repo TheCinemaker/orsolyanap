@@ -26,15 +26,26 @@ import { useScrollLock } from '../hooks/useScrollLock';
  *    kezd el rugózni az alatta lévő oldal.
  */
 export default function ReelsGallery() {
-  const { reels, exhibitors, likeReel, setActiveView, focusExhibitorOnMap, showToast } = useOrsolya();
+  const {
+    reels,
+    exhibitors,
+    likeReel,
+    likedReelIds,
+    setActiveView,
+    focusExhibitorOnMap,
+    showToast,
+    loadMoreReels,
+    hasMoreReels,
+    loadingMoreReels,
+  } = useOrsolya();
 
-  const [likedReelIds, setLikedReelIds] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('orsolya_liked_reel_ids') || '[]');
-    } catch {
-      return [];
-    }
-  });
+  /* Mennyit rajzolunk ki a mostani körül.
+     A többi fotó helye megmarad (ugyanolyan magas üres doboz), csak a kép és
+     a feliratok nem kerülnek a DOM-ba. Kétszáz betöltött fotó kétszáz képet
+     és négyszáz szövegréteget jelentene egyszerre — attól egy telefon
+     bereccsen, a görgetés pedig szaggat. */
+  const ABLAK = 2;
+
   const [activeIndex, setActiveIndex] = useState(0);
   /** Hol és melyik fotón pattanjon fel a szív. */
   const [burst, setBurst] = useState(null);
@@ -44,10 +55,6 @@ export default function ReelsGallery() {
   const lastTapRef = useRef({ id: null, time: 0 });
 
   useScrollLock(true);
-
-  useEffect(() => {
-    localStorage.setItem('orsolya_liked_reel_ids', JSON.stringify(likedReelIds));
-  }, [likedReelIds]);
 
   /* Melyik fotó van épp a képernyőn. Ebből tudjuk, mit kell előretölteni.
      Figyelő, nem görgetés-számolás: az utóbbi minden eszközön máshogy
@@ -70,15 +77,17 @@ export default function ReelsGallery() {
     return () => megfigyelo.disconnect();
   }, [reels.length]);
 
-  const like = useCallback(
-    (id) => {
-      if (likedReelIds.includes(id)) return false;
-      setLikedReelIds((prev) => [...prev, id]);
-      likeReel(id);
-      return true;
-    },
-    [likedReelIds, likeReel]
-  );
+  /* A kedvelés valtó: második koppintásra visszavonja. Az adatbázis tartja
+     nyilván, melyik készülék melyik reelt kedvelte, tehát egy oldalfrissítés
+     nem ad újabb kedvelést. */
+  const like = useCallback((id) => likeReel(id), [likeReel]);
+
+  /* Utántöltés. Három fotóval a vége előtt szólunk, hogy mire a vendég
+     odaerül, már ott legyen a folytatás — így nem áll meg a görgetés. */
+  useEffect(() => {
+    if (reels.length === 0) return;
+    if (activeIndex >= reels.length - 3) loadMoreReels();
+  }, [activeIndex, reels.length]);
 
   /* Dupla koppintás kézzel. A két koppintás között 300 ms-ot engedünk, és
      csak akkor fogadjuk el, ha a két érintés egymáshoz közel esett -- így a
@@ -91,10 +100,11 @@ export default function ReelsGallery() {
     if (elozo.id === reel.id && most - elozo.time < 300) {
       lastTapRef.current = { id: null, time: 0 };
       const doboz = event.currentTarget.getBoundingClientRect();
+      // Dupla koppintás SOHA nem vonja vissza a kedvelést -- az Instagramon sem.
+      // Aki már kedvelte, annak csak a szív pattan fel újra.
+      if (!likedReelIds.includes(reel.id)) like(reel.id);
       setBurst({ id: reel.id, x: pont.clientX - doboz.left, y: pont.clientY - doboz.top, kulcs: most });
-      like(reel.id);
-      // A szív a felpattanás után eltűnik; a kulcs biztosítja, hogy egymás
-      // utáni koppintásoknál újrainduljon az animáció.
+      // A kulcs biztosítja, hogy egymás utáni koppintásoknál újrainduljon az animáció.
       setTimeout(() => setBurst((b) => (b && b.kulcs === most ? null : b)), 900);
       return;
     }
@@ -141,6 +151,7 @@ export default function ReelsGallery() {
           {reels.length > 0 && (
             <span className="ml-2 font-bold text-white/70">
               {activeIndex + 1}/{reels.length}
+              {hasMoreReels && '+'}
             </span>
           )}
         </h2>
@@ -157,6 +168,12 @@ export default function ReelsGallery() {
         ref={scrollerRef}
         className="flex-1 overflow-y-auto snap-y snap-mandatory scrollbar-none h-full w-full bg-stone-950 overscroll-contain"
       >
+        {reels.length > 0 && loadingMoreReels && (
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-40 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-bold text-white/80 pointer-events-none">
+            További fotók betöltése…
+          </div>
+        )}
+
         {reels.length === 0 && (
           <div className="flex items-center justify-center h-full text-white/50 text-sm font-bold">
             Még nincsenek fotók.
@@ -169,7 +186,21 @@ export default function ReelsGallery() {
           // A szomszédos fotók azonnal, a tobbi lustan: igy a kovetkezo
           // gorgetesnel mar kesz a kep, de nem toltunk le mindent elore.
           const kozel = Math.abs(index - activeIndex) <= 1;
+          const kirajzoljuk = Math.abs(index - activeIndex) <= ABLAK;
           const nyitottSzoveg = expandedId === reel.id;
+
+          // Távolabbi fotó: csak a helye marad meg, hogy a görgetés és a
+          // snap pontosan ott álljon meg, ahol kell.
+          if (!kirajzoljuk) {
+            return (
+              <div
+                key={reel.id}
+                data-index={index}
+                className="snap-start snap-always w-full h-[100dvh] bg-black"
+                aria-hidden="true"
+              />
+            );
+          }
 
           return (
             <div
@@ -201,8 +232,8 @@ export default function ReelsGallery() {
                   // Asztali gépen az egér duplakattintása is kedvelés.
                   const doboz = e.currentTarget.getBoundingClientRect();
                   const most = Date.now();
+                  if (!likedReelIds.includes(reel.id)) like(reel.id);
                   setBurst({ id: reel.id, x: e.clientX - doboz.left, y: e.clientY - doboz.top, kulcs: most });
-                  like(reel.id);
                   setTimeout(() => setBurst((b) => (b && b.kulcs === most ? null : b)), 900);
                 }}
               >
@@ -224,7 +255,7 @@ export default function ReelsGallery() {
                       className={`p-3 rounded-full backdrop-blur-md transition-all active:scale-90 shadow-lg cursor-pointer ${
                         isLiked ? 'bg-rose-500/20' : 'bg-white/10 hover:bg-white/20'
                       }`}
-                      aria-label="Kedvelés"
+                      aria-label={isLiked ? 'Kedvelés visszavonása' : 'Kedvelés'}
                     >
                       <Heart
                         className={`w-8 h-8 transition-colors ${

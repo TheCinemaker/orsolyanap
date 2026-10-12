@@ -13,6 +13,14 @@ import { deviceId } from '../lib/eszkoz';
  */
 const ORGANIZER_PIN = '0169';
 
+/**
+ * Mennyi fotó jöjjön le egyszerre.
+ *
+ * Harminc annyi, amennyit a vendég végiggörget amúgy is, és a megnyitás
+ * ettől marad gyors függetlenül attól, hány ezer fotó van összesen.
+ */
+const REEL_PAGE = 30;
+
 const OrsolyaContext = createContext();
 
 export function OrsolyaProvider({ children }) {
@@ -51,6 +59,16 @@ export function OrsolyaProvider({ children }) {
   const [votedItemIds, setVotedItemIds] = useState([]);
   // Hányszor nyílt meg az app, és hány különböző készülékről.
   const [visitStats, setVisitStats] = useState(null);
+  const [hasMoreReels, setHasMoreReels] = useState(false);
+  const [loadingMoreReels, setLoadingMoreReels] = useState(false);
+  // A kedvelt reelek: a szerver a hiteles forrás, a tároló csak gyors indítás.
+  const [likedReelIds, setLikedReelIds] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('orsolya_liked_reel_ids') || '[]');
+    } catch {
+      return [];
+    }
+  });
 
   // Global Visitor Filter States (Day & Dietary Preferences)
   const [selectedDay, setSelectedDay] = useState('all'); // 'all' | 'saturday' | 'sunday'
@@ -195,9 +213,19 @@ export function OrsolyaProvider({ children }) {
           .order('start_time', { ascending: true });
         if (!eventErr && eventData) setEvents(eventData);
 
-        const { data: reelData, error: reelErr } = await supabase.from('reels').select('*').order('created_at', { ascending: false });
+        /* Fotók: csak a legfrissebb adag.
+           Korábban az ÖSSZES reel lejött minden megnyitásnál. Egy forgalmas
+           hétvégén ez százakat jelent, és nem is a letöltés a nagyobb baj,
+           hanem hogy a telefon mindet ki is rajzolja. A többi akkor jön,
+           amikor a vendég odagörget. */
+        const { data: reelData, error: reelErr } = await supabase
+          .from('reels')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(REEL_PAGE);
         if (!reelErr && reelData) {
           setReels(reelData);
+          setHasMoreReels(reelData.length === REEL_PAGE);
         }
       } catch (err) {
         console.error('Supabase fetch exception:', err);
@@ -330,6 +358,10 @@ export function OrsolyaProvider({ children }) {
     localStorage.setItem('orsolya_voted_item_ids', JSON.stringify(votedItemIds));
   }, [votedItemIds]);
 
+  useEffect(() => {
+    localStorage.setItem('orsolya_liked_reel_ids', JSON.stringify(likedReelIds));
+  }, [likedReelIds]);
+
   /* Megnyitás rögzítése és a már leadott szavazatok visszaolvasása.
      Egyszer fut, az app betöltésekor.
 
@@ -351,6 +383,13 @@ export function OrsolyaProvider({ children }) {
       }
 
       try {
+        const { data } = await supabase.rpc('reel_likes_by_device', { p_device_id: deviceId() });
+        if (!eldobva && Array.isArray(data)) setLikedReelIds(data);
+      } catch (err) {
+        console.warn('reel_likes_by_device nem elérhető:', err?.message || err);
+      }
+
+      try {
         const { data } = await supabase.rpc('votes_by_device', { p_device_id: deviceId() });
         if (!eldobva && Array.isArray(data) && data.length > 0) {
           setVotedItemIds((prev) => [...new Set([...prev, ...data])]);
@@ -364,6 +403,34 @@ export function OrsolyaProvider({ children }) {
       eldobva = true;
     };
   }, []);
+
+  /**
+   * A következő adag fotó. A legrégebbi már betöltöttnél régebbiek jönnek
+   * — nem oldalszám szerint, mert közben új fotó is érkezhet, és akkor a
+   * lapozás elcsúszna: kihagyna vagy megduplazna sorokat.
+   */
+  const loadMoreReels = async () => {
+    if (loadingMoreReels || !hasMoreReels || !isSupabaseConfigured) return;
+    setLoadingMoreReels(true);
+    try {
+      const legregebbi = reels[reels.length - 1]?.created_at;
+      let q = supabase.from('reels').select('*').order('created_at', { ascending: false }).limit(REEL_PAGE);
+      if (legregebbi) q = q.lt('created_at', legregebbi);
+      const { data, error } = await q;
+      if (error) throw error;
+      if (data && data.length > 0) {
+        setReels((prev) => {
+          const ismert = new Set(prev.map((r) => r.id));
+          return [...prev, ...data.filter((r) => !ismert.has(r.id))];
+        });
+      }
+      setHasMoreReels((data || []).length === REEL_PAGE);
+    } catch (err) {
+      console.warn('További fotók betöltése nem sikerült:', err?.message || err);
+    } finally {
+      setLoadingMoreReels(false);
+    }
+  };
 
   // Focus exhibitor on map
   const focusExhibitorOnMap = (exhibitorId) => {
@@ -1019,17 +1086,53 @@ export function OrsolyaProvider({ children }) {
   };
 
   // Like a live Reel / Story
+  /**
+   * Kedvelés be/ki. Egy készülék egy reelt egyszer, de visszavonhatóan — az
+   * Instagramon is így működik, és a vendég ezt várja.
+   *
+   * A számolás és a korlátozás is az adatbázisban van. Korábban a kliens a
+   * saját, esetleg elavult számából írt abszolút értéket: két egyidejű
+   * kedvelés felülírta egymást, és egy oldalfrissítés után ugyanaz a telefon
+   * újra kedvelhetett.
+   *
+   * @returns {Promise<boolean>} igaz, ha a kedvelés most lett bekapcsolva
+   */
   const likeReel = async (reelId) => {
+    const elozo = reels.find((r) => r.id === reelId);
+    const voltKedvelve = likedReelIds.includes(reelId);
+
+    // Azonnali visszajelzés: a szív nem várhat a hálózatra.
+    setLikedReelIds((prev) => (voltKedvelve ? prev.filter((id) => id !== reelId) : [...prev, reelId]));
     setReels((prev) =>
-      prev.map((r) => (r.id === reelId ? { ...r, likes: (r.likes || 0) + 1 } : r))
+      prev.map((r) =>
+        r.id === reelId ? { ...r, likes: Math.max(0, (r.likes || 0) + (voltKedvelve ? -1 : 1)) } : r
+      )
     );
 
     try {
-      const reel = reels.find((r) => r.id === reelId);
-      const newLikes = (reel?.likes || 0) + 1;
-      await supabase.from('reels').update({ likes: newLikes }).eq('id', reelId);
-    } catch (e) {
-      console.warn('Supabase reel like notice:', e);
+      const { data, error } = await supabase.rpc('toggle_reel_like', {
+        p_reel_id: reelId,
+        p_device_id: deviceId(),
+      });
+      if (error) throw error;
+
+      if (data && typeof data.likes === 'number') {
+        setReels((prev) => prev.map((r) => (r.id === reelId ? { ...r, likes: data.likes } : r)));
+      }
+      if (data && typeof data.liked === 'boolean') {
+        setLikedReelIds((prev) =>
+          data.liked ? [...new Set([...prev, reelId])] : prev.filter((id) => id !== reelId)
+        );
+        return data.liked;
+      }
+      return !voltKedvelve;
+    } catch (err) {
+      // Nincs tartalék abszolút írásra: az kikerülte volna a készülékenkénti
+      // korlátot. Inkább visszaforgatjuk, amit mutattunk.
+      console.error('toggle_reel_like hiba:', err?.message || err);
+      setLikedReelIds((prev) => (voltKedvelve ? [...new Set([...prev, reelId])] : prev.filter((id) => id !== reelId)));
+      setReels((prev) => prev.map((r) => (r.id === reelId ? { ...r, likes: elozo?.likes || 0 } : r)));
+      return voltKedvelve;
     }
   };
 
@@ -1065,6 +1168,10 @@ export function OrsolyaProvider({ children }) {
         votedItemIds,
         voteForItem,
         visitStats,
+        likedReelIds,
+        loadMoreReels,
+        hasMoreReels,
+        loadingMoreReels,
         isVotingOpen,
         toggleForceVotingOpen,
         updateItemStock,
