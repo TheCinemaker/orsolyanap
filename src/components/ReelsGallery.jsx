@@ -37,6 +37,7 @@ export default function ReelsGallery() {
     loadMoreReels,
     hasMoreReels,
     loadingMoreReels,
+    reelStartId,
   } = useOrsolya();
 
   /* Mennyit rajzolunk ki a mostani körül.
@@ -55,6 +56,17 @@ export default function ReelsGallery() {
   const lastTapRef = useRef({ id: null, time: 0 });
 
   useScrollLock(true);
+
+  /* Arra a fotóra állítunk, amire a vendég a sávban koppintott. Ugrással,
+     nem görgetéssel: a feed nem futhat végig előtte tizenöt képen. */
+  useEffect(() => {
+    if (!reelStartId || reels.length === 0) return;
+    const i = reels.findIndex((r) => r.id === reelStartId);
+    if (i < 0) return;
+    setActiveIndex(i);
+    const el = scrollerRef.current?.querySelector(`[data-index="${i}"]`);
+    if (el) el.scrollIntoView({ block: 'start', behavior: 'instant' });
+  }, [reelStartId, reels.length]);
 
   /* Melyik fotó van épp a képernyőn. Ebből tudjuk, mit kell előretölteni.
      Figyelő, nem görgetés-számolás: az utóbbi minden eszközön máshogy
@@ -155,12 +167,15 @@ export default function ReelsGallery() {
             </span>
           )}
         </h2>
+        {/* Csupasz X, buborék nélkül. Az Instagramon sincs keret a gombok
+            körül: csak az ikon és egy erős árnyék, hogy világos képen is
+            látszódjon. A fagyottüveg-buborékoktól érződött webappnak. */}
         <button
           onClick={() => setActiveView('visitor')}
-          className="p-2 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-full text-white transition-colors cursor-pointer shadow-lg pointer-events-auto"
+          className="text-white transition-transform active:scale-90 cursor-pointer pointer-events-auto drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]"
           aria-label="Bezárás"
         >
-          <X className="w-6 h-6" />
+          <X className="w-7 h-7" strokeWidth={2.5} />
         </button>
       </div>
 
@@ -252,29 +267,29 @@ export default function ReelsGallery() {
                   <div className="flex flex-col items-center gap-1">
                     <button
                       onClick={() => like(reel.id)}
-                      className={`p-3 rounded-full backdrop-blur-md transition-all active:scale-90 shadow-lg cursor-pointer ${
-                        isLiked ? 'bg-rose-500/20' : 'bg-white/10 hover:bg-white/20'
-                      }`}
+                      className="transition-transform active:scale-75 cursor-pointer drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]"
                       aria-label={isLiked ? 'Kedvelés visszavonása' : 'Kedvelés'}
                     >
                       <Heart
-                        className={`w-8 h-8 transition-colors ${
-                          isLiked ? 'fill-rose-500 text-rose-500' : 'text-white'
+                        className={`w-9 h-9 transition-all ${
+                          isLiked ? 'fill-rose-500 text-rose-500 scale-110' : 'text-white'
                         }`}
+                        strokeWidth={2}
                       />
                     </button>
-                    <span className="text-white text-xs font-bold drop-shadow-md">{reel.likes || 0}</span>
+                    <span className="text-white text-xs font-bold drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
+                      {reel.likes || 0}
+                    </span>
                   </div>
 
                   <div className="flex flex-col items-center gap-1">
                     <button
                       onClick={() => megosztas(reel)}
-                      className="p-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md transition-all active:scale-90 shadow-lg cursor-pointer"
+                      className="transition-transform active:scale-75 cursor-pointer drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]"
                       aria-label="Megosztás"
                     >
-                      <Share2 className="w-7 h-7 text-white" />
+                      <Share2 className="w-8 h-8 text-white" strokeWidth={2} />
                     </button>
-                    <span className="text-white text-xs font-bold drop-shadow-md">Megosztás</span>
                   </div>
 
                   {exhibitor && (
@@ -284,12 +299,14 @@ export default function ReelsGallery() {
                           setActiveView('map');
                           setTimeout(() => focusExhibitorOnMap(exhibitor.id), 100);
                         }}
-                        className="p-3 rounded-full bg-amber-500/90 hover:bg-amber-400 backdrop-blur-md text-stone-950 transition-all active:scale-90 shadow-lg cursor-pointer"
+                        className="transition-transform active:scale-75 cursor-pointer drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]"
                         aria-label="Stand a térképen"
                       >
-                        <MapPin className="w-7 h-7" />
+                        <MapPin className="w-8 h-8 text-amber-400" strokeWidth={2} />
                       </button>
-                      <span className="text-white text-xs font-bold drop-shadow-md">Stand</span>
+                      <span className="text-white text-[11px] font-bold drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
+                        Stand
+                      </span>
                     </div>
                   )}
                 </div>

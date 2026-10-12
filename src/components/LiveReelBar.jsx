@@ -13,10 +13,10 @@ export default function LiveReelBar() {
     convertFileToBase64,
     focusExhibitorOnMap,
     showToast,
-    setActiveView
+    setActiveView,
+    openReels
   } = useOrsolya();
 
-  const [activeStoryModal, setActiveStoryModal] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   // Add Reel Form for Visitors & Exhibitors
@@ -31,7 +31,7 @@ export default function LiveReelBar() {
   });
 
   // A háttéroldal ne legyen görgethető, amíg bármelyik réteg nyitva van.
-  useScrollLock(Boolean(isAddModalOpen || activeStoryModal));
+  useScrollLock(Boolean(isAddModalOpen));
   useEffect(() => { localStorage.setItem('orsolya_liked_reel_ids', JSON.stringify(likedReelIds)); }, [likedReelIds]);
   const uniqueReels = Array.from(new Map(reels.map((reel) => [String(reel.id), reel])).values());
 
@@ -129,7 +129,7 @@ export default function LiveReelBar() {
           return (
             <div
               key={reel.id}
-              onClick={() => setActiveStoryModal(reel)}
+              onClick={() => openReels(reel.id)}
               className="flex-shrink-0 w-28 sm:w-32 h-44 sm:h-48 rounded-md relative overflow-hidden cursor-pointer group shadow-xs hover:shadow-md transition-all snap-start border border-stone-300 bg-stone-900"
             >
               {/* Background Photo */}
@@ -312,87 +312,6 @@ export default function LiveReelBar() {
         </div>
       )}
 
-      {/* ---------------------------------------------------------------- */}
-      {/* FULLSCREEN STORY VIEWER MODAL */}
-      {/* ---------------------------------------------------------------- */}
-      {activeStoryModal && (
-        <div
-          onClick={() => setActiveStoryModal(null)}
-          className="fixed inset-0 z-50 bg-stone-950/90 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="bg-stone-900 text-white rounded-md max-w-sm w-full overflow-hidden shadow-2xl relative border border-stone-800 flex flex-col justify-between h-[80vh] max-h-[650px]"
-          >
-            {/* Top Bar Header */}
-            <div className="p-4 bg-gradient-to-b from-stone-950/80 to-transparent z-10 flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-full bg-amber-500 text-stone-950 font-black text-xs flex items-center justify-center border-2 border-amber-300">
-                  {activeStoryModal.exhibitor_name?.substring(0, 2).toUpperCase() || 'LÁ'}
-                </div>
-                <div>
-                  <h4 className="font-extrabold text-xs text-white leading-tight">
-                    {activeStoryModal.exhibitor_name}
-                  </h4>
-                  <p className="text-[10px] text-amber-300 font-bold">
-                    {formatTimeShort(activeStoryModal.created_at)}
-                  </p>
-                </div>
-              </div>
-
-              <button
-                onClick={() => setActiveStoryModal(null)}
-                className="p-1.5 bg-stone-800/80 hover:bg-stone-700 rounded-full text-stone-300"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Story Image */}
-            <div className="flex-1 relative flex items-center justify-center overflow-hidden bg-black">
-              <img
-                src={activeStoryModal.image}
-                alt={activeStoryModal.caption}
-                className="w-full h-full object-contain"
-              />
-            </div>
-
-            {/* Bottom Caption & Action Bar */}
-            <div className="p-4 bg-stone-900 border-t border-stone-800 space-y-3">
-              <p className="text-sm font-black text-amber-100 leading-snug">
-                "{activeStoryModal.caption}"
-              </p>
-
-              <div className="flex items-center justify-between gap-2 pt-1">
-                <button
-                  onClick={() => {
-                    if (likedReelIds.includes(activeStoryModal.id)) return;
-                    setLikedReelIds((prev) => [...prev, activeStoryModal.id]);
-                    likeReel(activeStoryModal.id);
-                  }}
-                  className="flex items-center gap-1.5 px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white font-black text-xs rounded-md shadow-xs transition-colors cursor-pointer"
-                >
-                  <Heart className={`w-4 h-4 ${likedReelIds.includes(activeStoryModal.id) ? "fill-white" : ""}`} />
-                  <span>{activeStoryModal.likes || 0} Kedvelés</span>
-                </button>
-
-                {exhibitors.find((e) => e.id === activeStoryModal.exhibitor_id) && (
-                  <button
-                    onClick={() => {
-                      focusExhibitorOnMap(activeStoryModal.exhibitor_id);
-                      setActiveStoryModal(null);
-                    }}
-                    className="flex items-center gap-1.5 px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-stone-950 font-black text-xs rounded-md shadow-xs transition-colors cursor-pointer"
-                  >
-                    <MapPin className="w-4 h-4" />
-                    <span>Stand a térképen</span>
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

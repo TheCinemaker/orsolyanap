@@ -60,6 +60,8 @@ export function OrsolyaProvider({ children }) {
   // Hányszor nyílt meg az app, és hány különböző készülékről.
   const [visitStats, setVisitStats] = useState(null);
   const [hasMoreReels, setHasMoreReels] = useState(false);
+  /** Melyik fotón nyíljon meg a teljes képernyős folyám. */
+  const [reelStartId, setReelStartId] = useState(null);
   const [loadingMoreReels, setLoadingMoreReels] = useState(false);
   // A kedvelt reelek: a szerver a hiteles forrás, a tároló csak gyors indítás.
   const [likedReelIds, setLikedReelIds] = useState(() => {
@@ -430,6 +432,18 @@ export function OrsolyaProvider({ children }) {
     } finally {
       setLoadingMoreReels(false);
     }
+  };
+
+  /**
+   * A fotófolyám megnyitása, azon a képen, amire a vendég koppintott.
+   *
+   * Korábban a sáv egy középre tett kártyát nyitott: egy fotó, nincs
+   * továbbgörgetés. A teljes képernyős folyám meg volt írva, csak semmi
+   * nem hívta meg -- az `activeView === 'reels'` állapotba nem vezetett út.
+   */
+  const openReels = (reelId = null) => {
+    setReelStartId(reelId);
+    setActiveView('reels');
   };
 
   // Focus exhibitor on map
@@ -1169,6 +1183,8 @@ export function OrsolyaProvider({ children }) {
         voteForItem,
         visitStats,
         likedReelIds,
+        openReels,
+        reelStartId,
         loadMoreReels,
         hasMoreReels,
         loadingMoreReels,
