@@ -288,6 +288,17 @@ export function OrsolyaProvider({ children }) {
             }
           }
         )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'app_stats' },
+          (payload) => {
+            // A látogatásszámláló élőben. Két kulcs van: 'opens' és 'devices',
+            // külön sorban, tehát külön eseményként is érkezhetnek.
+            const key = payload.new?.key;
+            if (key !== 'opens' && key !== 'devices') return;
+            setVisitStats((prev) => ({ ...(prev || {}), [key]: Number(payload.new.value) }));
+          }
+        )
         .subscribe();
     } catch (err) {
       console.warn('Realtime subscription fallback:', err);

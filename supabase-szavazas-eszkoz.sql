@@ -106,6 +106,14 @@ create table if not exists app_devices (
 );
 alter table app_devices enable row level security;
 
+-- Az app_stats publikus szamlalo: a lablecben mindenki latja. Olvasasra
+-- nyitva, irasra nem -- azt csak a lenti security definer fuggveny vegzi.
+-- Realtime-hoz EZ KELL: a feliratkozo csak olyan sort kap meg, amit olvashat.
+drop policy if exists app_stats_read on app_stats;
+create policy app_stats_read on app_stats for select using (true);
+
+-- Az app_devices SZANDEKOSAN nem kap policy-t: keszulekazonositok vannak benne.
+
 create or replace function register_visit(p_device_id text)
 returns json
 language plpgsql
@@ -129,6 +137,13 @@ begin
 
   select count(*) into v_devices from app_devices;
 
+  -- A keszulekszamot is ide irjuk, nem csak visszaadjuk. Realtime-ban csak
+  -- olyan tablat lehet kuldeni, amit a bongeszo olvashat is -- az app_devices
+  -- viszont keszulekazonositokat tartalmaz, azt nem nyitjuk ki. Igy a ket
+  -- publikus szam egy helyen van, es egy feliratkozas eleg hozzajuk.
+  insert into app_stats (key, value) values ('devices', v_devices)
+  on conflict (key) do update set value = excluded.value;
+
   return json_build_object('opens', v_opens, 'devices', v_devices);
 end;
 $$;
@@ -145,6 +160,28 @@ as $$
     'devices', (select count(*) from app_devices)
   );
 $$;
+
+-- ---------------------------------------------------------------------------
+--  3b. Realtime
+--
+--  A szavazatok mar most elonek: a menu_items UPDATE-jere fel van iratkozva az
+--  app. A szamlalohoz az app_stats-ot is be kell tenni a publikaciba, kulonben
+--  a labléc csak ujratoltesre frissul.
+-- ---------------------------------------------------------------------------
+do $$
+declare
+  t text;
+begin
+  foreach t in array array['app_stats', 'menu_items', 'exhibitors']
+  loop
+    if not exists (
+      select 1 from pg_publication_tables
+       where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = t
+    ) then
+      execute format('alter publication supabase_realtime add table public.%I', t);
+    end if;
+  end loop;
+end $$;
 
 -- ---------------------------------------------------------------------------
 --  4. Újraszámolás a naplóból
@@ -166,8 +203,13 @@ as $$
 declare
   v_rows bigint;
 begin
+  -- A WHERE nem dekoracio: a Supabase biztonsagi kapcsoloja elutasitja a
+  -- WHERE nelkuli UPDATE-et ("UPDATE requires a WHERE clause"), tehat enelkul
+  -- a fuggveny soha nem futott volna le. Egyben csak azokat a sorokat irja at,
+  -- amelyek valoban elcsusztak, es a visszaadott szam is ezt mondja meg.
   update menu_items m
-     set votes = (select count(*) from item_votes v where v.item_id = m.id);
+     set votes = (select count(*) from item_votes v where v.item_id = m.id)
+   where coalesce(m.votes, 0) <> (select count(*) from item_votes v where v.item_id = m.id);
   get diagnostics v_rows = row_count;
   return v_rows;
 end;
@@ -181,16 +223,17 @@ grant execute on function votes_by_device(text)      to anon, authenticated;
 grant execute on function register_visit(text)       to anon, authenticated;
 grant execute on function app_counters()             to anon, authenticated;
 
+-- FIGYELEM: a PostgreSQL minden uj funkciora ALAPBOL a PUBLIC szerepnek adja a
+-- futtatasi jogot, es az anon annak tagja. Ezert a PUBLIC-tol kell megvonni,
+-- nem csak az anon-tol -- enelkul a tiltas latszolagos. Merve: a megvonas utan
+-- a bongeszo kulcsaval a recount_votes tovabbra is lefutott.
+revoke execute on function recount_votes() from public;
 revoke execute on function recount_votes() from anon, authenticated;
 
--- A régi, korlátozás nélküli szavazófüggvény megszűnik a böngésző számára:
--- amíg hívható volt, a készülékenkénti korlát egy sor kóddal kikerülhető volt.
-do $$
-begin
-  if exists (
-    select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
-    where n.nspname = 'public' and p.proname = 'increment_item_votes'
-  ) then
-    execute 'revoke execute on function increment_item_votes(text) from anon, authenticated';
-  end if;
-end $$;
+-- A regi, korlatozas nelkuli szavazofuggveny torlese.
+--
+-- Nem elég megvonni a jogot: amig a fuggveny letezett, egyetlen REST-hivassal
+-- kikerulhette volna a keszulekenkenti korlatot -- merve: anon kulccsal
+-- lefutott es megnovelte a szavazatszamot. A kod mar nem hasznalja (a kliens
+-- tartalek agat is kivettuk), tehat nincs mire megtartani.
+drop function if exists increment_item_votes(text);
