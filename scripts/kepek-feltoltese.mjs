@@ -19,7 +19,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { env, api, norm, matchFiles, compress, FOOD, LOGO } from './lib.mjs';
+import { env, api, norm, matchFiles, compress, isImage, imageGlob, FOOD, LOGO } from './lib.mjs';
 
 const arg = process.argv[2];
 if (!arg) {
@@ -37,6 +37,57 @@ const safe = (s) => s.replace(/[\\/:*?"<>|]/g, '-').trim();
 let uploaded = 0;
 let skipped = [];
 
+/**
+ * Kézi párosítás: `parositas.json` a képek mappájában.
+ *
+ * Akkor kell, amikor tippelni nem szabad. Két eset van rá:
+ *   - rövidítés: a "NOE.png" logót semmilyen hasonlóság nem köti a
+ *     "Nagycsaládosok Országos Egyesületének..." névhez
+ *   - egy kép több tételhez: egy "italok.png" a kávéhoz, teához, üdítőhöz
+ *
+ *   { "NOE.png": "Nagycsaládosok Országos Egyesületének Kőszeg és Kőszeghegyalja Szervezete" }
+ *   { "italok.png": ["Kávé", "Tea", "Üdítő"] }
+ *
+ * Amit itt megadsz, az pontos egyezés, nem tipp — a szkript nem bírálja felül.
+ */
+function readMapping(dir) {
+  const f = path.join(dir, 'parositas.json');
+  if (!fs.existsSync(f)) return {};
+  try {
+    return JSON.parse(fs.readFileSync(f, 'utf8'));
+  } catch (err) {
+    console.error(`\n  Hibás parositas.json: ${f}\n  ${err.message}\n`);
+    process.exit(1);
+  }
+}
+
+/** A kézzel megadott párosításokat kivesszük a tippelésből. */
+function applyMapping(mapping, files, items, label) {
+  const manual = [];
+  const consumed = new Set();
+
+  for (const [file, targetsRaw] of Object.entries(mapping)) {
+    if (!files.includes(file)) {
+      skipped.push(`${label}: a parositas.json a(z) "${file}" fájlt említi, de az nincs a mappában`);
+      continue;
+    }
+    const targets = Array.isArray(targetsRaw) ? targetsRaw : [targetsRaw];
+    let hit = false;
+    for (const t of targets) {
+      const found = items.find((i) => norm(i.name) === norm(t));
+      if (!found) {
+        skipped.push(`${label}: a parositas.json "${t}" tételre hivatkozik, de ilyen nincs`);
+        continue;
+      }
+      manual.push({ file, id: found.id, name: found.name, score: 2, forced: false, manual: true });
+      hit = true;
+    }
+    if (hit) consumed.add(file);
+  }
+
+  return { manual, restFiles: files.filter((f) => !consumed.has(f)) };
+}
+
 /** Egy adag kép feldolgozása: tömörítés, feltöltés, URL beírása. */
 async function send(plan, srcDir, outDir, table, bucket) {
   for (const p of plan) {
@@ -49,7 +100,7 @@ async function send(plan, srcDir, outDir, table, bucket) {
     const url = await db.upload(bucket, `${p.id}.webp`, buf);
     await db.patch(table, p.id, { image: url });
     uploaded++;
-    const mark = p.forced ? '  (kényszerű párosítás)' : '';
+    const mark = p.manual ? '  (kézi párosítás)' : p.forced ? '  (kényszerű párosítás)' : '';
     console.log(`    ${p.name.slice(0, 40).padEnd(42)}${String(Math.round(buf.length / 1024)).padStart(3)} kB${mark}`);
   }
 }
@@ -62,8 +113,11 @@ if (arg === '--logok') {
     console.error('Nincs logok/ mappa.');
     process.exit(1);
   }
-  const files = fs.readdirSync('logok').filter((f) => /\.(png|jpe?g|webp)$/i.test(f));
-  const { plan, unmatchedFiles } = matchFiles(files, exhibitors);
+  const files = fs.readdirSync('logok').filter(isImage);
+  const { manual, restFiles } = applyMapping(readMapping('logok'), files, exhibitors, 'logók');
+  const rest = exhibitors.filter((x) => !manual.some((m) => m.id === x.id));
+  const { plan: fuzzy, unmatchedFiles } = matchFiles(restFiles, rest);
+  const plan = [...manual, ...fuzzy];
   const fresh = plan.filter((p) => {
     const ex = exhibitors.find((x) => x.id === p.id);
     return !ex.image || process.env.FORCE === '1';
@@ -112,14 +166,17 @@ else {
   for (const stand of targets) {
     const dir = 'etelfotok/' + safe(stand.name);
     if (!fs.existsSync(dir)) continue;
-    const files = fs.readdirSync(dir).filter((f) => /\.(png|jpe?g|webp)$/i.test(f));
+    const files = fs.readdirSync(dir).filter(isImage);
     if (!files.length) continue;
 
     const items = await db.select(
       'menu_items',
       `exhibitor_id=eq.${encodeURIComponent(stand.id)}&select=id,name,image&order=name`
     );
-    const { plan, unmatchedFiles, unmatchedItems } = matchFiles(files, items);
+    const { manual, restFiles } = applyMapping(readMapping(dir), files, items, stand.name);
+    const restItems = items.filter((i) => !manual.some((m) => m.id === i.id));
+    const { plan: fuzzy, unmatchedFiles, unmatchedItems } = matchFiles(restFiles, restItems);
+    const plan = [...manual, ...fuzzy];
     const fresh = plan.filter((p) => {
       const it = items.find((i) => i.id === p.id);
       return !it.image || process.env.FORCE === '1';
@@ -130,7 +187,7 @@ else {
 
     if (fresh.length) {
       const outDir = path.join(tmp, safe(stand.id));
-      compress(path.join(dir, '*'), outDir, FOOD);
+      compress(imageGlob(dir), outDir, FOOD);
       await send(fresh, dir, outDir, 'menu_items', 'etelek');
     }
     unmatchedFiles.forEach((f) => skipped.push(`${stand.name}: ${f} — nem tudom, melyik ételhez tartozik`));

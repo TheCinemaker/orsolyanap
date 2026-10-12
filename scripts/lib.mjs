@@ -109,12 +109,45 @@ export const LOGO = { w: 400, q: 68 };
  * @param {string} outDir kimeneti könyvtár
  * @param {{w:number,h?:number,q:number}} spec FOOD vagy LOGO
  */
+/**
+ * Amit képnek tekintünk. EGY helyen, mert a baj abból lett, hogy a fájlszűrő
+ * és a tömörítés mintája szétcsúszott: a szűrő csak a képeket vette fel, a
+ * tömörítés viszont a mappa teljes tartalmát kapta, és egy ott felejtett
+ * JSON-on elhasalt az egész stand feltöltése.
+ */
+const IMAGE_EXT = ['png', 'jpg', 'jpeg', 'webp'];
+
+export const isImage = (f) => new RegExp('\\.(' + IMAGE_EXT.join('|') + ')$', 'i').test(f);
+
+/** Csak a képekre illeszkedő glob-minta egy mappához. */
+export const imageGlob = (dir) => {
+  const both = IMAGE_EXT.flatMap((e) => [e, e.toUpperCase()]);
+  return dir.split('\\').join('/').replace(/\/$/, '') + '/*.{' + both.join(',') + '}';
+};
+
 export function compress(inputGlob, outDir, spec) {
   fs.mkdirSync(outDir, { recursive: true });
-  const args = ['--yes', 'sharp-cli', '-i', inputGlob, '-o', outDir, '-f', 'webp', '-q', String(spec.q), 'resize', String(spec.w)];
+
+  // A sharp-cli a bemenetet glob-mintaként értelmezi, abban pedig a visszaperjel
+  // ESCAPE-karakter, nem útvonalválasztó. Windowson a path.join visszaperjelet
+  // ad, így a minta egyetlen fájlra sem illeszkedett: a szkript "No input
+  // files"-t kapott, és egy egész stand fotói kimaradtak. Előre perjellel
+  // mindkét rendszeren működik.
+  const pattern = String(inputGlob).split('\\').join('/');
+
+  const args = ['--yes', 'sharp-cli', '-i', pattern, '-o', outDir, '-f', 'webp', '-q', String(spec.q), 'resize', String(spec.w)];
   if (spec.h) args.push(String(spec.h), '--fit', 'cover', '--position', 'center');
   else args.push('--withoutEnlargement');
-  execFileSync('npx', args, { stdio: 'ignore', shell: process.platform === 'win32' });
+
+  // A shell:true kell, mert Windowson az npx egy .cmd, azt a Node mashogy nem
+  // inditja el. Viszont ilyenkor a Node NEM idezojelezi az argumentumokat, es
+  // a standok mappaneveben van szokoz ("Jimmy Gym", "Nagycsaladosok Orszagos
+  // Egyesuletenek..."). Idezojel nelkul a sharp-cli az elso szokoznel elvagja
+  // az utvonalat, es a tomorites eldobja az egesz standot.
+  const quoted = args.map((a) =>
+    /[\s&|<>^()]/.test(a) ? '"' + String(a).replace(/"/g, '\\"') + '"' : a
+  );
+  execFileSync('npx', quoted, { stdio: 'ignore', shell: true });
 }
 
 // ---------------------------------------------------------------------------
@@ -154,21 +187,47 @@ export function lcs(a, b) {
  *
  * @returns {{plan: Array, unmatchedFiles: string[], unmatchedItems: Array}}
  */
+/**
+ * Egy fájlnév és egy tételnév hasonlósága.
+ *
+ * A `score` a rövidebb szöveghez normalizál, hogy mindkét irány működjön: a
+ * rövid fájlnév hosszú ételnévhez ("harcsa" -> "Orsolya-napi szálkamentes
+ * harcsahalászlé"), és a bő fájlnév rövid standnévhez ("JIMMY GYM Kőszeg
+ * erőemelő embléma" -> "Jimmy Gym").
+ *
+ * A `len` az egyező rész HOSSZA, és ez legalább olyan fontos. A puszta arány
+ * ugyanis a rövid neveket felértékeli: "süteményválogatás" és "Tea" közös
+ * része mindössze a "te", de mivel a "tea" három karakter, az arány 0,67 --
+ * magasabb, mint a helyes "Különböző édes és sós házi sütemények" 0,47-e. Így
+ * egy süteményfotó került a tea mellé. Két karakter nem egyezés, hanem zaj.
+ */
+const MIN_MATCH = 3;
+
+function similarity(fileBase, itemName) {
+  const nb = norm(itemName);
+  if (fileBase === nb) return { score: 2, len: nb.length };
+  const len = lcs(fileBase, nb);
+  return { score: len / (Math.min(fileBase.length, nb.length) || 1), len };
+}
+
+/** Előbb arány, holtversenyben a hosszabb egyezés. */
+const better = (a, b) => b.score - a.score || b.len - a.len;
+
 export function matchFiles(files, items) {
   const plan = [];
   const used = new Set();
 
   for (const f of files) {
     const fb = norm(path.basename(f, path.extname(f)));
+    // A MIN_MATCH alatti jelölteket itt dobjuk el, nem a végén: ha csak a
+    // legjobbat vizsgálnánk, egy zajos jelölt (magas arány, két karakteres
+    // egyezés) a RANGSOR ÉLÉRE kerülne, és azzal a helyes párosítást is
+    // elrontaná -- sem fel nem kerül, sem a jót nem engedi.
     const scored = items
-      .map((it) => {
-        const nb = norm(it.name);
-        // A rövidebb szöveghez normalizálunk: így mindkét irány működik --
-        // a rövid fájlnév hosszú ételnévhez, és a bő fájlnév rövid standnévhez.
-        const base = Math.min(fb.length, nb.length) || 1;
-        return { it, score: fb === nb ? 2 : lcs(fb, nb) / base };
-      })
-      .sort((a, b) => b.score - a.score);
+      .map((it) => ({ it, ...similarity(fb, it.name) }))
+      .filter((c) => c.len >= MIN_MATCH)
+      .sort(better);
+    if (scored.length === 0) continue;
     const [first, second] = scored;
     if (first.score >= 0.9 && first.score - (second?.score ?? 0) >= 0.15 && !used.has(first.it.id)) {
       plan.push({ file: f, id: first.it.id, name: first.it.name, score: first.score, forced: false });
@@ -184,15 +243,17 @@ export function matchFiles(files, items) {
       .map((f) => {
         const fb = norm(path.basename(f, path.extname(f)));
         const s = leftItems
-          .map((it) => {
-            const nb = norm(it.name);
-            return { it, score: lcs(fb, nb) / (Math.min(fb.length, nb.length) || 1) };
-          })
-          .sort((a, b) => b.score - a.score);
+          .map((it) => ({ it, ...similarity(fb, it.name) }))
+          .filter((c) => c.len >= MIN_MATCH)
+          .sort(better);
         return { f, best: s[0], second: s[1] };
       })
-      .sort((a, b) => b.best.score - a.best.score);
+      .filter((c) => c.best)
+      .sort((a, b) => better(a.best, b.best));
 
+    // A "mar csak egy maradt" eset sem szabadit fel a MIN_MATCH alol: az
+    // utolso fajlt sem szabad az utolso tetelre dobni, ha a kettonek semmi koze
+    // egymashoz. Inkabb maradjon kep nelkul, mint rossz keppel.
     const ok = (c) =>
       (leftFiles.length === 1 && leftItems.length === 1) ||
       (c.best.score >= 0.4 && (!c.second || c.best.score - c.second.score >= 0.15));
