@@ -191,6 +191,12 @@ előtt. Nem egysoros javítás, mert a `profileData` kezdőértéke
 
 ## Ami nyitott
 
+- **A parkolók koordinátája hiányzik.** A szöveges tájékoztató él, de a
+  `src/data/parkolas.js`-ben még `coordinates: null` áll. Amint megjön a pont,
+  oda kell beírni — a térkép-pin, a „Parkolók" gomb, a jelmagyarázat és a
+  tájékoztató „a térképen is meg van jelölve" mondata maguktól megjelennek.
+  Koordinátát **ne tippelj**: egy rossz helyre tett parkoló-pin rosszabb, mint
+  a semmi, mert a látogató elhiszi és odamegy.
 - **13 stand térkép-pinje becsült.** A helyszíni körön kell pontosítani,
   a `KOORDINATAK_ELLENORIZENDO.txt` listázza őket. A fájl a tizedesjegyek
   száma alapján válogat, tehát magától frissül.

@@ -1,7 +1,8 @@
 import React from 'react';
-import { X, Calendar, Sparkles, Landmark, Leaf, Clock, Trophy, Phone, ShoppingBasket, ImageOff } from 'lucide-react';
+import { X, Calendar, Sparkles, Landmark, Leaf, Clock, Trophy, Phone, ShoppingBasket, ImageOff, Car } from 'lucide-react';
 import VisitKoszegLogo from './VisitKoszegLogo';
 import { useScrollLock } from '../hooks/useScrollLock';
+import { PARKING_NOTICE, PARKING_LOTS, mappedParkingLots } from '../data/parkolas';
 
 export default function OrsolyaInfoModal({ isOpen, onClose }) {
   // A háttéroldal ne legyen görgethető, amíg ez nyitva van.
@@ -42,9 +43,9 @@ export default function OrsolyaInfoModal({ isOpen, onClose }) {
         {/* Story Content Blocks */}
         <div className="space-y-4 text-xs text-stone-700 leading-relaxed">
           {/* Kérés a vendégekhez -- a szervezők kiemelt felhívása.
-              Szándékosan ez az első és egyetlen amber kártya: ez az egyetlen
-              dolog a leírásban, amit a látogatónak MÉG INDULÁS ELŐTT kell
-              megtennie. */}
+              Szándékosan amber: a leírásban két dolog van, amit a látogatónak
+              MÉG INDULÁS ELŐTT kell tudnia. Ez az egyik, a másik a parkolás
+              közvetlenül alatta. */}
           <div className="bg-amber-50 border border-amber-300/80 rounded-md p-4 space-y-2">
             <div className="flex items-center gap-2 font-bold text-sm text-amber-950">
               <Leaf className="w-4 h-4 text-amber-800" />
@@ -56,6 +57,29 @@ export default function OrsolyaInfoModal({ isOpen, onClose }) {
               gusztusosabb a kóstolás, kulturáltabb a fogyasztás, és nem terheled a
               környezetet eldobható műanyaggal.
             </p>
+          </div>
+
+          {/* Parkolás -- a szervezők második kiemelt kérése. Aztán kell tudni,
+              hogy ingyenes, de a belvárosban nem lesz hely: ezt indulás előtt
+              kell elolvasni, nem a harmadik kör után a Fő tér körül. */}
+          <div className="bg-amber-50 border border-amber-300/80 rounded-md p-4 space-y-2">
+            <div className="flex items-center gap-2 font-bold text-sm text-amber-950">
+              <Car className="w-4 h-4 text-amber-800" />
+              <h3>Parkolás — ingyenes, de a város szélén</h3>
+            </div>
+            <p className="text-amber-950/90">{PARKING_NOTICE}</p>
+            <ul className="space-y-1 list-disc list-inside text-amber-950/90 pt-0.5">
+              {PARKING_LOTS.map((lot) => (
+                <li key={lot.id}>
+                  <strong>{lot.name}</strong> — {lot.hint}
+                </li>
+              ))}
+            </ul>
+            {mappedParkingLots().length > 0 && (
+              <p className="text-amber-900/70 pt-1 font-medium">
+                A parkolók a <strong>térképen</strong> is meg vannak jelölve.
+              </p>
+            )}
           </div>
 
           {/* Gyakorlati tudnivalók */}
