@@ -36,6 +36,28 @@ const safe = (s) => s.replace(/[\\/:*?"<>|]/g, '-').trim();
 
 let uploaded = 0;
 let skipped = [];
+let lecserelt = 0;
+
+/**
+ * Feltöltendő-e ez a kép?
+ *
+ * Akkor igen, ha még nincs kép, VAGY ha a gépen lévő fájl frissebb annál,
+ * ami fent van. Ez teszi a cserét egyszerűvé: lecseréled a fájlt a mappában,
+ * futtatsz, és csak az megy fel, amihez hozzányúltál.
+ *
+ * Korábban minden meglévő kép kimaradt, és cseréhez a FORCE=1 kellett — az
+ * viszont mind a 162 fotót újratömörítette és újratöltötte.
+ */
+function kellFeltolteni(vanKep, forrasFajl, tarhelyIdo) {
+  if (process.env.FORCE === '1') return true;
+  if (!vanKep) return true;
+  if (!tarhelyIdo) return false;
+  try {
+    return fs.statSync(forrasFajl).mtimeMs > new Date(tarhelyIdo).getTime();
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Kézi párosítás: `parositas.json` a képek mappájában.
@@ -118,10 +140,12 @@ if (arg === '--logok') {
   const rest = exhibitors.filter((x) => !manual.some((m) => m.id === x.id));
   const { plan: fuzzy, unmatchedFiles } = matchFiles(restFiles, rest);
   const plan = [...manual, ...fuzzy];
+  const tarhely = await db.listBucket('logok');
   const fresh = plan.filter((p) => {
     const ex = exhibitors.find((x) => x.id === p.id);
-    return !ex.image || process.env.FORCE === '1';
+    return kellFeltolteni(Boolean(ex.image), path.join('logok', p.file), tarhely.get(`${p.id}.webp`));
   });
+  lecserelt += fresh.filter((p) => exhibitors.find((x) => x.id === p.id)?.image).length;
 
   console.log(`\n  ${files.length} fájl, ${plan.length} párosítva, ${fresh.length} feltöltendő`);
   if (fresh.length) {
@@ -177,10 +201,12 @@ else {
     const restItems = items.filter((i) => !manual.some((m) => m.id === i.id));
     const { plan: fuzzy, unmatchedFiles, unmatchedItems } = matchFiles(restFiles, restItems);
     const plan = [...manual, ...fuzzy];
+    const tarhely = await db.listBucket('etelek');
     const fresh = plan.filter((p) => {
       const it = items.find((i) => i.id === p.id);
-      return !it.image || process.env.FORCE === '1';
+      return kellFeltolteni(Boolean(it.image), path.join(dir, p.file), tarhely.get(`${p.id}.webp`));
     });
+    lecserelt += fresh.filter((p) => items.find((i) => i.id === p.id)?.image).length;
 
     console.log(`\n  ${stand.name}`);
     console.log(`    ${files.length} fájl, ${plan.length} párosítva, ${fresh.length} feltöltendő`);
@@ -200,7 +226,7 @@ else {
 
 function report() {
   console.log('');
-  console.log(`  Feltöltve: ${uploaded} kép`);
+  console.log(`  Feltöltve: ${uploaded} kép` + (lecserelt ? `, ebből ${lecserelt} csere` : ''));
   if (skipped.length) {
     console.log(`  Kimaradt ${skipped.length} — ezekhez döntés kell:`);
     skipped.forEach((s) => console.log(`    - ${s}`));

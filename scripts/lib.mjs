@@ -86,6 +86,21 @@ export function api(e) {
         body: JSON.stringify(data),
       }),
     /** Fájl feltöltése, majd a publikus URL visszaadása. */
+    /**
+     * Mi van most a tárhelyen és mikor került oda.
+     * Ebből tudjuk eldönteni, hogy egy helyi fájl új-e a fentihez képest.
+     */
+    listBucket: async (bucket) => {
+      const r = await fetch(`${U}/storage/v1/object/list/${bucket}`, {
+        method: 'POST',
+        headers: { ...H, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ limit: 1000, prefix: '' }),
+      });
+      if (!r.ok) return new Map();
+      const lista = await r.json();
+      return new Map((Array.isArray(lista) ? lista : []).map((o) => [o.name, o.updated_at || o.created_at]));
+    },
+
     upload: async (bucket, objectPath, buffer) => {
       await req(`${U}/storage/v1/object/${bucket}/${objectPath}`, {
         method: 'POST',
