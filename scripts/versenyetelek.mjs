@@ -42,6 +42,7 @@ const NEVEZESEK = [
   ['Jézus Szíve Karitász Csoport', 'Magyaros gulyásleves', SZO],
   ['Jimmy Gym', 'Harcsapaprikás túrós csuszával', SZO],
   ['Kőszeg Város Fúvószenekara és jubileumi sátra', 'Burgundi sertésragu', SZO],
+  ['Kőszegi Turisztikai Szövetség Egyesület', 'Áfonyás szarvaspörkölt szalvétagombóccal', SZO],
   ['Kőszegfalvi Baráti Kör', 'Bucinudli sváb módra', SZO],
   ['Kőszegfalvi Óvoda és Kőszegfalvi Gyermekekért Egyesület', 'vadas zsemlegombóccal', SZO],
   ['Kőszegi Atlétikai Club Sportegyesület', 'Gulyásleves', SZO],
@@ -75,6 +76,7 @@ const NEVEZESEK = [
   ['Kőszegi Ifjúsági Tűzoltók', 'Töltött káposzta tűzoltó módra', VAS],
   ['Központi Óvoda', 'marhapörkölt', VAS],
   ['Kőszegi Birkózók', 'pejsli zsemlegombóccal', VAS],
+  ['Kőszegi Turisztikai Szövetség Egyesület', 'Vadas vargányás szalvétagombóccal', VAS],
   ['Kőszegi Lóránt Gyula Futball Club', 'Gólkirály gulyásleves', VAS],
   ['Nagycsaládosok Országos Egyesületének Kőszeg és Kőszeghegyalja Szervezete', 'Orsolya-napi lélekmelegítő csülkös káposzta nagycsaládos módra', VAS],
   ['Tézsula Hagyományőrző Egyesület', 'krumplis pacó', VAS],
@@ -156,8 +158,15 @@ for (const [standNev, etelNev, nap] of NEVEZESEK) {
   }
   const sajat = items.filter((i) => i.exhibitor_id === stand.id);
   const alias = ATNEVEZES.get(`${standNev}|${etelNev}`);
-  const kulcs = norm(alias || etelNev);
-  const pontos = sajat.find((i) => norm(i.name) === kulcs);
+
+  /* Először a NEVEZÉSI nevet keressük, csak utána a régit.
+     Az első futtatás átnevezte az ételeket a nevezési lap szerint, tehát a
+     régi név már nem létezik. Fordított sorrendben az alias nem talált volna
+     semmit, és a szkript levette volna a versenyjelölést hat ételről —
+     pont azokról, amelyeket korábban ő maga rakott rendbe. */
+  const kulcs = norm(etelNev);
+  let pontos = sajat.find((i) => norm(i.name) === kulcs);
+  if (!pontos && alias) pontos = sajat.find((i) => norm(i.name) === norm(alias));
   const kozeli =
     pontos ||
     sajat.find((i) => {
