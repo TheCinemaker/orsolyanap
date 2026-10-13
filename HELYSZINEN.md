@@ -1,0 +1,333 @@
+# A helyszínen — mit hogyan
+
+Ez a lap a vásár két napjára és az azt megelőző péntekre szól. Feltételezi,
+hogy egy laptopnál állsz, sátorépítés közben, és valaki épp most szólt, hogy
+„ezt még betennéd?".
+
+**A legfontosabb szabály:** minden parancsnak van `--proba` kapcsolója, ami
+megmutatja, mit csinálna, de nem ír semmit. Kapkodva, telefonos netről, zajban
+ezt használd előbb. Egy rossz adat visszajavítása tízszer annyi idő.
+
+---
+
+## 0. Indulás a gépen (egyszer, otthon vagy induláskor)
+
+```bash
+git clone https://github.com/TheCinemaker/orsolyanap.git
+cd orsolyanap
+npm install
+```
+
+Majd **hozd létre a `.env` fájlt** a repó gyökerében:
+
+```
+VITE_SUPABASE_URL=https://qceznytdsqdcodgrgoxd.supabase.co
+VITE_SUPABASE_ANON_KEY=<a Supabase Project Settings → API → anon public kulcs>
+SUPABASE_SERVICE_ROLE_KEY=<ugyanott a service_role kulcs>
+```
+
+**A `.env` SOHA nem kerül a gitbe**, és nem is kerülhet: a `service_role`
+kulccsal az egész adatbázis írható és törölhető. A repó nyilvános. Vidd át
+kézzel — pendrive, jelszókezelő, magadnak küldött üzenet.
+
+Ellenőrzés, hogy minden megvan:
+
+```bash
+node scripts/ellenorzes.mjs
+```
+
+Ha ez kiírja a standok és ételek számát, készen állsz.
+
+---
+
+## 1. Belépési kódok
+
+```bash
+node scripts/pin-lista.mjs
+```
+
+Két fájlt ír a gépre: `KIALLITO_PIN_KODOK.txt` (minden stand kódja) és
+`KOORDINATAK_ELLENORIZENDO.txt` (melyik térkép-pin becsült még).
+
+Mindkettő gitignore-olt, és ez szándékos: a repó nyilvános, egy kiszivárgott
+PIN-nel bárki beléphetne egy stand nevében és átírhatná az étlapját.
+
+Új stand felvétele után **futtasd újra**, különben az ő kódja nem lesz a
+listában.
+
+---
+
+## 2. Jön egy új stand
+
+Készíts egy JSON fájlt — csak a `nev` és az `etelek` kötelező:
+
+```json
+{
+  "nev": "Valami Egyesület",
+  "etelek": [
+    "Gulyásleves",
+    { "nev": "Tea", "kategoria": "italok" },
+    { "nev": "Töltött káposzta", "nap": "sunday" }
+  ],
+  "gps": [47.38992583549108, 16.539408011205357],
+  "napok": "both",
+  "uzenet": "Szombaton 17:00-kor zenélünk!"
+}
+```
+
+```bash
+node scripts/stand-felvetel.mjs uj.json
+```
+
+Kap egyedi PIN-t, térkép-pint és fotómappát. **A PIN-t nem írja a képernyőre** —
+a `pin-lista.mjs` adja meg.
+
+GPS nélkül becsült helyet kap a sétányon, és figyelmeztet rá. Kategóriák:
+`meleg_etel`, `street_food`, `sutemeny`, `italok`, `egyeb` — a szkript tippel a
+név alapján, **nézd át a kiírt listát**, mert ez dönti el, melyik szekcióba
+kerül az étel.
+
+---
+
+## 3. Egy meglévő stand még hoz valamit
+
+Ez a gyakoribb eset a helyszínen.
+
+```bash
+echo '["Rakott krumpli", "Véres és májas hurka"]' > uj-etelek.json
+node scripts/etel-felvetel.mjs "Cák" uj-etelek.json --proba
+node scripts/etel-felvetel.mjs "Cák" uj-etelek.json
+```
+
+A standnevet elég részben megadni, de **ha többre illik, megáll és felsorolja
+őket** — négy „Kőszegfalvi" és két „Dr. Nagy László EGYMI" van. Ami már bent
+van, azt nem veszi fel újra.
+
+Naponként eltérő fogás:
+
+```json
+[{ "nev": "Rakott krumpli", "nap": "saturday" },
+ { "nev": "Hurka", "nap": "sunday" }]
+```
+
+---
+
+## 4. Képek
+
+### Hova
+
+```
+etelfotok/<stand neve>/<étel neve>.png     ételfotók
+logok/<stand neve>.png                     logók
+```
+
+A nagy, eredeti fájlokat nyugodtan ide másold — **a szkript tömöríti őket**
+(3 MB-ból ~50 kB lesz), és csak a kicsi változat megy fel. Ezek a mappák
+gitignore-oltak, a nagy fájlok sosem kerülnek a buildbe.
+
+### Feltöltés
+
+```bash
+node scripts/kepek-feltoltese.mjs --mind              # minden stand
+node scripts/kepek-feltoltese.mjs "Jimmy Gym"         # egy stand
+node scripts/kepek-feltoltese.mjs --logok             # logók
+node scripts/kepek-feltoltese.mjs --logok "logok/uj"  # logók máshonnan
+```
+
+Csak azt tölti fel, ami még nincs fent **vagy frissebb a feltöltöttnél**. Egy
+második futtatás nem csinál semmit — így néz ki, ha nincs teendő.
+
+### Csere
+
+Tedd be az új képet ugyanazzal a névvel, `_1` végződéssel:
+`Babgulyás_1.png`. A régi maradhat. Ha kétszer cseréled, `_2`. A legmagasabb
+sorszámú nyer.
+
+### Sok kép egyszerre, egy mappában
+
+Ha a fájlnév az **étel neve**, nem kell standonként szétpakolni:
+
+```bash
+node scripts/kepek-feltoltese.mjs --koteg <mappa> --proba
+node scripts/kepek-feltoltese.mjs --koteg <mappa>
+```
+
+Amelyik nevet több stand is használja, **mindegyik megkapja**. A szkript elnézi
+az időbélyeget a fájlnévben, a levágott neveket és az elgépelést is — de amit
+nem tud biztosan, azt kiírja és nem tölti fel.
+
+### Amit tudni kell
+
+- **Logónál nincs tippelés.** A fájlnév legyen betűre a stand neve. Ha nem az,
+  írd be a `logok/parositas.json`-ba: `{ "noe.png": "Nagycsaládosok Országos…" }`
+- **Két logó védett** és nem cserélhető: Kovács Miklós, Kőszeg Város
+  Fúvószenekara. A tiltás a `VEDETT_LOGOK` listában van a szkript tetején.
+- **Kép SOHA nem kerül a `public/` mappába.** Onnan a build változtatás nélkül
+  kiszállítja. Egyszer 36 MB ment ki így. Kivétel csak a `megosztas.jpg` és az
+  ikonok, azoknak fix címen kell lenniük.
+
+### Mi hiányzik még
+
+```bash
+node scripts/mi-kell-meg.mjs
+```
+
+Standonként megmondja, melyik ételhez kell fotó és milyen néven, meg hol
+hiányzik logó.
+
+---
+
+## 5. Péntek: a térkép-pinek bemérése
+
+Jelenleg 31 pin **becsült** — egy szabályos rács a sétány két oldalán, aminek
+semmi köze a valósághoz. Ez a leglátványosabb hibalehetőség: a vendég
+rákoppint, odamegy, és nincs ott a stand.
+
+**Ne állj meg 31 ponton.** Elég ennyi:
+
+1. Sétáld végig a sort, és írd le a sátrak **sorrendjét**.
+2. Minden **ötödik** sátornál állj meg és vedd fel a GPS-pontot.
+3. A sor **két végét** mindenképp mérd be.
+
+A köztes helyeket ebből kiszámolom. Két bemért pont között a hiba egy méter
+alatt marad, ami egy 3×3-as sátorhoz pontos.
+
+Ha mégis pontonként mérnél, a bemenet egy szövegfájl, soronként egy stand,
+akárhogy:
+
+```
+Hajnalcsillag: 47.38919270798614, 16.539153584867744
+KTSZE stand 47.38986871225532, 16.539555530929338
+```
+
+```bash
+node scripts/koordinatak.mjs pontok.txt --proba
+node scripts/koordinatak.mjs pontok.txt
+```
+
+**Négy dolgot utasít el**, mert mind a négy rossz sátorhoz vinné a látogatót:
+kétértelmű standnév, Kőszegen kívüli pont (ez fogja meg a felcserélt
+szélesség/hosszúságot), hat tizedesjegynél pontatlanabb szám (csonkult
+beillesztés), és ugyanannak a pontnak a kétszeri megadása.
+
+---
+
+## 6. Szövegek
+
+```bash
+node scripts/stand-leirasok.mjs x.json      # standok bemutatkozása
+node scripts/program-leirasok.mjs x.json    # programleírások
+node scripts/versenyetelek.mjs              # versenyételek jelölése
+```
+
+A két leírás-szkript JSON-t vár: `{ "Név": "szöveg" }`. A `null` érték törli a
+szöveget. Mindkettő **pontos névegyezést** kér, nem tippel.
+
+A `versenyetelek.mjs` a nevezési listából dolgozik, ami a szkript tetején van
+kiírva. Ha a szervezők frissítik a kiírást, azt a listát kell bővíteni.
+Újrafuttatható: előbb mindenhonnan leveszi a jelölést, aztán felteszi.
+
+**A szervezői szöveg gyakran tartalmaz nekünk szóló megjegyzést** („a pontos
+műfajt a szervezővel egyeztetni kell"). Az ilyen mondat nem mehet az appba — a
+látogató értelmetlennek látja.
+
+---
+
+## 7. Szavazás
+
+```bash
+node scripts/szavazatok.mjs                 # valódi állás a naplóból
+node scripts/szavazatok.mjs --ujraszamol    # a kiírt szám javítása
+```
+
+A `menu_items.votes` oszlop csak **gyorsítótár**. Az igazság az `item_votes`
+napló, amit a böngészőből nem lehet írni. **Eredményt csak a naplóból hirdess.**
+Ugyanez látszik a szervezői nézetben is: a `0169` kóddal belépve a PIN-jegyzék
+fölött ott az élő állás, és jelzi, ha a kiírt szám eltér a naplótól.
+
+---
+
+## 8. Kirakás az internetre
+
+**Adatváltozáshoz nem kell semmit kirakni.** A standok, ételek, képek,
+programok mind az adatbázisból jönnek — amint a szkript lefutott, a telefonokon
+is ott van. A szavazás és a látogatásszámláló élőben frissül.
+
+**Kódváltozáshoz** viszont igen:
+
+```bash
+git add -A && git commit -m "…" && git push
+```
+
+A Netlify magától épít a `main` ágról, nagyjából egy perc. Ellenőrzés:
+
+```bash
+npm run build     # előbb helyben: ha itt elhasal, ott is fog
+```
+
+---
+
+## 9. Ha valami elromlik
+
+**Először mindig:**
+
+```bash
+node scripts/ellenorzes.mjs
+```
+
+Ez megmondja, hiányzik-e PIN, kép, koordináta, vagy van-e étel nélküli stand.
+
+**Nem jelenik meg egy új stand a katalógusban** → nincs egyetlen étele sem. Az
+`ellenorzes.mjs` külön kiírja.
+
+**Nem töltődnek be a képek, de az app megy** → elfogyott a Supabase havi
+forgalmi kerete. Ezt csak a Supabase felületén lehet megoldani (csomagváltás),
+kódból nem.
+
+**A Netlify nem épít** → nézd meg a deploy logot. A két ismert ok: egy
+platformspecifikus bináris került a `package.json`-ba (macOS-en futtatott
+`npm install` nyoma), vagy JS-hiba. Helyben az `npm run build` ugyanazt mutatja.
+
+**Egy stand nem tudja menteni az ételét** → valószínűleg `price` mező került a
+mentésbe. A `menu_items` táblában nincs ilyen oszlop, és a Supabase emiatt az
+*egész* kérést visszautasítja.
+
+**Elromlott egy adat** → a legtöbb szkript naplózza, mit csinált, és a
+képfeltöltés sosem töröl: a régi fájl a gépen marad.
+
+---
+
+## 10. Amit soha
+
+- **Árat kiírni.** Sehol. A vásáron adománygyűjtés folyik; a `menu_items`
+  táblában nincs `price` oszlop, és ha a mentés mégis küld ilyet, egyetlen
+  stand sem tud ételt szerkeszteni.
+- **PIN kódot a repóba, képernyőre, képernyőképre.** A repó nyilvános.
+- **A `.env`-et commitolni.**
+- **Az `src/data/orsolyaGastroCatalog.js`-t szerkeszteni.** Halott fájl, az app
+  nem használja; aki abba dolgozik, a semmibe dolgozik.
+- **Képet a `public/` mappába tenni.**
+- **Élő adaton tesztelni.** Erre való a `--proba`. (Egyszer három stand fotóját
+  írtam felül egy teszttel — fél óra volt visszaállítani.)
+
+---
+
+## Gyorslista
+
+| Mit | Parancs |
+|---|---|
+| Mi az állás | `node scripts/ellenorzes.mjs` |
+| Mihez kell még kép | `node scripts/mi-kell-meg.mjs` |
+| PIN kódok | `node scripts/pin-lista.mjs` |
+| Új stand | `node scripts/stand-felvetel.mjs uj.json` |
+| Új étel meglévő standhoz | `node scripts/etel-felvetel.mjs "Stand" etelek.json` |
+| Képek fel | `node scripts/kepek-feltoltese.mjs --mind` |
+| Logók fel | `node scripts/kepek-feltoltese.mjs --logok` |
+| Egy mappa, étel-nevekkel | `node scripts/kepek-feltoltese.mjs --koteg <mappa>` |
+| Koordináták | `node scripts/koordinatak.mjs pontok.txt` |
+| Versenyételek | `node scripts/versenyetelek.mjs` |
+| Szavazás állása | `node scripts/szavazatok.mjs` |
+| Kirakás | `git add -A && git commit -m "…" && git push` |
+
+Mindegyikhez `--proba` (a `pin-lista` és az `ellenorzes` kivételével, azok nem
+írnak semmit).

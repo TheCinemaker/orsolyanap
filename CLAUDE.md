@@ -3,6 +3,10 @@
 Kőszeg, 2026. október 17–18. A **Civil Ízek Utcája** (Diáksétány) standjait,
 ételeit, térképét és programját mutatja a látogatóknak.
 
+**A helyszínen a [HELYSZINEN.md](HELYSZINEN.md) a mérvadó.** Ott minden
+parancs együtt van, a pénteki koordináta-méréssel és azzal, mit kell tenni,
+ha valami elromlik. Ez a lap a hátterét mondja el.
+
 Ha standot vagy képet kell felvenni, **ne írj saját megoldást** — használd a
 `scripts/` alatti szkripteket. A konvenciók ott kódban vannak, nem itt
 leírásban, pont azért, mert kétszer is kiderült, hogy újraértelmezve más
@@ -63,6 +67,7 @@ kötelező: az anon kulcs nem tud Storage-ba írni.
 ```bash
 node scripts/ellenorzes.mjs               # állapot: mi hiányzik még
 node scripts/stand-felvetel.mjs uj.json   # új stand ételekkel, PIN-nel, pinnel
+node scripts/etel-felvetel.mjs "Stand" x.json  # új étel meglévő standhoz
 node scripts/kepek-feltoltese.mjs "Stand" # a stand ételfotói
 node scripts/kepek-feltoltese.mjs --mind  # minden stand új fotói
 node scripts/kepek-feltoltese.mjs --logok # logók a logok/ mappából
