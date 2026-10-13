@@ -92,6 +92,12 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
      a versenyételek minden kategóriában előfordulnak, és a vendég gyakran
      pont ezt a listát keresi — ebből áll össze, mit érdemes végigkóstolni. */
   const [csakVerseny, setCsakVerseny] = useState(false);
+
+  /* Nap szerinti bontás a főzőversenynél, ha a látogató nem választott napot. */
+  const NAP_SZEKCIOK = [
+    { id: 'verseny-szombat', title: 'Szombati versenyételek', icon: ChefHat, nap: 'saturday' },
+    { id: 'verseny-vasarnap', title: 'Vasárnapi versenyételek', icon: ChefHat, nap: 'sunday' },
+  ];
   const [showAllTags, setShowAllTags] = useState(false);
 
   // Location modal state ({ item, exhibitor })
@@ -115,6 +121,9 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
     });
     return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'hu'));
   }, [menuItems]);
+
+  const napSzerint = csakVerseny && selectedDay === 'all';
+  const szekciok = napSzerint ? NAP_SZEKCIOK : CATEGORY_SECTIONS;
 
   const categoryFilters = CATEGORY_SECTIONS.filter((section) =>
     menuItems.some((item) => item.category === section.id || (section.id === 'italok' && item.category === 'ital'))
@@ -473,10 +482,21 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
         </div>
       ) : (
         <div className="space-y-3">
-          {/* Category sections */}
-          {CATEGORY_SECTIONS.map((section) => {
+          {/* Szekciók.
+              Alapesetben kategória szerint. Főzőverseny-szűrőnél viszont NAP
+              szerint: a verseny két külön megmérettetés, 32 csapat szombaton és
+              26 vasárnap. Egy listába öntve a vendég nem tudná, mit kóstolhat
+              MA — és pont ez a kérdése. Ha már választott napot fent, akkor
+              marad a kategória-bontás, mert a napot úgyis ő szűrte. */}
+          {szekciok.map((section) => {
             const isDrinkSection = section.id === 'italok';
             const sectionItems = sortedItems.filter((i) => {
+              if (napSzerint) {
+                const nap = i.available_day || 'both';
+                // A mindkét napos fogás mindkét nál ott van -- van, aki ugyanazzal
+                // nevezett szombatra és vasárnapra is.
+                return nap === section.nap || nap === 'both';
+              }
               if (isDrinkSection) return i.category === 'italok' || i.category === 'ital';
               return i.category === section.id;
             });
@@ -487,7 +507,10 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
             // Keresés közben nyitva, hacsak kézzel be nem csukták; egyébként
             // csukva, amíg ki nem nyitják.
             const searchActive = Boolean(searchQuery && searchQuery.trim());
-            const isOpen = searchActive
+            // A nap-szekciók NYITVA kezdenek: kettő van belőlük, és a vendég
+            // éppen most koppintott rá, hogy lássa a versenyételeket — két csukott
+            // sáv lenne a válasz a kérdésére.
+            const isOpen = searchActive || napSzerint
               ? openSections[section.id] !== false
               : openSections[section.id] === true;
             const isClosed = !isOpen;

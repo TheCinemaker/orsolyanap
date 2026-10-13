@@ -86,6 +86,61 @@ const NEVEZESEK = [
   ['353. Chernel István Cserkészcsapat', 'Tábori császártekercs dödöllével', VAS],
 ];
 
+/**
+ * Ahol a stand MÁS NÉVEN vette fel az ételt, mint ahogy nevezett.
+ *
+ * Nem hasonlóságra bízzuk: a "Székelykáposzta" és a "Töltött káposzta" két
+ * különböző étel, mégis ugyanazt a tételt takarja — ezt csak a szervező tudja
+ * megmondani, algoritmus nem. Ami itt áll, az megkérdezett és megerősített.
+ *
+ *   'stand neve|nevezési név' -> ahogy most az étlapon szerepel
+ */
+const ATNEVEZES = new Map([
+  ['Balog Iskola|Betyáros húsgombóc házi galuskával', 'Vargányás betyárgombóc házi galuskával'],
+  ['Dance Jam Kőszeg|Káposztába göngyölt jókedv', 'Töltött káposzta'],
+  ['Dance Jam Kőszeg|Csülökpörkölt táncos körítéssel', 'Csülökpörkölt nokedlivel'],
+  ['Kőszeg Város Fúvószenekara és jubileumi sátra|Burgundi sertésragu', 'Burgundi sertéspörkölt'],
+  ['Hajnalcsillag Néptáncegyüttes|Fordított lacipecsenye, sült paprika ágyon', 'Fordított élvezet'],
+  ['Dr. Nagy László EGYMI|Székelykáposzta', 'Töltött káposzta'],
+]);
+
+/**
+ * A nevezési listán vegyes a kis- és nagybetű: van "Pejsli" és "gulyásleves"
+ * is. A szöveget szó szerint átvesszük, de a kezdőbetűt nagyítjuk — a listán
+ * ez elgépelés, nem szándék, és kisbetűvel kezdődő ételnév rendetlennek
+ * látszik a kártyán.
+ */
+const etelNevre = (sz) => sz.charAt(0).toUpperCase() + sz.slice(1);
+
+/**
+ * Ahol az ÉTLAPON pontosabb a név, ott nem nevezünk át.
+ *
+ * A nevezési lapokon néhol rövidítve írták a fogást: "marhapörkölt" ott,
+ * ahol az étlapon "Vörösboros marhapörkölt káposztasalátával" áll. A cél az
+ * volt, hogy a stand által adott különleges név jelenjen meg — nem az, hogy
+ * információt vegyünk el a vendégtől.
+ *
+ * Két esetben hagyjuk békén:
+ *   - a két név csak írásmódban tér el (vessző, kötőjel, nagybetű)
+ *   - az étlap neve magában foglalja a nevezésit, tehát bővebb nála
+ */
+const MARAD_AZ_ETLAP_NEVE = new Set([
+  // "Vadpörkölt nokedlival, uborkával" -- a nevezésen lemaradt az uborka,
+  // de a vendégnek az is információ, főleg ha válogatós.
+  'Bersek Iskola|vadpörkölt nokedlivel',
+]);
+
+const atnevezendo = (item, nevezes, standNev) => {
+  const ujNev = etelNevre(nevezes);
+  if (item.name === ujNev) return null;
+  if (MARAD_AZ_ETLAP_NEVE.has(`${standNev}|${nevezes}`)) return null;
+  const a = norm(item.name);
+  const b = norm(nevezes);
+  if (a === b) return null; // csak írásmód
+  if (a.includes(b)) return null; // az étlap neve bővebb
+  return ujNev;
+};
+
 const db = api(env());
 const exhibitors = await db.select('exhibitors', 'select=id,name');
 const items = await db.select('menu_items', 'select=id,name,exhibitor_id,available_day,is_competition');
@@ -100,7 +155,8 @@ for (const [standNev, etelNev, nap] of NEVEZESEK) {
     continue;
   }
   const sajat = items.filter((i) => i.exhibitor_id === stand.id);
-  const kulcs = norm(etelNev);
+  const alias = ATNEVEZES.get(`${standNev}|${etelNev}`);
+  const kulcs = norm(alias || etelNev);
   const pontos = sajat.find((i) => norm(i.name) === kulcs);
   const kozeli =
     pontos ||
@@ -117,17 +173,23 @@ for (const [standNev, etelNev, nap] of NEVEZESEK) {
 }
 
 const felvesz = [...talalt.values()].filter((t) => !t.item.is_competition);
+const atnevez = [...talalt.values()]
+  .map((t) => ({ ...t, ujNev: atnevezendo(t.item, t.nevezes, t.stand) }))
+  .filter((t) => t.ujNev);
 const levesz = items.filter((i) => i.is_competition && !talalt.has(i.id));
 
 console.log('');
 console.log(`  ${NEVEZESEK.length} nevezés, ${talalt.size} megtalálva, ${hianyzo.length} nem`);
-console.log(`  jelölést kap: ${felvesz.length} | jelölés lekerül: ${levesz.length}`);
+console.log(`  jelölést kap: ${felvesz.length} | átnevezés: ${atnevez.length} | jelölés lekerül: ${levesz.length}`);
 
-const kozelitok = [...talalt.values()].filter((t) => !t.pontos);
-if (kozelitok.length) {
+if (atnevez.length) {
   console.log('');
-  console.log('  Nem szó szerint egyezik, de párosítottam:');
-  kozelitok.forEach((t) => console.log(`    ${t.stand}\n       nevezés: "${t.nevezes}"\n       étlapon: "${t.item.name}"`));
+  console.log('  Átnevezés a nevezési lap szerint:');
+  atnevez.forEach((t) =>
+    console.log(`    ${t.stand}
+       eddig:     "${t.item.name}"
+       mostantól: "${t.ujNev}"`)
+  );
 }
 
 if (hianyzo.length) {
@@ -148,9 +210,15 @@ if (dryRun) {
   console.log('');
 } else {
   for (const i of levesz) await db.patch('menu_items', i.id, { is_competition: false });
-  for (const t of felvesz) await db.patch('menu_items', t.item.id, { is_competition: true });
+  for (const t of talalt.values()) {
+    const valtozas = {};
+    if (!t.item.is_competition) valtozas.is_competition = true;
+    const ujNev = atnevezendo(t.item, t.nevezes, t.stand);
+    if (ujNev) valtozas.name = ujNev;
+    if (Object.keys(valtozas).length) await db.patch('menu_items', t.item.id, valtozas);
+  }
   console.log('');
-  console.log(`  Kész: ${felvesz.length} étel megjelölve, ${levesz.length} jelölés levéve.`);
+  console.log(`  Kész: ${felvesz.length} megjelölve, ${atnevez.length} átnevezve, ${levesz.length} jelölés levéve.`);
   console.log('  Következő: node scripts/ellenorzes.mjs');
   console.log('');
 }
