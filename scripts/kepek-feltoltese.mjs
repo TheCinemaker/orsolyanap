@@ -254,8 +254,27 @@ else if (arg === '--logok') {
   }
   const files = legfrissebbValtozatok(fs.readdirSync('logok').filter(isImage));
   const { manual, restFiles } = applyMapping(readMapping('logok'), files, exhibitors, 'logók');
+
+  /* Pontos névegyezés előnyt élvez.
+     Ha a fájl neve betűre a stand neve, az dönt — nincs hasonlóság-becslés.
+     Két stand hívják "Dr. Nagy László EGYMI"-nek (a másik Szakiskola) és három
+     kezdődik úgy, hogy "Kőszegfalvi"; ezeknél egy becslés előbb-utóbb a rossz
+     standhoz tenné a logót, és azt ők vennék észre először. */
+  const pontos = [];
+  const maradek = [];
+  for (const f of restFiles) {
+    const kulcs = norm(fajlAlapnev(f));
+    const talalat = exhibitors.filter((x) => norm(x.name) === kulcs);
+    if (talalat.length === 1 && !manual.some((m) => m.id === talalat[0].id)) {
+      pontos.push({ file: f, id: talalat[0].id, name: talalat[0].name, score: 2, forced: false, manual: true });
+    } else {
+      maradek.push(f);
+    }
+  }
+  manual.push(...pontos);
+
   const rest = exhibitors.filter((x) => !manual.some((m) => m.id === x.id));
-  const { plan: fuzzy, unmatchedFiles } = matchFiles(restFiles, rest);
+  const { plan: fuzzy, unmatchedFiles } = matchFiles(maradek, rest);
   const plan = [...manual, ...fuzzy];
   const tarhely = await db.listBucket('logok');
   const fresh = plan.filter((p) => {
