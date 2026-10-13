@@ -1,0 +1,17 @@
+{
+  "name": "Orsolya-napi Vásár • Civil Ízek Utcája",
+  "short_name": "Orsolya-napi Vásár",
+  "description": "38 stand, több mint 170 étel, térkép és programfüzet. Kőszeg, 2026. október 17–18.",
+  "lang": "hu",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fafaf9",
+  "theme_color": "#b45309",
+  "icons": [
+    { "src": "/ikon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/ikon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/ikon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

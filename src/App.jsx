@@ -9,6 +9,7 @@ import ExhibitorDashboard from './components/ExhibitorAdmin/ExhibitorDashboard';
 import ExhibitorAuthPage from './components/ExhibitorAuthPage';
 import MapView from './components/MapView';
 import LiveReelBar from './components/LiveReelBar';
+import TelepitesSav from './components/TelepitesSav';
 import ReelsGallery from './components/ReelsGallery';
 import BackToTopButton from './components/BackToTopButton';
 import SignageView from './components/SignageView';
@@ -176,6 +177,9 @@ function MainApp() {
         ) : (
           /* Visitor Main View */
           <div className="max-w-5xl mx-auto px-3 sm:px-4 pt-2 pb-4 space-y-4">
+            {/* Csak akkor látszik, ha van mit felajánlani: nem a főképernyőről
+                fut, és a látogató nem küldte már el. */}
+            <TelepitesSav />
             {/* Top Title Section */}
             <div className="text-center py-1">
               <h1 className="text-xs sm:text-sm font-black text-amber-950 uppercase tracking-widest">
