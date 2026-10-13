@@ -237,12 +237,41 @@ function similarity(fileBase, itemName) {
 /** Előbb arány, holtversenyben a hosszabb egyezés. */
 const better = (a, b) => b.score - a.score || b.len - a.len;
 
+/**
+ * Újabb változat jelölése a fájlnévben: `harcsa_1.png`, `harcsa_2.png`.
+ *
+ * A cseréhez nem kell kitalálni, pontosan hogy hívták a régit: az új kép
+ * ugyanazt a nevet kapja egy `_1` toldalékkal. A toldalék a párosításnál
+ * levágódik, és ha több változat van ugyanahhoz az ételhez, A LEGMAGASABB
+ * SORSZÁMÚ NYER. A régi fájl ott maradhat a mappában — nem kell törölni,
+ * és megmarad belőle, mi volt korábban.
+ */
+const valtozatSzam = (fajl) => {
+  const alap = path.basename(fajl, path.extname(fajl));
+  const m = alap.match(/^(.*?)_(\d+)$/);
+  return m ? { alap: m[1], szam: Number(m[2]) } : { alap, szam: 0 };
+};
+
+/** Minden névhez csak a legfrissebb változatot adja vissza. */
+export function legfrissebbValtozatok(files) {
+  const legjobb = new Map();
+  for (const f of files) {
+    const { alap, szam } = valtozatSzam(f);
+    const kulcs = norm(alap);
+    const eddigi = legjobb.get(kulcs);
+    if (!eddigi || szam > eddigi.szam) legjobb.set(kulcs, { f, szam });
+  }
+  // Az eredeti sorrendet tartjuk, hogy a kimenet kiszámítható legyen.
+  const nyertesek = new Set([...legjobb.values()].map((x) => x.f));
+  return files.filter((f) => nyertesek.has(f));
+}
+
 export function matchFiles(files, items) {
   const plan = [];
   const used = new Set();
 
   for (const f of files) {
-    const fb = norm(path.basename(f, path.extname(f)));
+    const fb = norm(valtozatSzam(f).alap);
     // A MIN_MATCH alatti jelölteket itt dobjuk el, nem a végén: ha csak a
     // legjobbat vizsgálnánk, egy zajos jelölt (magas arány, két karakteres
     // egyezés) a RANGSOR ÉLÉRE kerülne, és azzal a helyes párosítást is
@@ -265,7 +294,7 @@ export function matchFiles(files, items) {
   while (leftItems.length && leftFiles.length) {
     const ranked = leftFiles
       .map((f) => {
-        const fb = norm(path.basename(f, path.extname(f)));
+        const fb = norm(valtozatSzam(f).alap);
         const s = leftItems
           .map((it) => ({ it, ...similarity(fb, it.name) }))
           .filter((c) => c.len >= MIN_MATCH)

@@ -19,7 +19,18 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { env, api, norm, matchFiles, compress, isImage, imageGlob, FOOD, LOGO } from './lib.mjs';
+import {
+  env,
+  api,
+  norm,
+  matchFiles,
+  legfrissebbValtozatok,
+  compress,
+  isImage,
+  imageGlob,
+  FOOD,
+  LOGO,
+} from './lib.mjs';
 
 const arg = process.argv[2];
 if (!arg) {
@@ -135,7 +146,7 @@ if (arg === '--logok') {
     console.error('Nincs logok/ mappa.');
     process.exit(1);
   }
-  const files = fs.readdirSync('logok').filter(isImage);
+  const files = legfrissebbValtozatok(fs.readdirSync('logok').filter(isImage));
   const { manual, restFiles } = applyMapping(readMapping('logok'), files, exhibitors, 'logók');
   const rest = exhibitors.filter((x) => !manual.some((m) => m.id === x.id));
   const { plan: fuzzy, unmatchedFiles } = matchFiles(restFiles, rest);
@@ -190,7 +201,7 @@ else {
   for (const stand of targets) {
     const dir = 'etelfotok/' + safe(stand.name);
     if (!fs.existsSync(dir)) continue;
-    const files = fs.readdirSync(dir).filter(isImage);
+    const files = legfrissebbValtozatok(fs.readdirSync(dir).filter(isImage));
     if (!files.length) continue;
 
     const items = await db.select(
