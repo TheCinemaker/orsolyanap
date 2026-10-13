@@ -81,12 +81,16 @@ export default function LiveReelBar() {
     return `${date.getMonth() + 1}.${date.getDate()}.`;
   };
 
-  // Only display reels from the last 2 hours on the main page bar (all reels are kept in Supabase)
-  const twoHoursAgo = Date.now() - 2 * 60 * 60 * 1000;
-  const recentReels = reels.filter((r) => {
-    const created = new Date(r.created_at).getTime();
-    return !isNaN(created) ? created >= twoHoursAgo : true;
-  });
+  /* A sáv a legfrissebb fotókat mutatja, kor tól függetlenül.
+     Korábban csak a két óránál fiatalabbak látszottak itt, így egy délelőtt
+     feltöltött kép délutánra eltűnt a főoldalról — a stand pedig azt látta,
+     hogy a saját fotója "kiesett". A fotók nem járnak le; a régebbiek egyszerűen
+     hátrébb csúsznák, ahogy új jön.
+
+     A sáv húsznál többet nem mutat, mert vízszintesen görgetni húsz kártyánál
+     tovább senki nem fog — az egészet a teljes képernyős folyám adja, ami egy
+     koppintásra nyílik. */
+  const recentReels = uniqueReels.slice(0, 20);
 
   return (
     <div className="space-y-2">
