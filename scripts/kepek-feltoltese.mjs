@@ -5,6 +5,7 @@
  *   node scripts/kepek-feltoltese.mjs --mind          minden stand, aminek van új fotója
  *   node scripts/kepek-feltoltese.mjs --logok         logók a logok/ mappából
  *   node scripts/kepek-feltoltese.mjs --koteg <mappa> egy mappa, ételnév szerint szétosztva
+ *   ... --koteg <mappa> --proba                      megmutatja, mit tenne, de nem tölt fel
  *
  * HONNAN OLVAS:
  *   ételfotó: etelfotok/<stand neve>/<étel neve>.png
@@ -179,15 +180,40 @@ if (arg === '--koteg') {
     }
   }
 
+  const proba = process.argv.includes('--proba');
+
   console.log(`
   ${files.length} fájl, ${plan.length} feltöltendő tétel`);
-  if (plan.length) {
-    const outDir = path.join(tmp, 'koteg');
-    compress(imageGlob(dir), outDir, FOOD);
-    await send(plan, dir, outDir, 'menu_items', 'etelek');
+
+  // Több változat ugyanahhoz az ételhez: kiírjuk, melyiket választottuk.
+  // A generátor `_1`, `_2`, `_3` végződéssel adja őket, és a legmagasabb
+  // sorszámú nyer -- de ezt látni kell, nem kitalálni.
+  const osszes = fs.readdirSync(dir).filter(isImage);
+  if (osszes.length > files.length) {
+    console.log(`  ${osszes.length - files.length} régebbi változatot hagytam ki (a magasabb sorszámú nyert)`);
   }
+
   nemTalalt.forEach((f) => skipped.push(`${f} — nincs ilyen nevű étel`));
-  report();
+
+  if (proba) {
+    plan.forEach((x) => console.log(`    ${x.file.padEnd(44)} -> ${x.name}`));
+    if (skipped.length) {
+      console.log('');
+      console.log(`  Nem kerülne fel ${skipped.length}:`);
+      skipped.forEach((x) => console.log(`    - ${x}`));
+    }
+    console.log('');
+    console.log('  Próba volt, semmit nem töltöttem fel.');
+    console.log('');
+    fs.rmSync(tmp, { recursive: true, force: true });
+  } else {
+    if (plan.length) {
+      const outDir = path.join(tmp, 'koteg');
+      compress(imageGlob(dir), outDir, FOOD);
+      await send(plan, dir, outDir, 'menu_items', 'etelek');
+    }
+    report();
+  }
 }
 
 // ---------------------------------------------------------------------------
