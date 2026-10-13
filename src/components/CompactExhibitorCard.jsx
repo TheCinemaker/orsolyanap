@@ -1,6 +1,6 @@
 import React from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { Heart, ChevronRight, Map, Calendar, Flame } from 'lucide-react';
+import { Heart, ChevronRight, Map, Calendar, Flame, ChefHat } from 'lucide-react';
 import { festivalDayToday, DAY_LABELS, DAY_SHORT } from '../data/napok';
 
 export default function CompactExhibitorCard({ exhibitor, onOpenDetails }) {
@@ -20,12 +20,16 @@ export default function CompactExhibitorCard({ exhibitor, onOpenDetails }) {
   const dishesOn = (day) =>
     menuItems.filter((i) => i.exhibitor_id === exhibitor.id && !i.is_hidden && i.available_day === day);
 
-  const dayRows = todayKey
-    ? [{ key: todayKey, label: 'Ma', items: dishesOn(todayKey) }]
-    : [
-        { key: 'saturday', label: DAY_SHORT.saturday, items: dishesOn('saturday') },
-        { key: 'sunday', label: DAY_SHORT.sunday, items: dishesOn('sunday') },
-      ].filter((r) => r.items.length > 0);
+  const versenyes = (items) => items.some((i) => i.is_competition);
+
+  const dayRows = (
+    todayKey
+      ? [{ key: todayKey, label: 'Ma', items: dishesOn(todayKey) }]
+      : [
+          { key: 'saturday', label: DAY_SHORT.saturday, items: dishesOn('saturday') },
+          { key: 'sunday', label: DAY_SHORT.sunday, items: dishesOn('sunday') },
+        ].filter((r) => r.items.length > 0)
+  ).map((r) => ({ ...r, verseny: versenyes(r.items) }));
 
   return (
     <article className="bg-white border border-stone-200/90 rounded-md p-2.5 sm:p-3 shadow-xs hover:border-amber-600/60 transition-colors flex flex-col relative group">
@@ -51,8 +55,20 @@ export default function CompactExhibitorCard({ exhibitor, onOpenDetails }) {
         <div className="mt-2 pt-2 border-t border-stone-100 space-y-1">
           {dayRows.map((row) => (
             <div key={row.key} className="flex items-start gap-1.5 text-left">
-              <span className="shrink-0 mt-px text-[9px] font-black uppercase tracking-wide text-amber-900 bg-amber-100 border border-amber-200 rounded px-1 py-0.5 inline-flex items-center gap-0.5">
-                <Flame className="w-2.5 h-2.5 text-amber-700" />
+              {/* Szakácssapka, ha a napi fogás a főzőversenyre nevezett étel —
+                  ez többnyire így van, de nem mindig, és a vendég ezt keresi. */}
+              <span
+                className={`shrink-0 mt-px text-[9px] font-black uppercase tracking-wide rounded px-1 py-0.5 inline-flex items-center gap-0.5 border ${
+                  row.verseny
+                    ? 'text-emerald-900 bg-emerald-50 border-emerald-300'
+                    : 'text-amber-900 bg-amber-100 border-amber-200'
+                }`}
+              >
+                {row.verseny ? (
+                  <ChefHat className="w-2.5 h-2.5 text-emerald-700" />
+                ) : (
+                  <Flame className="w-2.5 h-2.5 text-amber-700" />
+                )}
                 {row.label}
               </span>
               <span className="text-[11px] font-bold text-stone-700 leading-snug">

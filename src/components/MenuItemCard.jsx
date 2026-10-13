@@ -1,6 +1,6 @@
 import React from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { ThumbsUp, Trophy, CupSoda, MapPin } from 'lucide-react';
+import { ThumbsUp, Trophy, CupSoda, MapPin, ChefHat } from 'lucide-react';
 
 export default function MenuItemCard({ item, exhibitor, onOpenLocationModal }) {
   const { votedItemIds, voteForItem, isVotingOpen } = useOrsolya();
@@ -50,6 +50,18 @@ export default function MenuItemCard({ item, exhibitor, onOpenLocationModal }) {
               </span>
             )}
           </div>
+
+          {/* Versenyétel.
+              A főzőversenyre nevezett fogás — ezt a vendég külön keresi, mert
+              ezekből áll össze a nap programja. Szakácssapka, nem kupa: a kupa
+              már a közönségkedvencé, és a kettő nem ugyanaz — az egyik nevezés,
+              a másik eredmény. */}
+          {item.is_competition && (
+            <span className="bg-emerald-50 text-emerald-950 text-xs font-extrabold px-2.5 py-1 rounded-md border border-emerald-300 flex items-center gap-1">
+              <ChefHat className="w-3 h-3 text-emerald-800" />
+              <span>Főzőverseny</span>
+            </span>
+          )}
 
           {/* Top Voted Emblem Badge */}
           {isTopVoted && (

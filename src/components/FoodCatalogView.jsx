@@ -17,6 +17,7 @@ import {
   Sparkles,
   Heart,
   X,
+  ChefHat,
 } from 'lucide-react';
 
 /**
@@ -87,6 +88,10 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
   const [openSections, setOpenSections] = useState({});
   const [activeCategory, setActiveCategory] = useState(selectedCategory || 'all');
   const [activeTag, setActiveTag] = useState('all');
+  /* Csak a főzőversenyre nevezett fogások. Külön kapcsoló, nem kategória:
+     a versenyételek minden kategóriában előfordulnak, és a vendég gyakran
+     pont ezt a listát keresi — ebből áll össze, mit érdemes végigkóstolni. */
+  const [csakVerseny, setCsakVerseny] = useState(false);
   const [showAllTags, setShowAllTags] = useState(false);
 
   // Location modal state ({ item, exhibitor })
@@ -146,9 +151,11 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
         itemDay === selectedDay ||
         (exDay !== 'both' && exDay === selectedDay);
 
-      return matchesVisibility && matchesSearch && matchesDay && matchesCategory && matchesTag;
+      const matchesVerseny = !csakVerseny || item.is_competition === true;
+
+      return matchesVisibility && matchesSearch && matchesDay && matchesCategory && matchesTag && matchesVerseny;
     });
-  }, [menuItems, exhibitors, searchQuery, selectedDay, activeCategory, activeTag, isItemVisibleToVisitors]);
+  }, [menuItems, exhibitors, searchQuery, selectedDay, activeCategory, activeTag, csakVerseny, isItemVisibleToVisitors]);
 
   // Kártyasorrend: kategóriánként csoportosítva, de a kategóriákon belül
   // TELJESEN VÉLETLENSZERŰ (kártyakeverés minden látogatáskor),
@@ -391,6 +398,19 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
       <div className="bg-white border border-stone-200/90 rounded-md p-3 sm:p-4 shadow-2xs space-y-3">
 
         <div className="flex gap-2 overflow-x-auto pb-1">
+          <button
+            onClick={() => setCsakVerseny((v) => !v)}
+            aria-pressed={csakVerseny}
+            className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-extrabold border transition-all flex items-center gap-1.5 ${
+              csakVerseny
+                ? 'bg-emerald-800 text-white border-emerald-900'
+                : 'bg-emerald-50 text-emerald-900 border-emerald-300 hover:border-emerald-500'
+            }`}
+          >
+            <ChefHat className="w-3.5 h-3.5" />
+            Főzőverseny
+          </button>
+
           <button onClick={() => { setActiveCategory('all'); if (setSelectedCategory) setSelectedCategory('all'); }} className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-extrabold border transition-all ${activeCategory === 'all' ? 'bg-amber-900 text-white border-amber-900' : 'bg-stone-50 text-stone-600 border-stone-200 hover:border-amber-300'}`}>Minden</button>
           {categoryFilters.map((section) => {
             const IconComp = section.icon;
@@ -414,8 +434,8 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
           </button>
         )}
 
-        {(activeCategory !== 'all' || activeTag !== 'all' || searchQuery) && (
-          <button onClick={() => { setActiveCategory('all'); setActiveTag('all'); if (setSearchQuery) setSearchQuery(''); }} className="text-[11px] font-bold text-amber-800 hover:text-amber-950 flex items-center gap-1">
+        {(activeCategory !== 'all' || activeTag !== 'all' || searchQuery || csakVerseny) && (
+          <button onClick={() => { setActiveCategory('all'); setActiveTag('all'); setCsakVerseny(false); if (setSearchQuery) setSearchQuery(''); }} className="text-[11px] font-bold text-amber-800 hover:text-amber-950 flex items-center gap-1">
             <X className="w-3 h-3" /> Szűrők törlése
           </button>
         )}
