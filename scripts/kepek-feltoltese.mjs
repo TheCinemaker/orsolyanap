@@ -51,6 +51,16 @@ const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'orsolya-'));
 const exhibitors = await db.select('exhibitors', 'select=id,name,image&order=name');
 const safe = (s) => s.replace(/[\\/:*?"<>|]/g, '-').trim();
 
+/**
+ * Ezeknek a standoknak a logóját NEM cseréljük le.
+ *
+ * Valódi, meglévő logójuk van, amit nem helyettesít egy generált ábra. A
+ * védelem a névre szól, nem egy fájlra: így akkor is áll, ha később valaki
+ * más néven dob be egy képet. Ha mégis cserélni kell, ezt a listát kell
+ * átírni — szándékosan nem elég hozzá egy fájlt bemásolni.
+ */
+const VEDETT_LOGOK = ['Kovács Miklós', 'Kőszeg Város Fúvószenekara és jubileumi sátra'];
+
 let uploaded = 0;
 let skipped = [];
 let lecserelt = 0;
@@ -68,7 +78,11 @@ let lecserelt = 0;
 function kellFeltolteni(vanKep, forrasFajl, tarhelyIdo) {
   if (process.env.FORCE === '1') return true;
   if (!vanKep) return true;
-  if (!tarhelyIdo) return false;
+  // Nincs a megszokott `<id>.webp` néven tárolt példány: nem tudjuk összevetni
+  // a dátumokat, viszont a feltöltés létrehozza a rendes néven. Egyszer fut le
+  // ilyenkor, utána már van mihez hasonlítani. Korábban ez `false` volt, amiért
+  // két régi logót sosem lehetett volna lecserélni.
+  if (!tarhelyIdo) return true;
   try {
     return fs.statSync(forrasFajl).mtimeMs > new Date(tarhelyIdo).getTime();
   } catch {
@@ -248,12 +262,15 @@ if (arg === '--koteg') {
 // Logók
 // ---------------------------------------------------------------------------
 else if (arg === '--logok') {
-  if (!fs.existsSync('logok')) {
-    console.error('Nincs logok/ mappa.');
+  // A mappa megadható: --logok "logok/uj logok"
+  const logoDir = process.argv[3] && !process.argv[3].startsWith('--') ? process.argv[3] : 'logok';
+  if (!fs.existsSync(logoDir)) {
+    console.error(`Nincs ilyen mappa: ${logoDir}`);
     process.exit(1);
   }
-  const files = legfrissebbValtozatok(fs.readdirSync('logok').filter(isImage));
-  const { manual, restFiles } = applyMapping(readMapping('logok'), files, exhibitors, 'logók');
+  const proba = process.argv.includes('--proba');
+  const files = legfrissebbValtozatok(fs.readdirSync(logoDir).filter(isImage));
+  const { manual, restFiles } = applyMapping(readMapping(logoDir), files, exhibitors, 'logók');
 
   /* Pontos névegyezés előnyt élvez.
      Ha a fájl neve betűre a stand neve, az dönt — nincs hasonlóság-becslés.
@@ -274,31 +291,59 @@ else if (arg === '--logok') {
   manual.push(...pontos);
 
   const rest = exhibitors.filter((x) => !manual.some((m) => m.id === x.id));
+  /* Logónál nem tippelünk a maradékból.
+     A matchFiles végén van egy "ami megmaradt, párosítsuk össze" kör, ami
+     ételnél hasznos. Itt viszont ez tette a "Football_club_logo_design"-t a
+     Lóránt Gyula FC-re — angol fájlnévből, hasonlóság alapján. Egy rossz
+     logó a stand fejlécén rögtön látszik, és a standos szóvá teszi. */
   const { plan: fuzzy, unmatchedFiles } = matchFiles(maradek, rest);
-  const plan = [...manual, ...fuzzy];
+  const biztos = fuzzy.filter((p) => !p.forced);
+  fuzzy
+    .filter((p) => p.forced)
+    .forEach((p) => unmatchedFiles.push(p.file));
+  const plan = [...manual, ...biztos];
   const tarhely = await db.listBucket('logok');
   const fresh = plan.filter((p) => {
     const ex = exhibitors.find((x) => x.id === p.id);
-    return kellFeltolteni(Boolean(ex.image), path.join('logok', p.file), tarhely.get(`${p.id}.webp`));
+    return kellFeltolteni(Boolean(ex.image), path.join(logoDir, p.file), tarhely.get(`${p.id}.webp`));
   });
-  lecserelt += fresh.filter((p) => exhibitors.find((x) => x.id === p.id)?.image).length;
+  // A védett standok kiesnek, bármi is párosult hozzájuk.
+  const vedett = fresh.filter((p) => VEDETT_LOGOK.includes(p.name));
+  vedett.forEach((p) => skipped.push(`${p.file} — ${p.name} logóját nem cseréljük (védett)`));
+  const kuldendo = fresh.filter((p) => !VEDETT_LOGOK.includes(p.name));
+  lecserelt += kuldendo.filter((p) => exhibitors.find((x) => x.id === p.id)?.image).length;
 
-  console.log(`\n  ${files.length} fájl, ${plan.length} párosítva, ${fresh.length} feltöltendő`);
-  if (fresh.length) {
-    const outDir = path.join(tmp, 'logo');
-    for (const p of fresh) {
-      const one = path.join(tmp, 'in-' + p.id + path.extname(p.file));
-      fs.copyFileSync(path.join('logok', p.file), one);
-      compress(one, outDir, LOGO);
-      fs.renameSync(
-        path.join(outDir, path.basename(one, path.extname(one)) + '.webp'),
-        path.join(outDir, path.basename(p.file, path.extname(p.file)) + '.webp')
-      );
-    }
-    await send(fresh, 'logok', outDir, 'exhibitors', 'logok');
-  }
+  console.log(`
+  ${files.length} fájl, ${plan.length} párosítva, ${kuldendo.length} feltöltendő`);
   unmatchedFiles.forEach((f) => skipped.push(`${f} — nem tudom, melyik standhoz tartozik`));
-  report();
+
+  if (proba) {
+    kuldendo.forEach((p) => console.log(`    ${p.file.slice(0, 42).padEnd(44)} -> ${p.name}`));
+    if (skipped.length) {
+      console.log('');
+      console.log(`  Nem kerülne fel ${skipped.length}:`);
+      skipped.forEach((x) => console.log(`    - ${x}`));
+    }
+    console.log('');
+    console.log('  Próba volt, semmit nem töltöttem fel.');
+    console.log('');
+    fs.rmSync(tmp, { recursive: true, force: true });
+  } else {
+    if (kuldendo.length) {
+      const outDir = path.join(tmp, 'logo');
+      for (const p of kuldendo) {
+        const one = path.join(tmp, 'in-' + p.id + path.extname(p.file));
+        fs.copyFileSync(path.join(logoDir, p.file), one);
+        compress(one, outDir, LOGO);
+        fs.renameSync(
+          path.join(outDir, path.basename(one, path.extname(one)) + '.webp'),
+          path.join(outDir, path.basename(p.file, path.extname(p.file)) + '.webp')
+        );
+      }
+      await send(kuldendo, logoDir, outDir, 'exhibitors', 'logok');
+    }
+    report();
+  }
 }
 
 // ---------------------------------------------------------------------------
