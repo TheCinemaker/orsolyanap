@@ -56,22 +56,31 @@ export default function FoodCatalogView({ searchQuery, setSearchQuery, selectedC
     isVotingOpen
   } = useOrsolya();
 
-  // Véletlenszerű kártyakeverés minden megnyitáskor:
-  // Nincs fix sorrend, minden látogatás új "kártyakeverés" -- egyetlen stand sincs előre sorolva!
+  /* Véletlen kártyasorrend: minden látogatás új keverés, tehát egyetlen stand
+     sincs előre sorolva. A SORREND VISZONT ÁLL A LÁTOGATÁS ALATT.
+     Minden étel egyszer kap egy véletlen számot, és azt meg is tartja.
+
+     Korábban a `menuItems` minden változására új számot kapott mindegyik, és
+     az egész lista átrendeződött. A listát viszont realtime frissítjük: egy
+     szavazat is a menu_items-t írja, tehát BÁRKI szavazata átugráltatta volna a
+     kártyákat MINDENKI telefónján, olvasás közben. Egy képcsere sorozat
+     (157 egymás után) látványosan megmutatta.
+
+     Új étel közben is érkezhet — az kap egy számot és bekerül a sorba, a
+     többi marad a helyén. */
   const [shuffleKey, setShuffleKey] = useState(1);
   const shuffleOrderMap = useRef(new Map());
 
-  const reShuffle = () => {
-    const newMap = new Map();
-    menuItems.forEach((item) => {
-      newMap.set(item.id, Math.random());
-    });
-    shuffleOrderMap.current = newMap;
-    setShuffleKey((prev) => prev + 1);
-  };
-
   useEffect(() => {
-    reShuffle();
+    let ujDarab = 0;
+    menuItems.forEach((item) => {
+      if (!shuffleOrderMap.current.has(item.id)) {
+        shuffleOrderMap.current.set(item.id, Math.random());
+        ujDarab++;
+      }
+    });
+    // Csak akkor rajzolunk újra, ha tényleg új étel került be.
+    if (ujDarab > 0) setShuffleKey((prev) => prev + 1);
   }, [menuItems]);
 
   // Lenyíló szekciók állapota.
