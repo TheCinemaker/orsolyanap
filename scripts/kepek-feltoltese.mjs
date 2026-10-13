@@ -4,6 +4,7 @@
  *   node scripts/kepek-feltoltese.mjs "Jimmy Gym"     egy stand ételfotói
  *   node scripts/kepek-feltoltese.mjs --mind          minden stand, aminek van új fotója
  *   node scripts/kepek-feltoltese.mjs --logok         logók a logok/ mappából
+ *   node scripts/kepek-feltoltese.mjs --koteg <mappa> egy mappa, ételnév szerint szétosztva
  *
  * HONNAN OLVAS:
  *   ételfotó: etelfotok/<stand neve>/<étel neve>.png
@@ -34,7 +35,9 @@ import {
 
 const arg = process.argv[2];
 if (!arg) {
-  console.error('Használat: node scripts/kepek-feltoltese.mjs "<stand neve>" | --mind | --logok');
+  console.error(
+    'Használat: node scripts/kepek-feltoltese.mjs "<stand neve>" | --mind | --logok | --koteg <mappa>'
+  );
   process.exit(1);
 }
 
@@ -139,9 +142,58 @@ async function send(plan, srcDir, outDir, table, bucket) {
 }
 
 // ---------------------------------------------------------------------------
+// Köteg: egy mappa, ételnév szerint szétosztva
+//
+// Amikor a képek egyszerre készülnek, egyetlen mappába érkeznek, és a fájlnév
+// az étel neve. Nem kell 38 mappába szétpakolni őket: a név itt a kulcs.
+//
+// Ha egy nevet több stand is használ (a "Zsákbamacskát" négy), MINDEGYIK
+// megkapja ugyanazt a képet. Ez szándékos: ugyanarról az ételről van szó.
+// Ha külön képet akarsz nekik, a stand saját mappájába tedd — az erősebb.
+// ---------------------------------------------------------------------------
+if (arg === '--koteg') {
+  const dir = process.argv[3];
+  if (!dir || !fs.existsSync(dir)) {
+    console.error('Add meg a mappát: node scripts/kepek-feltoltese.mjs --koteg <mappa>');
+    process.exit(1);
+  }
+
+  const files = legfrissebbValtozatok(fs.readdirSync(dir).filter(isImage));
+  const items = await db.select('menu_items', 'select=id,name,image,exhibitor_id&order=name');
+  const standNev = new Map(exhibitors.map((x) => [x.id, x.name]));
+  const tarhely = await db.listBucket('etelek');
+
+  const plan = [];
+  const nemTalalt = [];
+  for (const f of files) {
+    const alap = norm(path.basename(f, path.extname(f)).replace(/_\d+$/, ''));
+    const egyezok = items.filter((i) => norm(i.name) === alap);
+    if (egyezok.length === 0) {
+      nemTalalt.push(f);
+      continue;
+    }
+    for (const it of egyezok) {
+      if (!kellFeltolteni(Boolean(it.image), path.join(dir, f), tarhely.get(`${it.id}.webp`))) continue;
+      if (it.image) lecserelt++;
+      plan.push({ file: f, id: it.id, name: `${it.name}  — ${standNev.get(it.exhibitor_id) || '?'}` });
+    }
+  }
+
+  console.log(`
+  ${files.length} fájl, ${plan.length} feltöltendő tétel`);
+  if (plan.length) {
+    const outDir = path.join(tmp, 'koteg');
+    compress(imageGlob(dir), outDir, FOOD);
+    await send(plan, dir, outDir, 'menu_items', 'etelek');
+  }
+  nemTalalt.forEach((f) => skipped.push(`${f} — nincs ilyen nevű étel`));
+  report();
+}
+
+// ---------------------------------------------------------------------------
 // Logók
 // ---------------------------------------------------------------------------
-if (arg === '--logok') {
+else if (arg === '--logok') {
   if (!fs.existsSync('logok')) {
     console.error('Nincs logok/ mappa.');
     process.exit(1);
