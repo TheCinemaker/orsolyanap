@@ -25,13 +25,20 @@
          A kép nem lehet SVG és nem lehet relatív útvonal: a Facebook egyiket
          sem fogadja el, és ilyenkor kép nélkül, szürke dobozként jelenik meg
          a link. Korábban a favicon.svg-re mutatott, tehát mindkettőt elrontotta.
-         1200x630 az a méret, amit a Facebook vágás nélkül mutat. -->
+         1200x630 az a méret, amit a Facebook vágás nélkül mutat.
+
+         Az abszolút cím ezért van bedrótozva: a keresórobot nem a böngészőből
+         olvassa az oldalt, nincs mihez képest feloldania egy relatív utat.
+         Ha az app címe változik, ezt a három sort kell átírni. -->
+    <meta property="og:url" content="https://orsolya.netlify.app/" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="hu_HU" />
     <meta property="og:site_name" content="Orsolya-napi Vásár" />
     <meta property="og:title" content="Orsolya-napi Vásár • Civil Ízek Utcája" />
     <meta property="og:description" content="38 stand, több mint 160 étel, térkép és programfüzet. Kőszeg, 2026. október 17–18., a belépés ingyenes." />
-    <meta property="og:image" content="/megosztas.jpg" />
+    <meta property="og:image" content="https://orsolya.netlify.app/megosztas.jpg" />
+    <meta property="og:image:secure_url" content="https://orsolya.netlify.app/megosztas.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Orsolya-napi Vásár, 2026. október 17–18." />
