@@ -247,23 +247,66 @@ const better = (a, b) => b.score - a.score || b.len - a.len;
  * és megmarad belőle, mi volt korábban.
  */
 const valtozatSzam = (fajl) => {
-  const alap = path.basename(fajl, path.extname(fajl));
-  const m = alap.match(/^(.*?)_(\d+)$/);
-  return m ? { alap: m[1], szam: Number(m[2]) } : { alap, szam: 0 };
+  let alap = path.basename(fajl, path.extname(fajl));
+  const szamok = [];
+  let m;
+  // Minden alahuzassal elvalasztott szamot leszedunk a vegerol. A gyarto
+  // ilyeneket rak oda: "Brownie_oszi_kontosben_1_20261013100926_2".
+  while ((m = alap.match(/^(.*?)_(\d+)$/))) {
+    szamok.unshift(Number(m[2]));
+    alap = m[1];
+  }
+  // A nyolcjegyunel hosszabb szam IDOBELYEG, nem valtozat. Enelkul a
+  // 20261013100926 belekerult a nevbe, es egyetlen etelre sem illeszkedett.
+  const valtozatok = szamok.filter((n) => String(n).length < 8);
+  return { alap, szam: valtozatok[0] || 0, alszam: valtozatok[1] || 0 };
 };
+
+/** A fájlnév sorszámok és időbélyeg nélkül. */
+export const fajlAlapnev = (fajl) => valtozatSzam(fajl).alap;
 
 /** Minden névhez csak a legfrissebb változatot adja vissza. */
 export function legfrissebbValtozatok(files) {
   const legjobb = new Map();
   for (const f of files) {
-    const { alap, szam } = valtozatSzam(f);
+    const { alap, szam, alszam } = valtozatSzam(f);
     const kulcs = norm(alap);
     const eddigi = legjobb.get(kulcs);
-    if (!eddigi || szam > eddigi.szam) legjobb.set(kulcs, { f, szam });
+    if (!eddigi || szam > eddigi.szam || (szam === eddigi.szam && alszam > eddigi.alszam)) {
+      legjobb.set(kulcs, { f, szam, alszam });
+    }
   }
   // Az eredeti sorrendet tartjuk, hogy a kimenet kiszámítható legyen.
   const nyertesek = new Set([...legjobb.values()].map((x) => x.f));
   return files.filter((f) => nyertesek.has(f));
+}
+
+/**
+ * Szerkesztési távolság: hány betűt kell beszúrni, törölni vagy cserélni.
+ *
+ * A leghosszabb közös rész nem fogja meg a SZÓ KÖZEPI elgépelést:
+ * "sertépörkölt" és "sertéspörkölt" között egyetlen betű a különbség, mégis
+ * két rövidebb darabra esik szét. Itt a távolság 1, ami félreérthetetlen.
+ */
+export function editTavolsag(a, b) {
+  if (a === b) return 0;
+  const m = a.length;
+  const n = b.length;
+  if (!m) return n;
+  if (!n) return m;
+  let elozo = Array.from({ length: n + 1 }, (_, j) => j);
+  for (let i = 1; i <= m; i++) {
+    const mostani = [i];
+    for (let j = 1; j <= n; j++) {
+      mostani[j] = Math.min(
+        elozo[j] + 1,
+        mostani[j - 1] + 1,
+        elozo[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+      );
+    }
+    elozo = mostani;
+  }
+  return elozo[n];
 }
 
 export function matchFiles(files, items) {

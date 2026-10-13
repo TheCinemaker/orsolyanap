@@ -25,8 +25,10 @@ import {
   env,
   api,
   norm,
+  editTavolsag,
   matchFiles,
   legfrissebbValtozatok,
+  fajlAlapnev,
   compress,
   isImage,
   imageGlob,
@@ -167,8 +169,34 @@ if (arg === '--koteg') {
   const plan = [];
   const nemTalalt = [];
   for (const f of files) {
-    const alap = norm(path.basename(f, path.extname(f)).replace(/_\d+$/, ''));
-    const egyezok = items.filter((i) => norm(i.name) === alap);
+    const alap = norm(fajlAlapnev(f));
+    let egyezok = items.filter((i) => norm(i.name) === alap);
+
+    // A generátor hosszú neveket LEVÁG: "Különböző édes és sós házi" a
+    // "...házi sütemények"-ből. Ilyenkor a fájlnév az ételnév eleje. Csak
+    // akkor fogadjuk el, ha EGYETLEN ételre illik és elég hosszú ahhoz, hogy
+    // ne véletlenül találjon el valamit.
+    if (egyezok.length === 0 && alap.length >= 12) {
+      // Mindkét irány kell. A generátor hol LEVÁGJA a nevet
+      // ("Különböző édes és sós házi"), hol HOZZÁÍR egy angol leírást
+      // ("Káposztás sonkás nokedli dumplin...").
+      const prefix = items.filter(
+        (i) => norm(i.name).startsWith(alap) || (norm(i.name).length >= 12 && alap.startsWith(norm(i.name)))
+      );
+      const nevek = new Set(prefix.map((i) => norm(i.name)));
+      if (nevek.size === 1) egyezok = prefix;
+    }
+
+    // Elgépelés: "sertépörkölt" a "sertéspörkölt" helyett. Engedünk néhány
+    // betűnyi eltérést — egy 45 karakteres névnél egy hiányzó betű nem
+    // kétséges —, de csak akkor, ha egyetlen ételre illik.
+    if (egyezok.length === 0 && alap.length >= 12) {
+      const hatar = Math.max(1, Math.round(alap.length * 0.06));
+      const jok = items.filter((i) => editTavolsag(norm(i.name), alap) <= hatar);
+      const nevek = new Set(jok.map((i) => norm(i.name)));
+      if (nevek.size === 1) egyezok = jok;
+    }
+
     if (egyezok.length === 0) {
       nemTalalt.push(f);
       continue;
