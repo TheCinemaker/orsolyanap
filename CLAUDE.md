@@ -229,10 +229,29 @@ A zárolás számlálóval működik, mert két réteg egymásra nyílhat.
 egymásra csúsznak. A tesztek sorrendje számít: a specifikusabb elöl
 (`szakiskola` a `egymi` előtt).
 
+**A `pin` oszlopot a böngésző nem olvashatja.** Az `exhibitors` betöltése
+FELSOROLT oszlopokat kér (`EXHIBITOR_OSZLOPOK` az `OrsolyaContext.jsx`-ben), és
+az anon kulcsnak nincs joga a `pin`-hez. Egy `select('*')` ezért hibát ad, és az
+app vészüzembe esik — új oszlopot a listába is fel kell venni, különben az app
+nem látja. Korábban a `*` mind a 38 PIN kódot letöltötte minden látogató
+telefonjára.
+
+A belépés a `login_exhibitor(pin)`, a szervezői jegyzék a `pin_jegyzek(kod)`, a
+PIN átírása a `set_exhibitor_pin(id, kod, uj)`. A belépéskor használt kód csak
+memóriában van (`aktivPin`), mert az infótáblás írásokhoz kell. A
+`pillanatkep.mjs` sem írhatja ki a `pin`-t: a `public/` nyilvános, és a
+szkript ezért ellenőrzi is a kiírás előtt.
+
 **Infótábla.** A standok üzenetei a `stand_hirek` táblában, minden üzenet
 külön sor szerzővel és időponttal. Írni csak a `post_stand_hir(exhibitor_id,
 pin, szoveg)` függvényen lehet, ami a stand PIN-jéhez köti a beszúrást; a
-táblára nincs insert policy. Ne készíts közvetlen insertet a kliensből: a
+táblára nincs insert policy. A szervező a `post_szervezo_hir(kod, szoveg)`-gel
+ír, standtól függetlenül, és a szervezői kóddal bármelyik üzenet javítható
+(`edit_stand_hir`) vagy levehető (`delete_stand_hir`).
+
+Javításnál a `created_at` NEM változik, csak a `modositva` oszlop telik meg:
+ha az időpont változna, a bejegyzés előreugrana a táblán, mintha most írták
+volna. A realtime ágban ezért az UPDATE eseményt is kezelni kell. Ne készíts közvetlen insertet a kliensből: a
 táblát az anon kulccsal mindenki eléri, és bárki posztolhatna idegen stand
 nevében.
 
