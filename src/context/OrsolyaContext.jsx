@@ -76,6 +76,10 @@ export function OrsolyaProvider({ children }) {
   const [menuItems, setMenuItems] = useState([]);
   const [reels, setReels] = useState([]);
   const [events, setEvents] = useState([]);
+  /* Infótábla: amit a standok üzennek a vásárnak. Minden üzenet külön sor,
+     szerzővel és időponttal — a „Kész a gulyás!" tíz perc múlva még
+     érdekes, két óra múlva félrevezető, és ezt csak az időpont mondja meg. */
+  const [standHirek, setStandHirek] = useState([]);
 
   // Scanned Favorite Exhibitors
   const [favoriteExhibitorIds, setFavoriteExhibitorIds] = useState([]);
@@ -271,6 +275,16 @@ export function OrsolyaProvider({ children }) {
           .order('start_time', { ascending: true });
         if (!eventErr && eventData) setEvents(eventData);
 
+        /* Infótábla. Ha a tábla még nem létezik (az SQL nincs lefuttatva),
+           nem hiba: üres marad, és az app minden más része megy tovább. */
+        const { data: hirData, error: hirErr } = await supabase
+          .from('stand_hirek')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(200);
+        if (hirErr) console.warn('Infotabla nem elerheto:', hirErr.message);
+        else if (hirData) setStandHirek(hirData);
+
         /* Fotók: csak a legfrissebb adag.
            Korábban az ÖSSZES reel lejött minden megnyitásnál. Egy forgalmas
            hétvégén ez százakat jelent, és nem is a letöltés a nagyobb baj,
@@ -368,6 +382,19 @@ export function OrsolyaProvider({ children }) {
               setReels((prev) => prev.map((r) => (r.id === payload.new.id ? { ...r, ...payload.new } : r)));
             } else if (payload.eventType === 'DELETE' && payload.old) {
               setReels((prev) => prev.filter((r) => r.id !== payload.old.id));
+            }
+          }
+        )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'stand_hirek' },
+          (payload) => {
+            if (payload.eventType === 'INSERT' && payload.new) {
+              setStandHirek((prev) =>
+                prev.some((h) => h.id === payload.new.id) ? prev : [payload.new, ...prev]
+              );
+            } else if (payload.eventType === 'DELETE' && payload.old) {
+              setStandHirek((prev) => prev.filter((h) => h.id !== payload.old.id));
             }
           }
         )
@@ -655,6 +682,56 @@ export function OrsolyaProvider({ children }) {
         return [...prev, exhibitorId];
       }
     });
+  };
+
+  /**
+   * Üzenet kiírása az infótáblára.
+   *
+   * CSAK STAND ÍRHAT, és csak a saját nevében: az adatbázis a stand PIN-jéhez
+   * köti a beszúrást (`post_stand_hir`), a táblára nincs insert policy. A
+   * böngészőből tehát nem lehet idegen stand nevében posztolni — pedig a
+   * táblát az anon kulccsal mindenki eléri.
+   *
+   * Az üzenetet nem felülírjuk, hanem hozzáírjuk: a vendégnek az időpont
+   * mondja meg, hogy a „Kész a gulyás!" most szól-e vagy két órája.
+   */
+  const postStandHir = async (szoveg) => {
+    const szov = String(szoveg ?? '').trim();
+    if (!activeExhibitor || szov.length < 2) return false;
+    try {
+      const { data, error } = await supabase.rpc('post_stand_hir', {
+        p_exhibitor_id: activeExhibitor.id,
+        p_pin: activeExhibitor.pin,
+        p_szoveg: szov,
+      });
+      if (error) throw error;
+      // A realtime is elhozza, de a saját gépen ne kelljen rá várni.
+      if (data) setStandHirek((prev) => (prev.some((h) => h.id === data.id) ? prev : [data, ...prev]));
+      showToast('Kiírva az infótáblára', 'success');
+      return true;
+    } catch (err) {
+      console.error('Infotabla poszt hiba:', err.message);
+      showToast('Nem sikerült kiírni. Van internet?', 'error');
+      return false;
+    }
+  };
+
+  /** A saját üzenet visszavétele: elírás, vagy már nem igaz. */
+  const deleteStandHir = async (id) => {
+    if (!activeExhibitor) return false;
+    try {
+      const { data, error } = await supabase.rpc('delete_stand_hir', {
+        p_id: id,
+        p_pin: activeExhibitor.pin,
+      });
+      if (error) throw error;
+      if (data) setStandHirek((prev) => prev.filter((h) => h.id !== id));
+      return Boolean(data);
+    } catch (err) {
+      console.error('Infotabla torles hiba:', err.message);
+      showToast('Nem sikerült visszavenni.', 'error');
+      return false;
+    }
   };
 
   // Toggle exhibitor hasDrinks
@@ -1325,6 +1402,9 @@ export function OrsolyaProvider({ children }) {
         menuItems,
         reels,
         events,
+        standHirek,
+        postStandHir,
+        deleteStandHir,
         postReel,
         likeReel,
         uploadImage,

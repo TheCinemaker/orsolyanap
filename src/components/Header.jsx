@@ -4,7 +4,7 @@ import OrsolyaInfoModal from './OrsolyaInfoModal';
 import FavoritesModal from './FavoritesModal';
 import MobileBottomNav from './MobileBottomNav';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { Utensils, MapPin, Store, Heart, Search, X, Info, Calendar, Clock, Menu, ThumbsUp } from 'lucide-react';
+import { Utensils, MapPin, Store, Heart, Search, X, Info, Calendar, Clock, Menu, ThumbsUp, Megaphone } from 'lucide-react';
 import HamburgerMenuDrawer from './HamburgerMenuDrawer';
 
 export default function Header({
@@ -156,6 +156,23 @@ export default function Header({
             >
               <MapPin className={`w-3.5 h-3.5 ${activeView === 'map' ? 'text-amber-200' : 'text-amber-700'}`} />
               <span>Térkép</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setActiveView('visitor');
+                setMainTab('info');
+              }}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-xs transition-all ${
+                activeView === 'visitor' && mainTab === 'info'
+                  ? 'bg-amber-900 text-white shadow-sm font-extrabold'
+                  : 'text-stone-700 hover:text-stone-900 font-semibold'
+              }`}
+            >
+              <Megaphone className={`w-3.5 h-3.5 ${
+                activeView === 'visitor' && mainTab === 'info' ? 'text-amber-200' : 'text-amber-700'
+              }`} />
+              <span>Infótábla</span>
             </button>
 
             {/* Info Button */}
@@ -324,7 +341,6 @@ export default function Header({
 
       {/* Mobile Bottom Navigation Bar */}
       <MobileBottomNav
-        onOpenFavorites={() => setIsFavoritesOpen(true)}
         onOpenHamburger={() => setIsHamburgerOpen(true)}
         setMainTab={setMainTab}
       />

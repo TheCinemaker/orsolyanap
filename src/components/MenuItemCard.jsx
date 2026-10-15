@@ -1,6 +1,6 @@
 import React from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { ThumbsUp, Trophy, CupSoda, MapPin, ChefHat, Megaphone } from 'lucide-react';
+import { ThumbsUp, Trophy, CupSoda, MapPin, ChefHat } from 'lucide-react';
 
 export default function MenuItemCard({ item, exhibitor, onOpenLocationModal }) {
   const { votedItemIds, voteForItem, isVotingOpen } = useOrsolya();
@@ -125,17 +125,6 @@ export default function MenuItemCard({ item, exhibitor, onOpenLocationModal }) {
           </div>
         )}
       </div>
-
-      {/* A stand élő üzenete. Itt a legfontosabb: a vendég ezt az ételt
-          nézi, és ez mondja meg, hogy mikor lesz kész vagy mi változott. */}
-      {exhibitor?.notice?.trim?.() && (
-        <div className="mt-2 bg-amber-50 border border-amber-200 rounded-md px-2 py-1.5 flex items-start gap-1.5">
-          <Megaphone className="w-3 h-3 text-amber-800 shrink-0 mt-0.5" />
-          <p className="text-[11px] font-semibold text-amber-950 leading-snug line-clamp-2">
-            {exhibitor.notice}
-          </p>
-        </div>
-      )}
 
       {/* Footer / Action Buttons */}
       <div className="pt-3 border-t border-stone-100 flex flex-col gap-2">

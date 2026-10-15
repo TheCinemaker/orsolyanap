@@ -229,11 +229,21 @@ A zárolás számlálóval működik, mert két réteg egymásra nyílhat.
 egymásra csúsznak. A tesztek sorrendje számít: a specifikusabb elöl
 (`szakiskola` a `egymi` előtt).
 
+**Infótábla.** A standok üzenetei a `stand_hirek` táblában, minden üzenet
+külön sor szerzővel és időponttal. Írni csak a `post_stand_hir(exhibitor_id,
+pin, szoveg)` függvényen lehet, ami a stand PIN-jéhez köti a beszúrást; a
+táblára nincs insert policy. Ne készíts közvetlen insertet a kliensből: a
+táblát az anon kulccsal mindenki eléri, és bárki posztolhatna idegen stand
+nevében.
+
+Az `exhibitors.notice` NEM ez: az a stand állandó megjegyzése (allergén-infó,
+hol a sátor), ami egész hétvégén igaz. Az időpontos hír az infótáblára megy.
+
 **Az `ExhibitorCard.jsx` halott kód.** A standlista a
 `CompactExhibitorCard`-ot használja. Emiatt az élő üzenet
 (`exhibitors.notice`) hónapokig sehol nem jelent meg: a standos beírta,
-mentette, és csak ebben a nem használt komponensben lett volna látható. Most
-az `EloUzenetek.jsx`, a `MenuItemCard` és az `ExhibitorDetailModal` írja ki.
+mentette, és csak ebben a nem használt komponensben lett volna látható. A notice-t
+most az `ExhibitorDetailModal` írja ki.
 Aki a standkártyán változtat, a `CompactExhibitorCard`-ban keresse.
 
 **AI-jelölés.** Az ételfotók generált illusztrációk. Ezt négy helyen kiírjuk

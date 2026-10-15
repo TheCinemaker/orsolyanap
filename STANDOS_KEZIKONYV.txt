@@ -43,11 +43,12 @@
 2. AMIT A KEZELŐBEN MEGTEHETSZ
 ================================================================================
 
-  Felülről lefelé három rész:
+  Felülről lefelé négy rész:
 
-    A)  Stand bemutatkozás, elérhetőségek és kiállítási napok
-    B)  Stand kínálata: ételek és italok
-    C)  Minden tételnél három állapotgomb: Kész / Fő az étel / Elfogyott
+    A)  Üzenet az Infótáblára — „Kész a gulyás!" (a 6. fejezet)
+    B)  Stand bemutatkozás, elérhetőségek és kiállítási napok
+    C)  Stand kínálata: ételek és italok
+    D)  Minden tételnél három állapotgomb: Kész / Fő az étel / Elfogyott
 
   Amit beírsz, AZONNAL látszik minden telefonon. Nem kell újratölteni.
 
@@ -69,22 +70,13 @@
     Telefon, e-mail     Ha szeretnéd, hogy megkeressenek
     Facebook, Instagram Teljes cím, https-sel kezdve
     Jótékonysági cél    Pl.: „A kőszegi gyermekmentők javára"
-    Élő üzenet          A LEGHASZNOSABB MEZŐ. Pl.: „A marhapörkölt frissen
-                        rotyog, várható elkészülés 12:45!"
+    Állandó megjegyzés  Ami EGÉSZ HÉTVÉGÉN igaz. Pl.: „Ételeink laktózmentes
+                        alapanyagokból készülnek." A stand kártyáján látszik.
 
   A rész alján: „Bemutatkozás & Adatok Mentése". Mentés nélkül elveszik.
 
-  AZ ÉLŐ ÜZENET HÁROM HELYEN JELENIK MEG, azonnal, minden telefonon:
-    - a főlap tetején, az „Élő a standokról" sávban, a stand nevével
-    - a stand kártyáján, ha valaki rákoppint
-    - mindegyik ételeteknél, a kártyán
-
-  Ezért ez a leggyorsabb módja annak, hogy szóljatok a vásárnak: mikor lesz
-  kész a pörkölt, hogy most sültek ki a rétesek, hogy fél óra múlva zenélnek
-  nálatok.
-
-  ÉS HA MÁR NEM ÉRVÉNYES, TÖRÖLJÉTEK. A mező mellett ott az „Üzenet törlése".
-  A „várható elkészülés 12:45" délután ötkor már félrevezeti a vendéget.
+  AMI IDŐPONTOS — „kész a gulyás", „elfogyott a pörkölt" —, az NEM ide megy,
+  hanem az infótáblára. Arról a 6. fejezet szól.
 
 
 ================================================================================
@@ -136,7 +128,39 @@
 
 
 ================================================================================
-6. ÉTEL SZERKESZTÉSE, TÖRLÉSE
+6. ÜZENET AZ INFÓTÁBLÁRA — „KÉSZ A GULYÁS!"
+================================================================================
+
+  Az appnak van egy INFÓTÁBLA oldala. A látogató az alsó sávban, a hangszóró
+  ikonnal nyitja meg. Ide ÍRNI CSAK A STANDOK TUDNAK, olvasni mindenki.
+
+  A stand kezelőjében, egészen fent: „Üzenet az Infótáblára".
+
+    1. Írj be egy rövid mondatot. Pl.: Kész a gulyás!
+    2. „Kiírom".
+    3. Egy-két másodperc, és ott van minden látogató telefonján.
+
+  Négy kész mondat is ott van egy koppintásra, ha nincs idő fogalmazni.
+
+  MINDEN ÜZENET MELLETT OTT A STAND NEVE ÉS AZ IDŐPONT. Ezért nem kell
+  törölni, és ezért nem is írja felül az előzőt: a vendég látja, hogy a
+  „Kész a gulyás!" öt perce vagy két órája szól.
+
+  Amit eddig kiírtál, ott van a mező alatt. Ha elírtad, a kuka ikonnal
+  visszavehető.
+
+  MIT ÉRDEMES KIÍRNI
+    - Kész az első adag, gyertek!
+    - Most sültek ki a rétesek.
+    - Fél óra és kész a pörkölt.
+    - Elfogyott a csülök, köszönjük!
+    - Fél óra múlva zenélünk a standnál.
+
+  Ez a leggyorsabb módja annak, hogy a vásár megtudja, mi van nálatok. Egy
+  mondat többet hoz, mint egy óra kiabálás.
+
+================================================================================
+7. ÉTEL SZERKESZTÉSE, TÖRLÉSE
 ================================================================================
 
   A kínálat listájában minden tétel mellett két kis ikon:
@@ -148,7 +172,7 @@
 
 
 ================================================================================
-7. FOTÓ POSZTOLÁSA A VÁSÁRRÓL
+8. FOTÓ POSZTOLÁSA A VÁSÁRRÓL
 ================================================================================
 
   A látogatói főoldal tetején van egy fotósáv. A legelső kártya a
@@ -166,7 +190,7 @@
 
 
 ================================================================================
-8. SZAVAZÁS AZ ÉTELEKRE
+9. SZAVAZÁS AZ ÉTELEKRE
 ================================================================================
 
   A látogató minden ételre szavazhat egy gombbal.
@@ -179,7 +203,7 @@
 
 
 ================================================================================
-9. AMI GYAKRAN FELMERÜL
+10. AMI GYAKRAN FELMERÜL
 ================================================================================
 
   Letöltsem az appot?
@@ -207,13 +231,17 @@
       Azok AI-val készült illusztrációk, és ez ki is van írva a kártyán. Ha
       van saját fotótok, töltsétek fel — az jobb, és felülírja.
 
+  Hol látom az infótáblát?
+      Az alsó sávban, a hangszóró ikonnál. Ha piros pötty van rajta, új
+      üzenet érkezett valamelyik standtól.
+
   Bezártam valamit, és nem találok vissza.
       Bal fent a hamburger menü (három vonal). Minden onnan elérhető. A
       felugró ablakokat az X-szel vagy a kép mellé koppintva lehet bezárni.
 
 
 ================================================================================
-10. HA ELAKADTOK
+11. HA ELAKADTOK
 ================================================================================
 
   Keressétek a szervezőt a helyszínen: a belépést és a PIN kódot ő kezeli.

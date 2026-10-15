@@ -1,6 +1,7 @@
 import React from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { Utensils, MapPin, Heart, Store, CalendarDays } from 'lucide-react';
+import { Utensils, MapPin, Megaphone, Store, CalendarDays } from 'lucide-react';
+import { olvasatlanSzam } from '../lib/infotabla';
 
 /**
  * Mobil alsó navigáció.
@@ -9,18 +10,18 @@ import { Utensils, MapPin, Heart, Store, CalendarDays } from 'lucide-react';
  * -- aki pörköltet keres, annak ne kelljen gondolkodnia, hol kezdje -, ezért
  * nagyobb, kiemelkedik a sávból, és pontosan középen van az öt elem közül.
  */
-export default function MobileBottomNav({ onOpenFavorites, setMainTab }) {
+export default function MobileBottomNav({ setMainTab }) {
   const {
     activeView,
     setActiveView,
-    favoriteExhibitorIds,
-    favoriteItemIds,
     navigateToStandFeed,
     navigateToFoodCatalog,
+    standHirek,
     mainTab
   } = useOrsolya();
 
-  const totalFavs = favoriteExhibitorIds.length + (favoriteItemIds?.length || 0);
+  // Hány üzenet jött azóta, hogy a vendég utoljára megnyitotta a táblát.
+  const olvasatlan = olvasatlanSzam(standHirek || []);
 
   // A látogatói nézetnek három füle van, ezért az aktív állapothoz a mainTab is
   // kell. Enélkül a "Standok" akkor is kiemelve maradna, amikor az ételeket
@@ -29,6 +30,7 @@ export default function MobileBottomNav({ onOpenFavorites, setMainTab }) {
   const isFood = activeView === 'visitor' && mainTab === 'food';
   const isProgram = activeView === 'visitor' && mainTab === 'program';
   const isMap = activeView === 'map';
+  const isInfo = activeView === 'visitor' && mainTab === 'info';
 
   /** A négy másodlagos gomb egységes stílusa. */
   const sideButton = (active) =>
@@ -107,17 +109,26 @@ export default function MobileBottomNav({ onOpenFavorites, setMainTab }) {
           <span className="text-[10px] font-bold">Programok</span>
         </button>
 
-        {/* 5. Kedvencek */}
-        <button onClick={onOpenFavorites} className={`${sideButton(false)} relative`}>
+        {/* 5. Infótábla — amit a standok üzennek.
+            A kedvencek innen kikerült: az a fejlécben és a menüben is ott
+            van, az infótábla viszont sehonnan nem volt elérhető. */}
+        <button
+          onClick={() => {
+            setActiveView('visitor');
+            if (setMainTab) setMainTab('info');
+          }}
+          className={`${sideButton(isInfo)} relative`}
+          title="Amit a standok üzennek"
+        >
           <div className="relative">
-            <Heart className="w-5 h-5 text-rose-700 fill-rose-700" />
-            {totalFavs > 0 && (
+            <Megaphone className={sideIcon(isInfo)} />
+            {olvasatlan > 0 && (
               <span className="absolute -top-1 -right-2 bg-rose-700 text-white font-extrabold text-[9px] px-1 rounded-full min-w-[14px] text-center">
-                {totalFavs}
+                {olvasatlan > 9 ? '9+' : olvasatlan}
               </span>
             )}
           </div>
-          <span className="text-[10px] font-bold">Kedvencek</span>
+          <span className="text-[10px] font-bold">Infótábla</span>
         </button>
 
       </div>

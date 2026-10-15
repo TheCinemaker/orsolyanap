@@ -9,7 +9,7 @@ import ExhibitorDashboard from './components/ExhibitorAdmin/ExhibitorDashboard';
 import ExhibitorAuthPage from './components/ExhibitorAuthPage';
 import MapView from './components/MapView';
 import LiveReelBar from './components/LiveReelBar';
-import EloUzenetek from './components/EloUzenetek';
+import InfoTabla from './components/InfoTabla';
 import TelepitesSav from './components/TelepitesSav';
 import ReelsGallery from './components/ReelsGallery';
 import BackToTopButton from './components/BackToTopButton';
@@ -199,13 +199,19 @@ function MainApp() {
             {/* Top Title Section */}
             <div className="text-center py-1">
               <h1 className="text-xs sm:text-sm font-black text-amber-950 uppercase tracking-widest">
-                {mainTab === 'program' ? 'PROGRAMFÜZET' : 'CIVIL ÍZEK UTCÁJA'}
+                {mainTab === 'program'
+                  ? 'PROGRAMFÜZET'
+                  : mainTab === 'info'
+                  ? 'AMIT A STANDOK ÜZENNEK'
+                  : 'CIVIL ÍZEK UTCÁJA'}
               </h1>
             </div>
 
             {/* Main Content Area */}
             {mainTab === 'program' ? (
               <EventProgramBook />
+            ) : mainTab === 'info' ? (
+              <InfoTabla />
             ) : mainTab === 'food' ? (
               <FoodCatalogView
                 searchQuery={searchQuery}
@@ -217,10 +223,6 @@ function MainApp() {
               <>
                 {/* Live Facebook/Instagram Style Reels Bar - Only on Main Tents Feed */}
                 <LiveReelBar />
-
-                {/* Amit a standosok épp most írtak be. Üres marad, ha senki
-                    nem írt semmit. */}
-                <EloUzenetek onOpenDetails={(ex) => setSelectedDetailExhibitor(ex)} />
 
                 {/* Exhibitors Feed */}
                 <div className="space-y-4 pt-2">

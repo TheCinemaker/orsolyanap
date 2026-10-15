@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useOrsolya } from '../../context/OrsolyaContext';
+import InfoTablaIro from './InfoTablaIro';
 import {
   Flame,
   Clock,
@@ -265,6 +266,10 @@ export default function ExhibitorDashboard() {
         </div>
       </div>
 
+      {/* Infótábla: a vásár közben ez a leggyakrabban használt mező, ezért
+          a bemutatkozó űrlap ELŐTT van. */}
+      <InfoTablaIro />
+
       {/* Profile & Story Editor Form */}
       <div className="bg-white border border-stone-200/90 rounded-md p-6 shadow-sm space-y-4">
         <h3 className="text-sm font-bold text-stone-900 flex items-center gap-2">
@@ -435,7 +440,7 @@ export default function ExhibitorDashboard() {
             <div>
               <div className="flex items-center justify-between mb-1 gap-2">
                 <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider">
-                  Élő Üzenet / Megjegyzés a Standnál
+                  Állandó megjegyzés a standnál
                 </label>
                 {/* Egy koppintással ki lehessen venni. Az élő üzenet a
                     legromlandóbb adat az appban: a „várható elkészülés
@@ -447,20 +452,21 @@ export default function ExhibitorDashboard() {
                     onClick={() => setProfileData({ ...profileData, notice: '' })}
                     className="shrink-0 text-[11px] font-extrabold text-rose-800 hover:text-rose-900 underline decoration-dotted cursor-pointer"
                   >
-                    Üzenet törlése
+                    Megjegyzés törlése
                   </button>
                 )}
               </div>
               <input
                 type="text"
-                placeholder="Pl. A marhapörkölt frissen rotyog, várható elkészülés 12:45!"
+                placeholder="Pl. Ételeink laktózmentes alapanyagokból készülnek."
                 value={profileData.notice}
                 onChange={(e) => setProfileData({ ...profileData, notice: e.target.value })}
                 className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
               />
               <p className="text-[11px] text-stone-500 font-medium mt-1 leading-snug">
-                Mentés után azonnal megjelenik a főlapon, az „Élő a standokról"
-                sávban, és az ételeidnél is. Ha már nem érvényes, töröld.
+                Ami EGÉSZ HÉTVÉGÉN igaz: allergén-infó, hol a sátor, kiknek
+                gyűjtötök. A stand kártyáján látszik. Ami időpontos — „kész a
+                gulyás", „elfogyott" —, az fentre, az infótáblára megy.
               </p>
             </div>
           </div>

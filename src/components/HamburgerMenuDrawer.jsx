@@ -12,6 +12,7 @@ import {
   Cookie,
   CupSoda,
   Compass,
+  Megaphone,
   Trophy,
   ThumbsUp,
   MapPin,
@@ -129,6 +130,21 @@ export default function HamburgerMenuDrawer({
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-800 px-3 block mb-1">
               FŐ NAVIGÁCIÓ
             </span>
+
+            <button
+              onClick={() => handleSelectTab('info')}
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-md text-xs font-extrabold transition-all cursor-pointer ${
+                mainTab === 'info'
+                  ? 'bg-amber-900 text-white shadow-xs'
+                  : 'text-stone-700 hover:bg-stone-100'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <Megaphone className="w-4 h-4" />
+                <span>Infótábla</span>
+              </div>
+              <ChevronRight className="w-4 h-4 opacity-70" />
+            </button>
 
             <button
               onClick={() => handleSelectTab('tents')}
