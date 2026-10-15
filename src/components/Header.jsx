@@ -4,7 +4,7 @@ import OrsolyaInfoModal from './OrsolyaInfoModal';
 import FavoritesModal from './FavoritesModal';
 import MobileBottomNav from './MobileBottomNav';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { Utensils, MapPin, Store, Heart, Search, X, Info, Calendar, Menu, ThumbsUp, Megaphone, CloudSun } from 'lucide-react';
+import { Utensils, MapPin, Store, Heart, Search, X, Info, Calendar, Menu, ThumbsUp, Megaphone } from 'lucide-react';
 import HamburgerMenuDrawer from './HamburgerMenuDrawer';
 import { olvasatlanSzam } from '../lib/infotabla';
 
@@ -102,23 +102,6 @@ export default function Header({
               onClick={handleStandClick}
               onLongPress5s={() => setActiveView('login')}
             />
-
-            {/* Kőszegi időjárás, új lapon. Ikonméretű gomb: a fejlécben a
-                menü, a logó, a kereső és a kedvencek is itt szorul, és egy
-                feliratos gomb hozzáért a szivecskéhez. A felirat csak nagy
-                képernyőn jelenik meg, ahol tényleg van hely; a tényleges
-                adat amúgy is a főlapi kártyán van. */}
-            <a
-              href="https://kiemet.hu"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="Kőszegi időjárás-előrejelzés – kiemet.hu (új lapon nyílik)"
-              aria-label="Kőszegi időjárás-előrejelzés"
-              className="shrink-0 w-9 h-9 lg:w-auto lg:px-2.5 lg:gap-1.5 flex items-center justify-center rounded-md bg-sky-50 hover:bg-sky-100 border border-sky-300/80 text-sky-900 transition-colors cursor-pointer"
-            >
-              <CloudSun className="w-5 h-5 text-sky-700 shrink-0" />
-              <span className="hidden lg:inline text-xs font-extrabold">Időjárás</span>
-            </a>
           </div>
 
           {/* Navigation Tabs (Desktop Apple Segmented Style) */}
