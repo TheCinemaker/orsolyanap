@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Crosshair, Check, X, MapPin, Loader2, Upload, AlertTriangle } from 'lucide-react';
+import { Crosshair, Check, X, MapPin, Loader2, Upload, AlertTriangle, Keyboard } from 'lucide-react';
 import { useOrsolya } from '../../context/OrsolyaContext';
 import { useScrollLock } from '../../hooks/useScrollLock';
 
@@ -58,6 +58,8 @@ export default function KoordinataFelvetel({ onClose }) {
   const [meres, setMeres] = useState(null); // melyik stand mérése fut
   const [allapot, setAllapot] = useState(null); // { pontossag, masodperc }
   const [varo, setVaro] = useState(olvasVaro);
+  const [kezi, setKezi] = useState(null); // melyik standhoz írunk kézzel
+  const [keziSzoveg, setKeziSzoveg] = useState('');
 
   useScrollLock(true);
 
@@ -148,11 +150,50 @@ export default function KoordinataFelvetel({ onClose }) {
     }
   };
 
+  /**
+   * Kézi beírás: beillesztett koordinátapárból.
+   *
+   * MIÉRT KELL A GPS MELLETT: nem mindig a sátor előtt állunk. Előfordul,
+   * hogy a szervező egy térképről vagy egy üzenetből olvas be egy pontot,
+   * este, a szállásról. Ugyanazt a három ellenőrzést futtatja, mint a
+   * `koordinatak.mjs`: Kőszegen van-e, és elég pontos-e a szám.
+   *
+   * Bármilyen alakot elfogad, amiben két szám van — a Google Maps
+   * „47.389831, 16.538930" formája is ilyen.
+   */
+  const keziMentes = async (stand) => {
+    const szamok = String(keziSzoveg).match(/-?\d+[.,]\d+/g) || [];
+    if (szamok.length < 2) {
+      showToast('Két számot kérek, pl. 47.389831, 16.538930', 'error');
+      return;
+    }
+    const [lat, lon] = szamok.slice(0, 2).map((n) => Number(n.replace(',', '.')));
+
+    if (!koszegben(lat, lon)) {
+      showToast('Ez a pont nem Kőszegen van. Nincs felcserélve a két szám?', 'error');
+      return;
+    }
+    const jegyek = (n) => (String(n).split('.')[1] || '').length;
+    if (Math.min(jegyek(lat), jegyek(lon)) < 6) {
+      showToast('Hat tizedesjegynél pontatlanabb — így a sátorhoz kevés.', 'error');
+      return;
+    }
+
+    setKezi(null);
+    setKeziSzoveg('');
+    await rogzit(stand, [lat, lon], null);
+  };
+
   /** Mentés: előbb a hálózaton, és ha nem megy, a várólistára. */
   const rogzit = async (stand, coords, pontossag) => {
     const ok = await mentCoordinatat(stand.id, coords);
     if (ok) {
-      showToast(`${stand.name}: bemérve, ${pontossag} m pontossággal.`, 'success');
+      showToast(
+        pontossag === null
+          ? `${stand.name}: beírva.`
+          : `${stand.name}: bemérve, ${pontossag} m pontossággal.`,
+        'success'
+      );
       uritVaro();
       return;
     }
@@ -203,8 +244,9 @@ export default function KoordinataFelvetel({ onClose }) {
       </div>
 
       <p className="shrink-0 px-3 py-2 bg-amber-100 border-b border-amber-200 text-[11px] font-semibold text-amber-950 leading-snug">
-        Állj a sátor elé, és koppints a nevére. Pár másodpercig mér, aztán
-        magától beírja. A 25 méternél pontatlanabbat nem fogadja el.
+        Állj a sátor elé, és koppints a nevére: pár másodpercig mér, aztán
+        magától beírja. A 25 méternél pontatlanabbat nem fogadja el. Ha nem a
+        helyszínen vagy, a billentyűzet ikonnal kézzel is beírhatod.
       </p>
 
       <div className="flex-1 overflow-y-auto overscroll-contain p-2.5 space-y-1.5">
@@ -214,59 +256,105 @@ export default function KoordinataFelvetel({ onClose }) {
           const fut = meres === x.id;
 
           return (
-            <button
+            <div
               key={x.id}
-              onClick={() => mer(x)}
-              disabled={Boolean(meres)}
-              className={`w-full text-left px-3 py-3 rounded-md border flex items-center gap-2.5 transition-colors cursor-pointer disabled:cursor-wait ${
+              className={`rounded-md border transition-colors ${
                 fut
                   ? 'bg-amber-100 border-amber-400'
                   : bemert
                   ? 'bg-white border-emerald-300'
-                  : 'bg-white border-stone-300 hover:border-amber-500'
+                  : 'bg-white border-stone-300'
               }`}
             >
-              <span className="shrink-0">
-                {fut ? (
-                  <Loader2 className="w-5 h-5 text-amber-800 animate-spin" />
-                ) : varakozik ? (
-                  <AlertTriangle className="w-5 h-5 text-amber-700" />
-                ) : bemert ? (
-                  <Check className="w-5 h-5 text-emerald-700" />
-                ) : (
-                  <MapPin className="w-5 h-5 text-stone-400" />
-                )}
-              </span>
+              <div className="flex items-center">
+                <button
+                  onClick={() => mer(x)}
+                  disabled={Boolean(meres)}
+                  className="min-w-0 flex-1 text-left px-3 py-3 flex items-center gap-2.5 cursor-pointer disabled:cursor-wait"
+                >
+                  <span className="shrink-0">
+                    {fut ? (
+                      <Loader2 className="w-5 h-5 text-amber-800 animate-spin" />
+                    ) : varakozik ? (
+                      <AlertTriangle className="w-5 h-5 text-amber-700" />
+                    ) : bemert ? (
+                      <Check className="w-5 h-5 text-emerald-700" />
+                    ) : (
+                      <MapPin className="w-5 h-5 text-stone-400" />
+                    )}
+                  </span>
 
-              <span className="min-w-0 flex-1">
-                <span className="block text-sm font-extrabold text-stone-900 leading-tight">
-                  {x.name}
-                </span>
-                <span className="block text-[11px] font-medium text-stone-500 leading-tight">
-                  {fut
-                    ? allapot?.pontossag
-                      ? `mérés… ${allapot.pontossag} m (${allapot.masodperc} s)`
-                      : 'GPS-jelre várok…'
-                    : varakozik
-                    ? 'bemérve, feltöltésre vár'
-                    : bemert
-                    ? `bemérve: ${x.coordinates[0].toFixed(6)}, ${x.coordinates[1].toFixed(6)}`
-                    : 'becsült hely — ide kell állni és koppintani'}
-                </span>
-              </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-extrabold text-stone-900 leading-tight">
+                      {x.name}
+                    </span>
+                    <span className="block text-[11px] font-medium text-stone-500 leading-tight">
+                      {fut
+                        ? allapot?.pontossag
+                          ? `mérés… ${allapot.pontossag} m (${allapot.masodperc} s)`
+                          : 'GPS-jelre várok…'
+                        : varakozik
+                        ? 'bemérve, feltöltésre vár'
+                        : bemert
+                        ? `${x.coordinates[0].toFixed(6)}, ${x.coordinates[1].toFixed(6)}`
+                        : 'becsült hely — ide kell állni és koppintani'}
+                    </span>
+                  </span>
 
-              {!fut && (
-                <span
-                  className={`shrink-0 px-2.5 py-1.5 rounded-md text-[11px] font-extrabold ${
-                    bemert
-                      ? 'bg-stone-100 text-stone-600 border border-stone-200'
-                      : 'bg-amber-900 text-white'
+                  {!fut && (
+                    <span
+                      className={`shrink-0 px-2.5 py-1.5 rounded-md text-[11px] font-extrabold ${
+                        bemert
+                          ? 'bg-stone-100 text-stone-600 border border-stone-200'
+                          : 'bg-amber-900 text-white'
+                      }`}
+                    >
+                      {bemert ? 'Újra' : 'Itt vagyok'}
+                    </span>
+                  )}
+                </button>
+
+                {/* Kézi beírás: ha nem a sátor előtt állsz. */}
+                <button
+                  onClick={() => {
+                    setKezi(kezi === x.id ? null : x.id);
+                    setKeziSzoveg(
+                      bemert ? `${x.coordinates[0]}, ${x.coordinates[1]}` : ''
+                    );
+                  }}
+                  title="Beírom kézzel"
+                  aria-label="Koordináta beírása kézzel"
+                  className={`shrink-0 p-3 cursor-pointer ${
+                    kezi === x.id ? 'text-amber-900' : 'text-stone-400 hover:text-stone-700'
                   }`}
                 >
-                  {bemert ? 'Újra' : 'Itt vagyok'}
-                </span>
+                  <Keyboard className="w-5 h-5" />
+                </button>
+              </div>
+
+              {kezi === x.id && (
+                <div className="px-3 pb-3 pt-0 flex items-start gap-1.5">
+                  <input
+                    autoFocus
+                    inputMode="decimal"
+                    value={keziSzoveg}
+                    onChange={(e) => setKeziSzoveg(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') keziMentes(x);
+                      if (e.key === 'Escape') setKezi(null);
+                    }}
+                    placeholder="47.389831, 16.538930"
+                    className="flex-1 min-w-0 px-2.5 py-2 bg-stone-50 border border-amber-400 rounded-md text-xs font-mono text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                  />
+                  <button
+                    onClick={() => keziMentes(x)}
+                    className="shrink-0 px-3 py-2 bg-emerald-800 hover:bg-emerald-700 text-white text-[11px] font-extrabold rounded-md cursor-pointer"
+                  >
+                    Beírom
+                  </button>
+                </div>
               )}
-            </button>
+            </div>
           );
         })}
       </div>

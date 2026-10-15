@@ -245,6 +245,13 @@ Amit magától megtesz:
 - A bemért standot pipával mutatja, a koordinátájával együtt. Ha félrement,
   az „Újra" gombbal újramérhető.
 
+**Kézzel is beírható**, ha nem a sátor előtt állsz: a stand mellett a
+billentyűzet ikon megnyit egy mezőt, abba beilleszthető a koordinátapár
+(`47.389831, 16.538930` — a Google Maps formája is jó). Ugyanazt a három
+ellenőrzést futtatja: Kőszegen van-e, nincs-e felcserélve a két szám, és elég
+pontos-e. A bemért standnál a mező a mostani értéket mutatja, tehát javítani
+is lehet vele.
+
 Közben a térképen azonnal a helyén lesz a pin, tehát menet közben
 ellenőrizheted.
 
