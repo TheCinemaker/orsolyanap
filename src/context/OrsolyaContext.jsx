@@ -13,6 +13,13 @@ import { deviceId } from '../lib/eszkoz';
  */
 const ORGANIZER_PIN = '0169';
 
+/* Amit a látogatói appnak tudnia kell egy standról. A `pin` szándékosan
+   nincs benne: lásd a betöltésnél. Új oszlopot ide is fel kell venni,
+   különben az app nem látja. */
+const EXHIBITOR_OSZLOPOK =
+  'id,name,location,coordinates,category,has_drinks,offerings,days,is_open,' +
+  'story,cause,phone,email,facebook_url,instagram_url,image,notice,created_at';
+
 /**
  * Mennyi fotó jöjjön le egyszerre.
  *
@@ -80,6 +87,11 @@ export function OrsolyaProvider({ children }) {
      szerzővel és időponttal — a „Kész a gulyás!" tíz perc múlva még
      érdekes, két óra múlva félrevezető, és ezt csak az időpont mondja meg. */
   const [standHirek, setStandHirek] = useState([]);
+  /* Amivel beléptek: a stand PIN-je vagy a szervezői kód. Csak memóriában,
+     a stand-lista már nem hordozza. Ez kell az infótáblás írásokhoz, mert
+     azokat az adatbázis a kódhoz köti. */
+  const [aktivPin, setAktivPin] = useState(null);
+  const [pinJegyzek, setPinJegyzek] = useState([]);
 
   // Scanned Favorite Exhibitors
   const [favoriteExhibitorIds, setFavoriteExhibitorIds] = useState([]);
@@ -243,7 +255,14 @@ export function OrsolyaProvider({ children }) {
     const fetchSupabaseData = async () => {
       setIsLoadingData(true);
       try {
-        const { data: exData, error: exErr } = await supabase.from('exhibitors').select('*');
+        /* Felsorolt oszlopok, mert a `pin` NEM kell a böngészőnek.
+           A `select('*')` minden látogatónak letöltötte mind a 38 stand PIN
+           kódját — elég volt megnyitni a fejlesztői eszközöket. A kódot a
+           belépéskor a `login_exhibitor` függvény ellenőrzi, a jegyzéket a
+           `pin_jegyzek` adja a szervezői kódra (supabase-pin-vedelem.sql). */
+        const { data: exData, error: exErr } = await supabase
+          .from('exhibitors')
+          .select(EXHIBITOR_OSZLOPOK);
         if (exErr) {
           console.error('Supabase exhibitors fetch error:', exErr.message);
           setExhibitors([]);
@@ -690,6 +709,9 @@ export function OrsolyaProvider({ children }) {
     });
   };
 
+  /** Amivel a mostani belépő írhat: a stand PIN-je, vagy a szervezői kód. */
+  const belepesiKod = () => (isSuperAdmin ? ORGANIZER_PIN : aktivPin);
+
   /**
    * Üzenet kiírása az infótáblára.
    *
@@ -703,11 +725,11 @@ export function OrsolyaProvider({ children }) {
    */
   const postStandHir = async (szoveg) => {
     const szov = String(szoveg ?? '').trim();
-    if (!activeExhibitor || szov.length < 2) return false;
+    if (!activeExhibitor || !belepesiKod() || szov.length < 2) return false;
     try {
       const { data, error } = await supabase.rpc('post_stand_hir', {
         p_exhibitor_id: activeExhibitor.id,
-        p_pin: activeExhibitor.pin,
+        p_pin: belepesiKod(),
         p_szoveg: szov,
       });
       if (error) throw error;
@@ -759,7 +781,7 @@ export function OrsolyaProvider({ children }) {
    * táblán, mintha most írták volna.
    */
   const editStandHir = async (id, szoveg) => {
-    const kod = isSuperAdmin ? ORGANIZER_PIN : activeExhibitor?.pin;
+    const kod = belepesiKod();
     const szov = String(szoveg ?? '').trim();
     if (!kod || szov.length < 2) return false;
     try {
@@ -786,7 +808,7 @@ export function OrsolyaProvider({ children }) {
    * táblán kell legyen mód levenni azt, ami nem odavaló.
    */
   const deleteStandHir = async (id) => {
-    const kod = isSuperAdmin ? ORGANIZER_PIN : activeExhibitor?.pin;
+    const kod = belepesiKod();
     if (!kod) return false;
     try {
       const { data, error } = await supabase.rpc('delete_stand_hir', {
@@ -830,18 +852,33 @@ export function OrsolyaProvider({ children }) {
    *
    * A hibaüzenet szándékosan nem ad példát kódra.
    */
-  const loginExhibitor = (pin) => {
+  const loginExhibitor = async (pin) => {
     const clean = String(pin ?? '').trim();
 
     if (clean === ORGANIZER_PIN) {
       setIsSuperAdmin(true);
+      setAktivPin(ORGANIZER_PIN);
       showToast('Szervezői belépés. Válaszd ki, melyik stand felületére lépsz.', 'success');
       return true;
     }
 
-    const found = exhibitors.find((ex) => ex.pin === clean);
+    /* A kódot az adatbázis ellenőrzi, mert a böngésző már nem ismeri a
+       PIN-eket. Ha a függvény még nincs meg (az SQL nem futott le), a régi
+       úton lépünk be a letöltött listából — így nincs olyan pillanat,
+       amikor a standosok nem tudnak bejutni. */
+    let found = null;
+    try {
+      const { data, error } = await supabase.rpc('login_exhibitor', { p_pin: clean });
+      if (error) throw error;
+      if (data) found = { ...data, hasDrinks: data.has_drinks, image: kepUtvonal(data.image) };
+    } catch (err) {
+      console.warn('login_exhibitor nem elerheto, tartalek ut:', err.message);
+      found = exhibitors.find((ex) => ex.pin === clean) || null;
+    }
+
     if (found) {
       setIsSuperAdmin(false);
+      setAktivPin(clean);
       setActiveExhibitorId(found.id);
       setActiveView('exhibitor');
       showToast(`Üdvözlünk, ${found.name}! Stand belépés sikeres.`, 'success');
@@ -850,6 +887,27 @@ export function OrsolyaProvider({ children }) {
 
     showToast('Hibás PIN kód.', 'error');
     return false;
+  };
+
+  /**
+   * A szervezői PIN-jegyzék betöltése.
+   *
+   * A böngésző a PIN-eket már nem kapja meg a stand-listával, ezért a
+   * jegyzéket külön kérjük el, a szervezői kóddal. Csak akkor, amikor a
+   * szervező tényleg megnyitja — nem minden indításnál.
+   */
+  const loadPinJegyzek = async () => {
+    try {
+      const { data, error } = await supabase.rpc('pin_jegyzek', { p_kod: ORGANIZER_PIN });
+      if (error) throw error;
+      setPinJegyzek(data || []);
+      return true;
+    } catch (err) {
+      console.warn('pin_jegyzek nem elerheto:', err.message);
+      // Amíg az SQL nem futott le, a letöltött listában még ott a pin.
+      setPinJegyzek(exhibitors.map((x) => ({ id: x.id, pin: x.pin })).filter((x) => x.pin));
+      return false;
+    }
   };
 
   /**
@@ -870,6 +928,8 @@ export function OrsolyaProvider({ children }) {
   const logoutExhibitor = () => {
     setActiveExhibitorId(null);
     setIsSuperAdmin(false);
+    setAktivPin(null);
+    setPinJegyzek([]);
     setActiveView('visitor');
     showToast('Kijelentkeztél az árus felületről.');
   };
@@ -959,11 +1019,27 @@ export function OrsolyaProvider({ children }) {
       prev.map((ex) => (ex.id === exhibitorId ? { ...ex, pin: cleanPin } : ex))
     );
 
+    setPinJegyzek((prev) =>
+      prev.map((x) => (x.id === exhibitorId ? { ...x, pin: cleanPin } : x))
+    );
+
     if (isSupabaseConfigured) {
+      /* A `pin` oszlopra a böngészőnek nincs írási joga: a szervezői kódot
+         kérő függvény írja. Amíg az SQL nem futott le, a régi út megy. */
       try {
-        await supabase.from('exhibitors').update({ pin: cleanPin }).eq('id', exhibitorId);
-      } catch (e) {
-        console.warn('Supabase PIN update warning:', e);
+        const { error } = await supabase.rpc('set_exhibitor_pin', {
+          p_id: exhibitorId,
+          p_kod: ORGANIZER_PIN,
+          p_uj_pin: cleanPin,
+        });
+        if (error) throw error;
+      } catch (err) {
+        console.warn('set_exhibitor_pin nem elerheto, tartalek ut:', err.message);
+        try {
+          await supabase.from('exhibitors').update({ pin: cleanPin }).eq('id', exhibitorId);
+        } catch (e) {
+          console.warn('Supabase PIN update warning:', e);
+        }
       }
     }
 
@@ -1472,6 +1548,8 @@ export function OrsolyaProvider({ children }) {
         reels,
         events,
         standHirek,
+        pinJegyzek,
+        loadPinJegyzek,
         postStandHir,
         postSzervezoHir,
         editStandHir,

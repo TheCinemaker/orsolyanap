@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
 import VisitKoszegLogo from './VisitKoszegLogo';
 import { Key, ArrowRight, ArrowLeft, ShieldCheck, Copy, Check, Plus, X, Lock, Store, Utensils, Calendar } from 'lucide-react';
@@ -15,6 +15,8 @@ export default function ExhibitorAuthPage() {
     setActiveView,
     exhibitors,
     updateExhibitorPin,
+    pinJegyzek,
+    loadPinJegyzek,
     addExhibitorTeam,
     uploadImage,
     showToast
@@ -57,11 +59,16 @@ export default function ExhibitorAuthPage() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const [belepesFut, setBelepesFut] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (loginExhibitor(pinInput)) {
-      setPinInput('');
-    }
+    if (belepesFut) return;
+    setBelepesFut(true);
+    // A kódot az adatbázis ellenőrzi: a böngésző már nem ismeri a PIN-eket.
+    const ok = await loginExhibitor(pinInput);
+    setBelepesFut(false);
+    if (ok) setPinInput('');
   };
 
   const handleRegisterSubmit = async (e) => {
@@ -79,14 +86,24 @@ export default function ExhibitorAuthPage() {
     if (created) {
       setIsRegisterModalOpen(false);
       // Auto login as new team
-      loginExhibitor(created.pin);
+      await loginExhibitor(created.pin);
     }
   };
 
+  /* A PIN-ek nem a stand-listából jönnek — azt minden látogató letölti.
+     A szervezői jegyzéket külön kérjük el, a szervezői kóddal. */
+  useEffect(() => {
+    if (isSuperAdmin) loadPinJegyzek();
+  }, [isSuperAdmin]);
+
+  const pinOf = (id) => pinJegyzek.find((x) => x.id === id)?.pin || '';
+
   const handleCopyPin = (exhibitor) => {
-    navigator.clipboard.writeText(exhibitor.pin);
+    const pin = pinOf(exhibitor.id);
+    if (!pin) return;
+    navigator.clipboard.writeText(pin);
     setCopiedPinId(exhibitor.id);
-    showToast(`PIN kód (${exhibitor.pin}) másolva a vágólapra!`, 'success');
+    showToast(`PIN kód (${pin}) másolva a vágólapra!`, 'success');
     setTimeout(() => setCopiedPinId(null), 2500);
   };
 
@@ -470,7 +487,7 @@ export default function ExhibitorAuthPage() {
                             maxLength={6}
                             value={newPinValue}
                             onChange={(e) => setNewPinValue(e.target.value)}
-                            placeholder={ex.pin}
+                            placeholder={pinOf(ex.id)}
                             className="w-20 px-2 py-1 bg-white border border-amber-500 rounded-lg text-xs font-mono font-bold text-stone-900 text-center"
                           />
                           <button
@@ -483,7 +500,7 @@ export default function ExhibitorAuthPage() {
                       ) : (
                         <div className="flex items-center gap-1.5">
                           <span className="bg-amber-100 text-amber-950 font-mono font-black text-sm px-3 py-1 rounded-md border border-amber-300">
-                            {ex.pin}
+                            {pinOf(ex.id) || '····'}
                           </span>
 
                           <button
@@ -501,7 +518,7 @@ export default function ExhibitorAuthPage() {
                           <button
                             onClick={() => {
                               setEditingPinExhibitorId(ex.id);
-                              setNewPinValue(ex.pin);
+                              setNewPinValue(pinOf(ex.id));
                             }}
                             className="px-2 py-1 bg-white hover:bg-stone-100 text-stone-700 text-[11px] font-bold rounded-md border border-stone-200"
                           >
