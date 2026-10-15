@@ -46,6 +46,7 @@ az ebben a két fájlban van, és a repóval együtt megjön:
 |---|---|
 | `CLAUDE.md` | a szabályok és a buktatók: miért nincs ár, miért nem megy kép a `public/`-ba, mi a halott kód |
 | `HELYSZINEN.md` | ez a lap: minden parancs, sorrendben |
+| `FEJLESZTOI_KEZIKONYV.md` | ha kódot kell írni: adatmodell, jogosultságok, komponensek, buktatók |
 
 A beszélgetés-előzményt nem kell átvinni, és **ne is tedd fel a repóba**: a
 repó nyilvános. Ami fontos volt belőle, az ebben a két fájlban van — ha a

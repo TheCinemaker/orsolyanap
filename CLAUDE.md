@@ -5,7 +5,13 @@ Kőszeg, 2026. október 17–18. A **Civil Ízek Utcája** (Diáksétány) stand
 
 **A helyszínen a [HELYSZINEN.md](HELYSZINEN.md) a mérvadó.** Ott minden
 parancs együtt van, a pénteki koordináta-méréssel és azzal, mit kell tenni,
-ha valami elromlik. Ez a lap a hátterét mondja el.
+ha valami elromlik.
+
+**Kódoláshoz a [FEJLESZTOI_KEZIKONYV.md](FEJLESZTOI_KEZIKONYV.md).** Ott van
+az élő adatmodell, a jogosultsági modell, a komponens-térkép, a funkció
+hozzáadásának sorrendje, és egy táblázat arról, mibe futottunk már bele.
+
+Ez a lap a rövid szabálylista: ha a három ütközik, ez a mérvadó.
 
 Ha standot vagy képet kell felvenni, **ne írj saját megoldást** — használd a
 `scripts/` alatti szkripteket. A konvenciók ott kódban vannak, nem itt
