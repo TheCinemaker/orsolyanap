@@ -31,8 +31,17 @@ const KEPEK = 'public/mentett-kepek';
 const e = env();
 const db = api(e);
 
+/* FELSOROLT OSZLOPOK, és a `pin` NEM lehet köztük.
+   Ez a fájl a `public/` mappába kerül, a git nyilvános, és a Netlify
+   kiszolgálja: egy `select=*` ide írta ki mind a 38 stand belépési kódját,
+   mindenki számára letölthetően. A szkript a service_role kulcsot
+   használja, tehát magától mindent látna. */
+const EXHIBITOR_OSZLOPOK =
+  'id,name,location,coordinates,category,has_drinks,offerings,days,is_open,' +
+  'story,cause,phone,email,facebook_url,instagram_url,image,notice,created_at';
+
 const [exhibitors, menuItems, events] = await Promise.all([
-  db.select('exhibitors', 'select=*&order=name'),
+  db.select('exhibitors', `select=${EXHIBITOR_OSZLOPOK}&order=name`),
   db.select('menu_items', 'select=*&order=name'),
   db.select('events', 'select=*&order=event_date,start_time'),
 ]);
@@ -118,6 +127,21 @@ const pillanatkep = {
   menuItems,
   events,
 };
+
+/* Biztosíték: ha valaki később mégis `*`-ot ír a lekérdezésbe, itt álljunk
+   meg, ne csak reméljük. Egy kiszivárgott PIN-nel bárki átírhatja egy stand
+   étlapját. */
+const TILOS = ['pin'];
+for (const x of exhibitors) {
+  const talalat = TILOS.filter((k) => k in x);
+  if (talalat.length) {
+    console.error('');
+    console.error(`  ÁLLJ: a pillanatkép ${talalat.join(', ')} oszlopot tartalmazna.`);
+    console.error('  Ez a fájl nyilvános. Vedd ki a lekérdezésből, és futtasd újra.');
+    console.error('');
+    process.exit(1);
+  }
+}
 
 fs.writeFileSync(KIMENET, JSON.stringify(pillanatkep), 'utf8');
 
