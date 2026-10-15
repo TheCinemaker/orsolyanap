@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { INITIAL_EXHIBITORS, INITIAL_MENU_ITEMS } from '../data/mockOrsolyaData';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { deviceId } from '../lib/eszkoz';
