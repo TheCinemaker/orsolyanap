@@ -95,7 +95,16 @@ export default function HamburgerMenuDrawer({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex justify-start animate-in fade-in duration-200">
+    /* A homályos háttér is bezárja a menüt. A `target === currentTarget`
+       azért kell, mert a fiók maga is ennek a divnek a gyereke: nélküle
+       minden menüpontra kattintás ide is felszállna, és a navigálás
+       ugyanabban a pillanatban zárná is be a menüt. */
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex justify-start animate-in fade-in duration-200"
+    >
       <div className="bg-white w-full max-w-xs sm:max-w-sm h-full shadow-2xl flex flex-col justify-between overflow-y-auto p-5 space-y-6 relative animate-in slide-in-from-left duration-250 border-r border-stone-200">
         {/* Top Header */}
         <div className="flex items-center justify-between border-b border-stone-100 pb-4">
