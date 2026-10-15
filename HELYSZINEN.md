@@ -38,6 +38,19 @@ node scripts/ellenorzes.mjs
 
 Ha ez kiírja a standok és ételek számát, készen állsz.
 
+**Ha ez egy másik gép** (például a MacBook a helyszínen), akkor az ott futó
+Claude Code **nem tud semmit az otthoni beszélgetésekről**. Amit tudnia kell,
+az ebben a két fájlban van, és a repóval együtt megjön:
+
+| Fájl | Mit mond el |
+|---|---|
+| `CLAUDE.md` | a szabályok és a buktatók: miért nincs ár, miért nem megy kép a `public/`-ba, mi a halott kód |
+| `HELYSZINEN.md` | ez a lap: minden parancs, sorrendben |
+
+A beszélgetés-előzményt nem kell átvinni, és **ne is tedd fel a repóba**: a
+repó nyilvános. Ami fontos volt belőle, az ebben a két fájlban van — ha a
+helyszínen kiderül valami új, írd bele, ne a beszélgetésbe.
+
 ---
 
 ## 1. Belépési kódok
@@ -54,6 +67,22 @@ PIN-nel bárki beléphetne egy stand nevében és átírhatná az étlapját.
 
 Új stand felvétele után **futtasd újra**, különben az ő kódja nem lesz a
 listában.
+
+### A standosoknak kiosztandó útmutató
+
+```bash
+node scripts/kezikonyvek.mjs              # mind a 38 stand
+node scripts/kezikonyvek.mjs "Hajnal"     # csak egy stand
+```
+
+A `STANDOS_KEZIKONYV.txt` a nyomtatható alap — abban a stand neve és a PIN
+helyén pontozott vonal van, mert a repó nyilvános. Ez a szkript abból készít
+személyre szabott példányokat a `kezikonyvek/` mappába (gitignore-olt), a
+stand nevével és **csak a saját kódjával** kitöltve. Ezt küldd át a
+csapatnak Messengeren: így senki nem kapja meg a teljes PIN-listát.
+
+Ha a kézikönyv szövegén változtatsz, **futtasd újra**, különben a kiosztott
+példányok a régi szöveget tartalmazzák.
 
 ---
 
@@ -142,6 +171,19 @@ második futtatás nem csinál semmit — így néz ki, ha nincs teendő.
 Tedd be az új képet ugyanazzal a névvel, `_1` végződéssel:
 `Babgulyás_1.png`. A régi maradhat. Ha kétszer cseréled, `_2`. A legmagasabb
 sorszámú nyer.
+
+**Miért a végződés és nem a puszta felülírás:** a szkript a fájl dátumából
+dönti el, hogy újabb-e a feltöltöttnél. Egy letöltött vagy másolt fájl
+dátuma gyakran RÉGEBBI, mint a feltöltés ideje — ilyenkor a csere némán
+kimarad. A `_1`-gyel ez nem fordulhat elő. Ha mégis muszáj ugyanazzal a
+névvel: `FORCE=1 node scripts/kepek-feltoltese.mjs "Stand"`.
+
+**Csere után futtasd a pillanatképet** (7b.). A kép CÍME cserénél nem
+változik, és normál működésben is a buildbe mentett másolatot szolgáljuk ki —
+ha a pillanatkép nem fut le, a vendég a régi fotót látja, miközben a
+Supabase-ben már az új van. A szkript magától észreveszi: a tárhelyi
+időpontot összeveti a helyi másolattal, és csak az elavultat tölti le újra
+(„1 lecserélt").
 
 ### Sok kép egyszerre, egy mappában
 
@@ -233,6 +275,33 @@ látogató értelmetlennek látja.
 
 ---
 
+## 6b. Infótábla — amit a standok üzennek
+
+A látogatói appban külön oldal (alsó sáv, hangszóró ikon). A standok ide
+írják, hogy „Kész a gulyás!", „Elfogyott a csülök" — minden üzenet külön
+bejegyzés, a stand nevével és a pontos időponttal.
+
+**Írni csak a standok tudnak**, a saját PIN-jükkel, a stand kezelőjének
+tetejéről. Az adatbázis köti a PIN-hez (`post_stand_hir`), a táblára nincs
+insert policy — a böngészőből nem lehet idegen stand nevében posztolni.
+
+Ehhez a `supabase-infotabla.sql`-nek le kell futnia a Supabase SQL
+Editorban. Ha nem futott le, a tábla üresen marad, a kiírás hibát ad, és a
+naplóban ez látszik: `Infotabla nem elerheto`. **Egyszeri dolog**, nem kell
+megismételni.
+
+Ha egy standos szól, hogy nem tud kiírni:
+
+1. Be van léptetve? Az írólap csak belépés után látszik.
+2. Van neki internet? A toast megmondja: „Nem sikerült kiírni. Van internet?"
+3. Lefutott az SQL? Ha nem, senki nem tud kiírni, nem csak ő.
+
+A **standok állandó megjegyzése** (`exhibitors.notice`) más dolog: az, ami
+egész hétvégén igaz (allergén-infó, hol a sátor). Az a stand kártyáján
+látszik, és nem az infótáblán. Az időpontos hír megy a táblára.
+
+---
+
 ## 7. Szavazás
 
 ```bash
@@ -296,6 +365,36 @@ npm run build     # előbb helyben: ha itt elhasal, ott is fog
 
 ---
 
+## 8b. Az utolsó kör, mielőtt gépet váltasz
+
+Ezt a sorrendet fusd végig, amikor minden adat bent van, és a következő
+munka már a MacBookon lesz. Nyolc perc, és utána a repó önmagában elég.
+
+```bash
+node scripts/ellenorzes.mjs                 # nincs hiányzó kép, PIN, koordináta
+node scripts/kezikonyvek.mjs                # standos útmutatók a legfrissebb szöveggel
+node scripts/pin-lista.mjs                  # PIN-lista és koordináta-állapot
+node scripts/pillanatkep.mjs                # vészüzem + a buildből szolgált képek
+npm run build                               # a dist ~850 kB; ha MB-os, kép került a public/-ba
+npm ci --dry-run --os=linux --cpu=x64       # ahogy a Netlify látja
+git add -A && git commit -m "…" && git push
+```
+
+Utána **nyisd meg a telefonon az éles oldalt**, és nézd meg, hogy a legutóbbi
+változás látszik-e. A build átmehet úgy is, hogy az oldal fehér marad (egy
+hiányzó import ilyen), és ezt csak a megnyitás mutatja meg.
+
+**Amit a git NEM visz át** — ezek gitignore-oltak, és ez szándékos:
+
+| Mi | Mi a megoldás a másik gépen |
+|---|---|
+| `.env` | kézzel létrehozni (0. fejezet), a kulcsokat magadnak átküldeni |
+| `KIALLITO_PIN_KODOK.txt` | `node scripts/pin-lista.mjs` újra legenerálja |
+| `kezikonyvek/` | `node scripts/kezikonyvek.mjs` újra legenerálja |
+| `etelfotok/`, `logok/` | a képek már fent vannak a Storage-ban; az új fotók a helyszínen készülnek, új mappába |
+
+---
+
 ## 9. Ha valami elromlik
 
 **Először mindig:**
@@ -356,6 +455,8 @@ képfeltöltés sosem töröl: a régi fájl a gépen marad.
 | Koordináták | `node scripts/koordinatak.mjs pontok.txt` |
 | Versenyételek | `node scripts/versenyetelek.mjs` |
 | Szavazás állása | `node scripts/szavazatok.mjs` |
+| Standos útmutatók PIN-nel | `node scripts/kezikonyvek.mjs` |
+| Vészüzemi pillanatkép | `node scripts/pillanatkep.mjs` |
 | Kirakás | `git add -A && git commit -m "…" && git push` |
 
 Mindegyikhez `--proba` (a `pin-lista` és az `ellenorzes` kivételével, azok nem

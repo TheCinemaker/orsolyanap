@@ -48,6 +48,26 @@ fs.mkdirSync(KEPEK, { recursive: true });
 const letoltve = new Map();
 let ujLetoltes = 0;
 let kihagyva = 0;
+let frissitve = 0;
+
+/* Mikor került a Storage-ba az egyes képek mostani változata.
+   Ez azért kell, mert a kép CÍME nem változik cserénél: ugyanaz az
+   `<id>.webp`. Ha csak a fájl létezését néznénk, a lecserélt fotóhoz örökre
+   a régi helyi másolat maradna -- és mivel normál működésben is a helyi
+   másolatot szolgáljuk ki, a vendég a RÉGI képet látná, miközben a
+   Supabase-ben már az új van. Ez egyszer már megtörtént két fotóval. */
+const tarhelyIdok = new Map();
+const tarhelyIdo = async (bucket, objektum) => {
+  if (!tarhelyIdok.has(bucket)) {
+    try {
+      tarhelyIdok.set(bucket, await db.listBucket(bucket));
+    } catch (err) {
+      console.warn(`  nem tudom lekerdezni a ${bucket} bucket idopontjait (${err.message})`);
+      tarhelyIdok.set(bucket, new Map());
+    }
+  }
+  return tarhelyIdok.get(bucket).get(objektum) || null;
+};
 
 async function helyire(url) {
   if (!url || !url.startsWith('http')) return url;
@@ -60,9 +80,18 @@ async function helyire(url) {
   const helyiUt = `/${KEPEK.replace(/^public\//, '')}/${nev}`;
 
   if (fs.existsSync(cel)) {
-    kihagyva++;
-    letoltve.set(url, helyiUt);
-    return helyiUt;
+    const [bucket, ...tobbi] = jel.split('/');
+    const tarhely = await tarhelyIdo(bucket, tobbi.join('/'));
+    const helyiIdo = fs.statSync(cel).mtimeMs;
+    const elavult = tarhely && new Date(tarhely).getTime() > helyiIdo;
+    if (!elavult) {
+      kihagyva++;
+      letoltve.set(url, helyiUt);
+      return helyiUt;
+    }
+    // Lecserélték a Storage-ban: a helyi másolat is cserélődik.
+    fs.rmSync(cel);
+    frissitve++;
   }
 
   try {
@@ -111,7 +140,7 @@ console.log('');
 console.log(`  ${exhibitors.length} stand, ${menuItems.length} étel, ${events.length} program`);
 console.log(`  ${KIMENET}  ${jsonKb} kB`);
 console.log(`  ${KEPEK}/  ${fs.readdirSync(KEPEK).length} kép, ${kepekMb.toFixed(1)} MB` +
-  `  (${ujLetoltes} új, ${kihagyva} már megvolt)`);
+  `  (${ujLetoltes - frissitve} új, ${frissitve} lecserélt, ${kihagyva} változatlan)`);
 console.log('');
 console.log('  Ezt most fel kell tolni, különben nem kerül ki:');
 console.log('    git add -A public && git commit -m "pillanatkep" && git push');
