@@ -196,8 +196,6 @@ function MainApp() {
               </div>
             )}
 
-            <TelepitesSav />
-
             {/* Kőszegi időjárás a vásár két napjára.
                 MINDEN FÜLÖN látszik, nem csak a standlistán: az app az
                 Ételek fülön nyílik, tehát egy standlistára tett kártyát a
@@ -205,10 +203,10 @@ function MainApp() {
                 ez az első kérdés, és egy sor helyet kér. */}
             <IdojarasKartya />
 
-            {/* Top Title Section */}
-            <div className="text-center py-1">
-              {/* Másfélszeres méret: ez a lap címe, eddig alig volt nagyobb
-                  a körülötte lévő feliratoknál. */}
+            {/* Top Title Section.
+                Szorosan a tartalom fölött: a saját térköze és a lap
+                `space-y-4`-e együtt túl szellőssé tette. */}
+            <div className="text-center -mb-1">
               <h1 className="text-lg sm:text-xl font-black text-amber-950 uppercase tracking-widest">
                 {mainTab === 'program'
                   ? 'PROGRAMFÜZET'
@@ -341,6 +339,14 @@ function MainApp() {
                 </div>
               </>
             )}
+
+            {/* „Tedd ki a főképernyőre": a tartalom UTÁN. A lap tetején két
+                színes sáv volt egymás alatt az időjárással, és ez a kettő
+                közül a kevésbé sürgős — aki végigolvasta a lapot, annak
+                amúgy is érdemes felajánlani. */}
+            <div className="pt-2">
+              <TelepitesSav />
+            </div>
           </div>
         )}
       </main>

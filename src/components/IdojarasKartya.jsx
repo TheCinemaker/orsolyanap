@@ -65,43 +65,39 @@ export default function IdojarasKartya() {
       className="group block bg-white border border-sky-300/80 rounded-md overflow-hidden shadow-xs hover:border-sky-500 transition-colors"
     >
       <div className="flex items-stretch">
-        {/* Most, a kőszegi mérőállomásról */}
+        {/* Most, Kőszegen */}
         {adat.most && (
-          <div className="shrink-0 px-3.5 py-3 bg-gradient-to-br from-sky-50 to-sky-100 border-r border-sky-200 flex flex-col justify-center items-center min-w-[92px]">
-            <span className="text-[9px] font-black uppercase tracking-widest text-sky-800/70">
-              Most Kőszegen
+          <div className="shrink-0 px-2.5 py-2 bg-gradient-to-br from-sky-50 to-sky-100 border-r border-sky-200 flex flex-col justify-center items-center min-w-[74px]">
+            <span className="text-[8px] font-black uppercase tracking-widest text-sky-800/70 leading-none">
+              Most
             </span>
-            <span className="text-2xl font-black text-sky-950 leading-tight">
+            <span className="text-xl font-black text-sky-950 leading-tight">
               {adat.most.fok}°
             </span>
-            <span className="text-[10px] font-bold text-sky-800 leading-tight text-center">
+            <span className="text-[9px] font-bold text-sky-800 leading-none text-center">
               {adat.most.szoveg}
             </span>
           </div>
         )}
 
-        <div className="min-w-0 flex-1 px-3.5 py-2.5 flex flex-col justify-center gap-1">
-          <span className="text-[9px] font-black uppercase tracking-widest text-stone-500">
-            A vásár két napja
-          </span>
-
+        <div className="min-w-0 flex-1 px-3 py-1.5 flex flex-col justify-center gap-0.5">
           {adat.napok.map((n) => {
             const { szoveg, jel } = kodSzerint(n.kod);
             const Ikon = IKON[jel] || Cloud;
             return (
-              <div key={n.nap} className="flex items-center gap-2 text-xs">
-                <Ikon className="w-4 h-4 text-sky-700 shrink-0" />
-                <span className="font-extrabold text-stone-900 w-[62px] shrink-0">
+              <div key={n.nap} className="flex items-center gap-1.5 text-[11px]">
+                <Ikon className="w-3.5 h-3.5 text-sky-700 shrink-0" />
+                <span className="font-extrabold text-stone-900 w-[58px] shrink-0">
                   {NAP_NEVE[n.nap]}
                 </span>
-                <span className="font-bold text-stone-900">
+                <span className="font-bold text-stone-900 shrink-0">
                   {n.min}–{n.max}°
                 </span>
                 <span className="text-stone-600 font-medium truncate">{szoveg}</span>
                 {/* A csapadékot csak akkor írjuk ki, ha van: a „0 mm" csak
                     elvonná a figyelmet a két hőmérsékletről. */}
                 {n.csapadek > 0.1 && (
-                  <span className="ml-auto shrink-0 inline-flex items-center gap-0.5 text-[11px] font-extrabold text-sky-800">
+                  <span className="ml-auto shrink-0 inline-flex items-center gap-0.5 text-[10px] font-extrabold text-sky-800">
                     <Droplets className="w-3 h-3" />
                     {n.csapadek.toFixed(1)} mm
                   </span>
@@ -109,9 +105,14 @@ export default function IdojarasKartya() {
               </div>
             );
           })}
+        </div>
 
-          <span className="text-[10px] font-bold text-sky-800 group-hover:text-sky-900 inline-flex items-center gap-0.5 mt-0.5">
-            Részletes előrejelzés, radar, webkamerák: kiemet.hu
+        {/* A forrás neve és a nyíl: ennyi elég ahhoz, hogy látsszon, hova
+            visz. A hosszú „részletes előrejelzés, radar, webkamerák" sor egy
+            külön sort vitt el a lap tetejéről. */}
+        <div className="shrink-0 pl-2 pr-3 flex items-center">
+          <span className="text-[11px] font-extrabold text-sky-800 group-hover:text-sky-900 inline-flex items-center gap-0.5 whitespace-nowrap">
+            kiemet.hu
             <ArrowUpRight className="w-3 h-3" />
           </span>
         </div>
