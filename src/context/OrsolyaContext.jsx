@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import { INITIAL_EXHIBITORS, INITIAL_MENU_ITEMS } from '../data/mockOrsolyaData';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { deviceId } from '../lib/eszkoz';
+import { olvasottIdo, olvasottnakJelol } from '../lib/infotabla';
 
 /**
  * Szervezői PIN kód.
@@ -87,6 +88,9 @@ export function OrsolyaProvider({ children }) {
      szerzővel és időponttal — a „Kész a gulyás!" tíz perc múlva még
      érdekes, két óra múlva félrevezető, és ezt csak az időpont mondja meg. */
   const [standHirek, setStandHirek] = useState([]);
+  /* Meddig olvasta el a vendég az infótáblát. Állapotban is tartjuk, nem
+     csak a tárolóban, különben a jelzőpötty nem tűnne el azonnal. */
+  const [infoOlvasva, setInfoOlvasva] = useState(() => olvasottIdo());
   /* Amivel beléptek: a stand PIN-je vagy a szervezői kód. Csak memóriában,
      a stand-lista már nem hordozza. Ez kell az infótáblás írásokhoz, mert
      azokat az adatbázis a kódhoz köti. */
@@ -128,6 +132,30 @@ export function OrsolyaProvider({ children }) {
     if (!KEPEK_A_BUILDBOL) return url;
     const nev = mentettNev(url);
     return nev && mentettKepek.current.has(nev) ? `/mentett-kepek/${nev}` : url;
+  };
+
+  /**
+   * A fentinek az ELLENTÉTE: helyi útvonalból vissza a Storage-címre.
+   *
+   * MIÉRT KELL: a standos felület a MEGJELENÍTETT értéket küldi vissza
+   * mentéskor. Ha a kép a buildből jött, akkor a `/mentett-kepek/...`
+   * útvonal került az adatbázisba, és a Supabase-cím elveszett. Az app ettől
+   * még mutatta a képet (a fájl ott van a buildben), ezért észrevehetetlen:
+   * a Kovács Miklós logónál pontosan ez történt, és csak az ellenorzes.mjs
+   * szúrta ki.
+   *
+   * A fájlnévben a bucket nevét egy aláhúzás követi, mert a `/`-ből az lett.
+   */
+  const tarhelyUrl = (ut) => {
+    if (typeof ut !== 'string' || !ut.startsWith('/mentett-kepek/')) return ut;
+    const nev = ut.slice('/mentett-kepek/'.length);
+    const i = nev.indexOf('_');
+    if (i < 1) return ut;
+    const bucket = nev.slice(0, i);
+    const objektum = nev.slice(i + 1);
+    const alap = import.meta.env.VITE_SUPABASE_URL;
+    if (!alap) return ut;
+    return `${alap}/storage/v1/object/public/${bucket}/${objektum}`;
   };
   /** Melyik fotón nyíljon meg a teljes képernyős folyám. */
   const [reelStartId, setReelStartId] = useState(null);
@@ -709,6 +737,13 @@ export function OrsolyaProvider({ children }) {
     });
   };
 
+  /** A tábla elolvasva eddig az időpontig. */
+  const infotablaOlvasott = (iso) => {
+    if (!iso) return;
+    olvasottnakJelol(iso);
+    setInfoOlvasva(iso);
+  };
+
   /** Amivel a mostani belépő írhat: a stand PIN-je, vagy a szervezői kód. */
   const belepesiKod = () => (isSuperAdmin ? ORGANIZER_PIN : aktivPin);
 
@@ -758,7 +793,9 @@ export function OrsolyaProvider({ children }) {
       const { data, error } = await supabase.rpc('post_szervezo_hir', {
         p_kod: ORGANIZER_PIN,
         p_szoveg: szov,
-        p_szerzo: szerzo || null,
+        // Kiírva küldjük, nem az adatbázis alapértékére hagyatkozunk: így
+        // nem kell SQL-t futtatni, ha az aláírás szövege változik.
+        p_szerzo: szerzo || 'Admin',
       });
       if (error) throw error;
       if (data) setStandHirek((prev) => (prev.some((h) => h.id === data.id) ? prev : [data, ...prev]));
@@ -977,7 +1014,7 @@ export function OrsolyaProvider({ children }) {
           email: newTeam.email,
           facebook_url: newTeam.facebook_url,
           instagram_url: newTeam.instagram_url,
-          image: newTeam.image,
+          image: tarhelyUrl(newTeam.image),
           notice: newTeam.notice
         }]);
       } catch (e) {
@@ -1068,7 +1105,7 @@ export function OrsolyaProvider({ children }) {
           facebook_url: updatedData.facebook_url,
           instagram_url: updatedData.instagram_url,
           days: updatedData.days,
-          image: updatedData.image || null
+          image: tarhelyUrl(updatedData.image) || null
         }).eq('id', exhibitorId);
         if (error) throw error;
       } catch (e) {
@@ -1227,7 +1264,7 @@ export function OrsolyaProvider({ children }) {
           is_lactose_free: formattedItem.is_lactose_free,
           is_sugar_free: formattedItem.is_sugar_free,
           is_vegan: formattedItem.is_vegan,
-          image: formattedItem.image || null
+          image: tarhelyUrl(formattedItem.image) || null
         };
 
         try {
@@ -1284,7 +1321,7 @@ export function OrsolyaProvider({ children }) {
           is_sugar_free: newItem.is_sugar_free,
           is_vegan: newItem.is_vegan,
           tags: newItem.tags || [],
-          image: newItem.image || null
+          image: tarhelyUrl(newItem.image) || null
         };
 
         try {
@@ -1548,6 +1585,8 @@ export function OrsolyaProvider({ children }) {
         reels,
         events,
         standHirek,
+        infoOlvasva,
+        infotablaOlvasott,
         pinJegyzek,
         loadPinJegyzek,
         postStandHir,

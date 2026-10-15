@@ -79,12 +79,31 @@ export function api(e) {
         headers: { ...HJ, Prefer: 'return=minimal' },
         body: JSON.stringify(rows),
       }),
-    patch: (table, id, data) =>
-      req(`${U}/rest/v1/${table}?id=eq.${encodeURIComponent(id)}`, {
+    /**
+     * Egy sor módosítása azonosító szerint.
+     *
+     * MIÉRT ELLENŐRZI, HOGY TALÁLT-E SORT: a PostgREST a nulla találatra is
+     * sikerrel válaszol. Egy elírt azonosítóra tehát a szkript boldogan
+     * kiírta, hogy „kész", és közben semmi nem változott. Három módosítás
+     * veszett el így némán — leírások és egy elírás javítása —, és csak egy
+     * véletlen visszaolvasáskor derült ki.
+     *
+     * Szűrőt is elfogad (`name=eq.Valami`), mert kézzel azt kényelmesebb;
+     * az `=` jel alapján dönt.
+     */
+    patch: async (table, id, data) => {
+      const kulcs = String(id);
+      const szuro = kulcs.includes('=') ? kulcs : `id=eq.${encodeURIComponent(kulcs)}`;
+      const sorok = await req(`${U}/rest/v1/${table}?${szuro}`, {
         method: 'PATCH',
-        headers: { ...HJ, Prefer: 'return=minimal' },
+        headers: { ...HJ, Prefer: 'return=representation' },
         body: JSON.stringify(data),
-      }),
+      });
+      if (!Array.isArray(sorok) || sorok.length === 0) {
+        throw new Error(`a modositas nem talalt sort: ${table}?${szuro}`);
+      }
+      return sorok;
+    },
     /** Fájl feltöltése, majd a publikus URL visszaadása. */
     /**
      * Mi van most a tárhelyen és mikor került oda.

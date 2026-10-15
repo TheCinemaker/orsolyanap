@@ -17,11 +17,12 @@ export default function MobileBottomNav({ setMainTab }) {
     navigateToStandFeed,
     navigateToFoodCatalog,
     standHirek,
+    infoOlvasva,
     mainTab
   } = useOrsolya();
 
   // Hány üzenet jött azóta, hogy a vendég utoljára megnyitotta a táblát.
-  const olvasatlan = olvasatlanSzam(standHirek || []);
+  const olvasatlan = olvasatlanSzam(standHirek || [], infoOlvasva);
 
   // A látogatói nézetnek három füle van, ezért az aktív állapothoz a mainTab is
   // kell. Enélkül a "Standok" akkor is kiemelve maradna, amikor az ételeket
@@ -121,10 +122,18 @@ export default function MobileBottomNav({ setMainTab }) {
           title="Amit a standok üzennek"
         >
           <div className="relative">
-            <Megaphone className={sideIcon(isInfo)} />
+            {/* Új üzenetnél a hangszóró is pirosra vált, nem csak a pötty
+                kerül rá: a sávban öt ikon van egymás mellett, és a 6 pixeles
+                pötty egyedül könnyen elnézhető. */}
+            <Megaphone
+              className={`w-5 h-5 ${
+                olvasatlan > 0 ? 'text-rose-700' : isInfo ? 'text-amber-800' : 'text-stone-500'
+              }`}
+            />
             {olvasatlan > 0 && (
-              <span className="absolute -top-1 -right-2 bg-rose-700 text-white font-extrabold text-[9px] px-1 rounded-full min-w-[14px] text-center">
-                {olvasatlan > 9 ? '9+' : olvasatlan}
+              <span className="absolute -top-0.5 -right-1.5 flex w-2 h-2">
+                <span className="absolute inline-flex w-full h-full rounded-full bg-rose-500 opacity-75 animate-ping" />
+                <span className="relative inline-flex w-2 h-2 rounded-full bg-rose-600 border border-white" />
               </span>
             )}
           </div>

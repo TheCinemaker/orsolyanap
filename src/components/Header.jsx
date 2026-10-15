@@ -6,6 +6,7 @@ import MobileBottomNav from './MobileBottomNav';
 import { useOrsolya } from '../context/OrsolyaContext';
 import { Utensils, MapPin, Store, Heart, Search, X, Info, Calendar, Clock, Menu, ThumbsUp, Megaphone } from 'lucide-react';
 import HamburgerMenuDrawer from './HamburgerMenuDrawer';
+import { olvasatlanSzam } from '../lib/infotabla';
 
 export default function Header({
   searchQuery,
@@ -27,8 +28,13 @@ export default function Header({
     exhibitors,
     votedItemIds,
     voteForItem,
+    standHirek,
+    infoOlvasva,
     navigateToStandFeed
   } = useOrsolya();
+
+  // Van-e olyan üzenet a táblán, amit ez a készülék még nem látott.
+  const olvasatlanHir = olvasatlanSzam(standHirek || [], infoOlvasva);
 
   const handleStandClick = () => {
     if (onSelectStandFeed) {
@@ -170,9 +176,19 @@ export default function Header({
               }`}
             >
               <Megaphone className={`w-3.5 h-3.5 ${
-                activeView === 'visitor' && mainTab === 'info' ? 'text-amber-200' : 'text-amber-700'
+                activeView === 'visitor' && mainTab === 'info'
+                  ? 'text-amber-200'
+                  : olvasatlanHir > 0
+                  ? 'text-rose-600'
+                  : 'text-amber-700'
               }`} />
               <span>Infótábla</span>
+              {olvasatlanHir > 0 && (
+                <span className="relative flex w-2 h-2">
+                  <span className="absolute inline-flex w-full h-full rounded-full bg-rose-500 opacity-75 animate-ping" />
+                  <span className="relative inline-flex w-2 h-2 rounded-full bg-rose-600" />
+                </span>
+              )}
             </button>
 
             {/* Info Button */}

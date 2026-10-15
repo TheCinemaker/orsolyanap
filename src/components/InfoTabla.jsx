@@ -1,7 +1,6 @@
 import React from 'react';
 import { Megaphone, Clock, Info, Trash2, Star } from 'lucide-react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { olvasottnakJelol } from '../lib/infotabla';
 
 /**
  * INFÓTÁBLA — amit a standok üzennek a vásárnak.
@@ -46,7 +45,8 @@ const friss = (iso) => {
 };
 
 export default function InfoTabla() {
-  const { standHirek, exhibitors, isSuperAdmin, deleteStandHir } = useOrsolya();
+  const { standHirek, exhibitors, isSuperAdmin, deleteStandHir, infotablaOlvasott } =
+    useOrsolya();
 
   /* Az időt percenként újraszámoljuk, különben a „3 perccel ezelőtt" ott
      marad a képernyőn fél órára is. */
@@ -64,7 +64,8 @@ export default function InfoTabla() {
     null
   );
   React.useEffect(() => {
-    if (legfrissebb) olvasottnakJelol(legfrissebb);
+    if (legfrissebb) infotablaOlvasott(legfrissebb);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [legfrissebb]);
 
   const standNev = new Map(exhibitors.map((x) => [x.id, x]));

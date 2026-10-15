@@ -28,9 +28,14 @@ export const olvasottnakJelol = (iso) => {
   }
 };
 
-/** Hány üzenet érkezett azóta, hogy a vendég utoljára megnyitotta a táblát. */
-export const olvasatlanSzam = (hirek) => {
-  const utolso = olvasottIdo();
+/**
+ * Hány üzenet érkezett azóta, hogy a vendég utoljára megnyitotta a táblát.
+ *
+ * Az időpontot a hívó adja (a kontextusból), nem mi olvassuk a tárolóból: a
+ * localStorage írása nem vált ki újrarajzolást, tehát a pötty ott maradt
+ * volna a sávban, amíg valami más nem mozdul a felületen.
+ */
+export const olvasatlanSzam = (hirek, utolso) => {
   if (!utolso) return hirek.length;
   const ido = new Date(utolso).getTime();
   return hirek.filter((h) => new Date(h.created_at).getTime() > ido).length;
