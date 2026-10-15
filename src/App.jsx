@@ -10,6 +10,7 @@ import ExhibitorAuthPage from './components/ExhibitorAuthPage';
 import MapView from './components/MapView';
 import LiveReelBar from './components/LiveReelBar';
 import InfoTabla from './components/InfoTabla';
+import IdojarasKartya from './components/IdojarasKartya';
 import TelepitesSav from './components/TelepitesSav';
 import ReelsGallery from './components/ReelsGallery';
 import BackToTopButton from './components/BackToTopButton';
@@ -225,6 +226,10 @@ function MainApp() {
               <>
                 {/* Live Facebook/Instagram Style Reels Bar - Only on Main Tents Feed */}
                 <LiveReelBar />
+
+                {/* Kőszegi időjárás a vásár két napjára. Szabadtéren ez az
+                    első kérdés; az adat a kiemet.hu forrásaiból jön. */}
+                <IdojarasKartya />
 
                 {/* Exhibitors Feed */}
                 <div className="space-y-4 pt-2">
