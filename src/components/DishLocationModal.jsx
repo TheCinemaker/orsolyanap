@@ -4,6 +4,7 @@ import { MapPin, X, ArrowRight, Store } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useScrollLock } from '../hooks/useScrollLock';
+import { hatterBezaras } from '../lib/bezaras';
 
 export default function DishLocationModal({ item, exhibitor, onClose }) {
   const { focusExhibitorOnMap, setActiveView } = useOrsolya();
@@ -81,7 +82,10 @@ export default function DishLocationModal({ item, exhibitor, onClose }) {
   if (!item || !exhibitor) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-stone-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+    <div
+      onClick={hatterBezaras(onClose)}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-stone-900/60 backdrop-blur-xs animate-in fade-in duration-200"
+    >
       <div className="bg-white border border-stone-200 rounded-md w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Modal Header */}
         <div className="p-3.5 sm:p-4 bg-amber-950 text-white flex items-center justify-between">
@@ -93,7 +97,8 @@ export default function DishLocationModal({ item, exhibitor, onClose }) {
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-md text-amber-200 hover:text-white hover:bg-amber-900/60 transition-colors cursor-pointer"
+            aria-label="Bezárás"
+            className="p-2.5 -m-1.5 rounded-md text-amber-200 hover:text-white hover:bg-amber-900/60 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>

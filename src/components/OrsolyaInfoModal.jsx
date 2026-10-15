@@ -2,6 +2,7 @@ import React from 'react';
 import { X, Calendar, Sparkles, Landmark, Leaf, Clock, Trophy, Phone, ShoppingBasket, ImageOff, Car, MapPinned } from 'lucide-react';
 import VisitKoszegLogo from './VisitKoszegLogo';
 import { useScrollLock } from '../hooks/useScrollLock';
+import { hatterBezaras } from '../lib/bezaras';
 import { PARKING_NOTICE, parkingRange, poiSummary, humanDistance } from '../data/helyszinek';
 
 export default function OrsolyaInfoModal({ isOpen, onClose }) {
@@ -17,12 +18,16 @@ export default function OrsolyaInfoModal({ isOpen, onClose }) {
   const places = poiSummary();
 
   return (
-    <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+    <div
+      onClick={hatterBezaras(onClose)}
+      className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-sm flex items-center justify-center p-4"
+    >
       <div className="bg-white border border-stone-200/90 rounded-md p-6 sm:p-8 w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-2xl relative space-y-6">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 text-stone-400 hover:text-stone-700 p-1 rounded-md transition-colors"
+          aria-label="Bezárás"
+          className="absolute top-3.5 right-3.5 text-stone-400 hover:text-stone-700 p-2.5 rounded-md transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>

@@ -2,6 +2,7 @@ import React from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
 import { X, MapPin, Phone, Mail, Heart, Utensils, Map, ThumbsUp, CupSoda, Calendar, Share2 } from 'lucide-react';
 import { useScrollLock } from '../hooks/useScrollLock';
+import { hatterBezaras } from '../lib/bezaras';
 
 export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish }) {
   const {
@@ -35,13 +36,17 @@ export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish 
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-3 sm:p-4 animate-in fade-in duration-150">
+    <div
+      onClick={hatterBezaras(onClose)}
+      className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex items-end sm:items-center justify-center p-3 sm:p-4 animate-in fade-in duration-150"
+    >
       <div className="bg-white border border-stone-200 rounded-2xl sm:rounded-md max-w-lg w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 shadow-2xl space-y-5 relative animate-in slide-in-from-bottom duration-200">
         
         {/* 8.4 Floating Sticky Close Button */}
         <button
           onClick={onClose}
-          className="sticky top-0 float-right z-30 p-2 rounded-full bg-white/90 backdrop-blur-md text-stone-700 hover:text-stone-900 hover:bg-stone-100 transition-all border border-stone-300 shadow-md -mr-2 -mt-2"
+          aria-label="Bezárás"
+          className="sticky top-0 float-right z-30 p-2.5 rounded-full bg-white/90 backdrop-blur-md text-stone-700 hover:text-stone-900 hover:bg-stone-100 transition-all border border-stone-300 shadow-md -mr-2 -mt-2"
           title="Bezárás"
         >
           <X className="w-5 h-5" />

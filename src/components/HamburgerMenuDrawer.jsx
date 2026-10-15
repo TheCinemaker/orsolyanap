@@ -18,6 +18,7 @@ import {
   Package
 } from 'lucide-react';
 import { useScrollLock } from '../hooks/useScrollLock';
+import { hatterBezaras } from '../lib/bezaras';
 
 export default function HamburgerMenuDrawer({
   isOpen,
@@ -95,14 +96,8 @@ export default function HamburgerMenuDrawer({
   };
 
   return (
-    /* A homályos háttér is bezárja a menüt. A `target === currentTarget`
-       azért kell, mert a fiók maga is ennek a divnek a gyereke: nélküle
-       minden menüpontra kattintás ide is felszállna, és a navigálás
-       ugyanabban a pillanatban zárná is be a menüt. */
     <div
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
+      onClick={hatterBezaras(onClose)}
       className="fixed inset-0 z-50 bg-stone-900/60 backdrop-blur-xs flex justify-start animate-in fade-in duration-200"
     >
       <div className="bg-white w-full max-w-xs sm:max-w-sm h-full shadow-2xl flex flex-col justify-between overflow-y-auto p-5 space-y-6 relative animate-in slide-in-from-left duration-250 border-r border-stone-200">
@@ -119,7 +114,8 @@ export default function HamburgerMenuDrawer({
           />
           <button
             onClick={onClose}
-            className="p-1.5 rounded-full text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-all cursor-pointer"
+            aria-label="Bezárás"
+            className="p-2.5 -m-1 rounded-full text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-all cursor-pointer"
             title="Bezárás"
           >
             <X className="w-5 h-5" />

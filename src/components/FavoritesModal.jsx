@@ -2,6 +2,7 @@ import React from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
 import { X, Heart, MapPin, QrCode, Trash2, Map, Utensils, Store } from 'lucide-react';
 import { useScrollLock } from '../hooks/useScrollLock';
+import { hatterBezaras } from '../lib/bezaras';
 
 export default function FavoritesModal({ isOpen, onClose }) {
   const {
@@ -24,7 +25,10 @@ export default function FavoritesModal({ isOpen, onClose }) {
   const favoriteItems = menuItems.filter((i) => favoriteItemIds?.includes(i.id));
 
   return (
-    <div className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-150">
+    <div
+      onClick={hatterBezaras(onClose)}
+      className="fixed inset-0 z-50 bg-stone-900/40 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-150"
+    >
       <div className="bg-white border border-stone-200 rounded-md p-5 sm:p-6 w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl relative">
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-stone-100">
@@ -39,7 +43,8 @@ export default function FavoritesModal({ isOpen, onClose }) {
           </div>
           <button
             onClick={onClose}
-            className="text-stone-400 hover:text-stone-700 p-1.5 rounded-full hover:bg-stone-100"
+            aria-label="Bezárás"
+            className="text-stone-400 hover:text-stone-700 p-2.5 -m-1 rounded-full hover:bg-stone-100 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>

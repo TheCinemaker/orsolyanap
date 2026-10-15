@@ -81,6 +81,7 @@ node scripts/program-leirasok.mjs x.json  # programleírások a szervező szöve
 node scripts/stand-leirasok.mjs x.json    # standok bemutatkozó szövege
 node scripts/szavazatok.mjs               # szavazás valódi állása a naplóból
 node scripts/pin-lista.mjs                # PIN-lista és koordináta-állapot
+node scripts/kezikonyvek.mjs              # standonkénti útmutató, PIN-nel kitöltve
 ```
 
 Minden adatmódosítás után futtasd az `ellenorzes.mjs`-t.
@@ -282,8 +283,9 @@ előtt. Nem egysoros javítás, mert a `profileData` kezdőértéke
   adatbázisban, mert a rendezvény fix infrastruktúrája. Újat egy sor felvenni.
 - **A Fitt-Box Egyesületnek nincs étele** felvéve, így a katalógusban nem
   jelenik meg. Nem hiba, hanem hiányzó étlap.
-- **A standos felület base64-be ír képet**, nem Storage-ba. Ha egy standos
-  a saját dashboardján tölt fel fotót, visszahozza a régi problémát.
+- **A standos felület Storage-ba tölt** (`uploadImage`, `feltoltes/` prefix),
+  nem base64-be: a böngésző tömöríti is a képet. A `kezikonyvek.mjs` ebből
+  ad standonkénti útmutatót a `STANDOS_KEZIKONYV.txt` alapján.
 - **A `supabase-schema.sql` és az élő adatbázis eltér** (pl. nincs `price`,
   nincs `short_name`). Új oszlopot ne a séma-fájlból következtess, hanem
   kérdezd le.

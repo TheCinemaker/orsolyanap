@@ -1,0 +1,214 @@
+================================================================================
+          ORSOLYA-NAPI VÁSÁR 2026  —  STANDOS ÚTMUTATÓ AZ APPHOZ
+                     Civil Ízek Utcája, Diáksétány
+                   2026. október 17–18., 10:00–18:00
+================================================================================
+
+  Az app címe:          https://orsolya.netlify.app
+  A STANDOD NEVE:       ...............................................
+  A PIN KÓDOD:          . . . .      (négy számjegy, csak a te standodé)
+
+  Nem kell letölteni semmit, és nem kell regisztrálni. A fenti címet nyisd
+  meg a telefonod böngészőjében. Működik Androidon és iPhone-on is.
+
+  TEDD KI A FŐKÉPERNYŐRE, hogy ne kelljen mindig beírni a címet:
+    Android:  a lapon megjelenő „Kirakom" gombra koppints.
+    iPhone:   alul a Megosztás ikon (nyíl a négyzetből), majd lejjebb
+              „Főképernyőhöz adás".
+
+
+================================================================================
+1. BELÉPÉS A STAND KEZELŐBE
+================================================================================
+
+  A belépés szándékosan rejtett, hogy a látogatók ne találjanak rá.
+
+  1. Nyisd meg az appot.
+  2. Fent, a fejlécben ott a VisitKőszeg logó.
+  3. TARTSD LENYOMVA A LOGÓT 5 MÁSODPERCIG. Ne koppints — nyomd és tartsd.
+     Közben egy csík fut körbe: ez jelzi, hogy számol.
+  4. Megjelenik a PIN beíró. Írd be a stand négy számjegyű kódját.
+  5. Megnyílik a stand kezelője, a tetején a stand nevével.
+
+  Kijelentkezés: jobbra fent a „Kijelentkezés" gomb.
+  Vissza a látogatói nézethez: „Vissza a látogatói felületre".
+
+  HA NEM MŰKÖDIK
+    - Ha túl hamar elveszed az ujjad, nem nyílik meg. Számolj ötig.
+    - Rossz PIN-nel nincs belépés. Kérdezd a szervezőt, ne találgass.
+    - A kód csak a te standodhoz tartozik, más standot nem tudsz szerkeszteni.
+
+
+================================================================================
+2. AMIT A KEZELŐBEN MEGTEHETSZ
+================================================================================
+
+  Felülről lefelé három rész:
+
+    A)  Stand bemutatkozás, elérhetőségek és kiállítási napok
+    B)  Stand kínálata: ételek és italok
+    C)  Minden tételnél három állapotgomb: Kész / Fő az étel / Elfogyott
+
+  Amit beírsz, AZONNAL látszik minden telefonon. Nem kell újratölteni.
+
+
+================================================================================
+3. A STAND BEMUTATKOZÁSA
+================================================================================
+
+  Nyisd le a „Stand Bemutatkozás, Elérhetőségek & Kiállítási Napok" részt.
+
+    Stand típusa        Gasztro / Civil szervezet / Egyesület / Iskola /
+                        Közösség / Egyéb
+    Logó, kép           „Kép kiválasztása" — a telefon galériájából
+    Bemutatkozás        Pár sor magatokról. Ezt látja a látogató a stand
+                        kártyáján. Pl.: „Kőszegi hagyományőrző társaság
+                        vagyunk, dédszüleink receptje alapján főzünk."
+    Kínálat röviden     Pl.: „Bográcsos marhapörkölt, szüretes gulyásleves"
+    Kiállítási napok    Mindkét nap / Csak Szombaton / Csak Vasárnap
+    Telefon, e-mail     Ha szeretnéd, hogy megkeressenek
+    Facebook, Instagram Teljes cím, https-sel kezdve
+    Jótékonysági cél    Pl.: „A kőszegi gyermekmentők javára"
+    Élő üzenet          A LEGHASZNOSABB MEZŐ. Pl.: „A marhapörkölt frissen
+                        rotyog, várható elkészülés 12:45!"
+
+  A rész alján: „Bemutatkozás & Adatok Mentése". Mentés nélkül elveszik.
+
+
+================================================================================
+4. ÚJ ÉTEL VAGY ITAL FELVÉTELE
+================================================================================
+
+  Jobbra fent (és a kínálat fejlécében is) két gomb:
+
+        + Új Étel          + Új Ital
+
+  A megnyíló ablakban:
+
+    Étel neve           Ahogy a vendégnek mondanátok. Pl. „Bográcsos
+                        marhapörkölt". Ez kötelező.
+    Leírás              Mi van benne, mivel tálaljátok. Pl. „Szabad tűzön
+                        főzött marhapörkölt házi tarhonyával"
+    Kategória           Italok / Meleg ételek / Hideg ételek /
+                        Sütemény, édesség / Street food / Egyéb
+    Mely napon          Mindkét nap / Szombat / Vasárnap
+    Fotó                „Kép kiválasztása" a galériából vagy a kamerából
+    Jelölések           Gluténmentes / Laktózmentes / Cukormentes / Vegán
+                        CSAK AKKOR jelöld be, ha biztos. Allergiás vendég
+                        támaszkodik rá.
+
+  Mentés után a tétel ott van a katalógusban, és lehet rá szavazni.
+
+  ÁRAT NE ÍRJ SEHOVA. A vásáron nem értékesítés folyik, hanem adománygyűjtés:
+  amit a vendég ad, az adomány. Ezért az appban nincs ár, és a leírásba se
+  kerüljön (se „1500 Ft", se „adag 1500").
+
+
+================================================================================
+5. A LEGFONTOSABB A VÁSÁR KÖZBEN: KÉSZ / FŐ AZ ÉTEL / ELFOGYOTT
+================================================================================
+
+  Minden ételnél és italnál ott van három gomb:
+
+      [ Kész ]          zöld — most kapható, gyere érte
+      [ Fő az étel ]    sárga — készül, kb. félóra
+      [ Elfogyott ]     piros — nincs már
+
+  EGY KOPPINTÁS, ÉS A VÁSÁRBAN MINDEN TELEFON AZONNAL ÁTÁLL.
+
+  Ez az, amiért az app létezik. Ha valami elfogyott, koppints rá — így nem
+  áll be hozzátok öt vendég hiába, és nem nektek kell magyarázkodni. Ha újra
+  lesz, koppints a „Kész"-re.
+
+  Nem baj, ha napközben tízszer váltogatod. Pont erre van.
+
+
+================================================================================
+6. ÉTEL SZERKESZTÉSE, TÖRLÉSE
+================================================================================
+
+  A kínálat listájában minden tétel mellett két kis ikon:
+
+      ceruza  = szerkesztés (név, leírás, fotó, kategória, jelölések)
+      kuka    = törlés
+
+  A törlés végleges. Ha csak most nincs, NE töröld — tedd „Elfogyott"-ra.
+
+
+================================================================================
+7. FOTÓ POSZTOLÁSA A VÁSÁRRÓL
+================================================================================
+
+  A látogatói főoldal tetején van egy fotósáv. A legelső kártya a
+  fényképezőgép ikonos — arra koppints.
+
+    1. „Fotó Kiválasztása / Készítése" — kamera vagy galéria.
+    2. A nevet magától kitölti a stand nevével, ha be vagy léptetve.
+    3. Rövid szöveg, és posztolás.
+
+  A kép azonnal megjelenik minden telefon főoldalán, a legújabb elöl, és
+  később sem tűnik el.
+
+  Mit érdemes feltenni: a bográcsot, az első adagot, a csapatot, a sütiket
+  frissen. Ami étvágyat csinál. Naponta két-három kép sokat ér.
+
+
+================================================================================
+8. SZAVAZÁS AZ ÉTELEKRE
+================================================================================
+
+  A látogató minden ételre szavazhat egy gombbal.
+
+  Egy készülék egy ételre EGYSZER szavazhat. Ezt az adatbázis zárja ki, nem
+  a jóindulat: nem lehet százszor megnyomni. A standnak nem kell ezzel
+  semmit tennie — csak szóljatok a vendégeknek, hogy lehet szavazni.
+
+  Az állás élőben látszik a menüben, a legnépszerűbb ételek listájában.
+
+
+================================================================================
+9. AMI GYAKRAN FELMERÜL
+================================================================================
+
+  Letöltsem az appot?
+      Nem. Böngészőben nyílik. Ki lehet tenni a főképernyőre, de telepíteni
+      nem kell semmit.
+
+  Más stand adatát látom, nem az enyémet.
+      Jelentkezz ki (jobbra fent), és lépj be újra a saját PIN-eddel.
+
+  Nem jelenik meg, amit beírtam.
+      Lementetted? A bemutatkozásnál külön mentés gomb van. Ha igen, húzd le
+      a lapot a frissítéshez.
+
+  Lassú a net a vásárban.
+      Az app ettől is megnyílik: a képeket a saját szerverünkről szolgáljuk
+      ki. Betöltés után már alig igényel adatot.
+
+  Rossz képet töltöttem fel.
+      Szerkesztés (ceruza), válassz másikat. Felülírja.
+
+  Ki látja, amit beírok?
+      Minden látogató, azonnal. Ezért érdemes ránézni a helyesírásra.
+
+  Az ételfotók egy része nem a mi fotónk.
+      Azok AI-val készült illusztrációk, és ez ki is van írva a kártyán. Ha
+      van saját fotótok, töltsétek fel — az jobb, és felülírja.
+
+  Bezártam valamit, és nem találok vissza.
+      Bal fent a hamburger menü (három vonal). Minden onnan elérhető. A
+      felugró ablakokat az X-szel vagy a kép mellé koppintva lehet bezárni.
+
+
+================================================================================
+10. HA ELAKADTOK
+================================================================================
+
+  Keressétek a szervezőt a helyszínen: a belépést és a PIN kódot ő kezeli.
+
+  A PIN kódot ne adjátok ki más standnak, és ne írjátok ki a sátorra —
+  azzal a ti kínálatotokat lehet átírni.
+
+  Köszönjük, hogy velünk vagytok. Jó vásárt!
+
+================================================================================
