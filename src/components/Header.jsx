@@ -4,7 +4,7 @@ import OrsolyaInfoModal from './OrsolyaInfoModal';
 import FavoritesModal from './FavoritesModal';
 import MobileBottomNav from './MobileBottomNav';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { Utensils, MapPin, Store, Heart, Search, X, Info, Calendar, Menu, ThumbsUp, Megaphone } from 'lucide-react';
+import { Utensils, MapPin, Store, Heart, Search, X, Info, Calendar, Menu, ThumbsUp, Megaphone, CloudSun, ArrowUpRight } from 'lucide-react';
 import HamburgerMenuDrawer from './HamburgerMenuDrawer';
 import { olvasatlanSzam } from '../lib/infotabla';
 
@@ -86,7 +86,7 @@ export default function Header({
         {/* Main Navbar */}
         <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 flex items-center justify-between gap-2">
           {/* Left Group: Clean Hamburger Button & Logo */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
             {/* A puszta ikonrol nem derult ki, hogy menut nyit -- ezert van
                 mellette a felirat is. Harom karakter, de ez donti el, hogy a
                 latogato egyaltalan megtalalja-e a terkepet es a kedvenceit. */}
@@ -102,6 +102,24 @@ export default function Header({
               onClick={handleStandClick}
               onLongPress5s={() => setActiveView('login')}
             />
+
+            {/* Kőszegi időjárás-előrejelzés. Szabadtéri vásáron ez az első
+                kérdés — hozzak-e kabátot —, ezért van a fejlécben és nem egy
+                menüpont mélyén. Új lapon nyílik, hogy a vásár appja nyitva
+                maradjon: a vendég visszalép, és ott folytatja. A szűk
+                telefonképernyőn csak az ikon fér el, a felirat `xs` fölött
+                jelenik meg. */}
+            <a
+              href="https://kiemet.hu"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Kőszegi időjárás-előrejelzés – kiemet.hu (új lapon nyílik)"
+              className="flex items-center gap-1 pl-1.5 pr-2 py-2 rounded-md bg-sky-50 hover:bg-sky-100 border border-sky-300/80 text-sky-900 transition-colors cursor-pointer shrink-0"
+            >
+              <CloudSun className="w-5 h-5 text-sky-700" />
+              <span className="hidden xs:inline text-xs font-extrabold">Időjárás</span>
+              <ArrowUpRight className="w-3 h-3 text-sky-600" />
+            </a>
           </div>
 
           {/* Navigation Tabs (Desktop Apple Segmented Style) */}

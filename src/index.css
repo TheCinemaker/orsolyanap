@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+/* A Tailwind legkisebb töréspontja a `sm` (640px), ami egy telefonon már
+   mindent elrejt. Az `xs` a legtöbb mai készüléken (390-430px széles)
+   teljesül, és csak a legszűkebb, 360 alatti kijelzőkön esik ki — ott
+   tényleg nincs is hely a feliratnak. */
+@theme {
+  --breakpoint-xs: 23rem;
+}
+
 @layer utilities {
   .scrollbar-none::-webkit-scrollbar {
     display: none;
