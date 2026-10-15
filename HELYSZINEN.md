@@ -247,6 +247,35 @@ fölött ott az élő állás, és jelzi, ha a kiírt szám eltér a naplótól.
 
 ---
 
+## 7b. Pillanatkép — a vészüzem frissítése
+
+```bash
+node scripts/pillanatkep.mjs
+git add -A public && git commit -m "pillanatkep" && git push
+```
+
+Ez kimenti az egész adatot és **minden képet** a `public/` mappába, ahonnan a
+Netlify szolgálja ki őket. Két dolgot ad:
+
+**1. Vészüzem.** Ha a Supabase nem válaszol — elfogy a keret, leáll, vagy csak
+gyenge a net a tömegben —, az app ebből dolgozik tovább: standok, ételek,
+leírások, fotók, program. Egy sárga sáv megmondja a látogatónak, hogy mentett
+adatot lát, és hogy a szavazás addig nem megy. Enélkül **üresen** töltött be,
+mintha egyetlen stand sem lenne.
+
+**2. A képek innen jönnek alapból is.** A forgalom szinte egészét a képek
+adják; a Supabase havi 5 GB-ot ad, a Netlify 100-at. Így a keret nem fogyhat el.
+
+**ÁRA:** ha egy stand lecseréli a fotóját, az csak új pillanatkép és push után
+látszik. Az ADAT élőben jön: új étel, elfogyott tétel, szavazat azonnal
+látszik, ehhez nem kell semmit kirakni.
+
+**Futtasd minden nagyobb változás után**, és mindenképp a rendezvény előtti
+utolsó körben. A pillanatkép annyit ér, amennyire friss.
+
+Kikapcsolható: `KEPEK_A_BUILDBOL = false` az `OrsolyaContext.jsx` tetején —
+onnantól minden kép újra a Supabase-ből jön.
+
 ## 8. Kirakás az internetre
 
 **Adatváltozáshoz nem kell semmit kirakni.** A standok, ételek, képek,

@@ -28,7 +28,8 @@ import {
   Loader2,
   Shuffle,
   ArrowDownAZ,
-  Eye
+  Eye,
+  WifiOff
 } from 'lucide-react';
 import './App.css';
 
@@ -45,7 +46,8 @@ function MainApp() {
     setSearchQuery,
     navigateToFoodCatalog,
     navigateToStandFeed,
-    visitStats
+    visitStats,
+    mentettAdat
   } = useOrsolya();
 
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -179,6 +181,19 @@ function MainApp() {
           <div className="max-w-5xl mx-auto px-3 sm:px-4 pt-2 pb-4 space-y-4">
             {/* Csak akkor látszik, ha van mit felajánlani: nem a főképernyőről
                 fut, és a látogató nem küldte már el. */}
+            {/* Vészüzem. Megmondjuk, mit lát és mi nem működik — különben a
+                látogató azt hiszi, elromlott a szavazás. */}
+            {mentettAdat && (
+              <div className="bg-amber-50 border border-amber-300 rounded-md px-3 py-2 flex items-start gap-2">
+                <WifiOff className="w-4 h-4 text-amber-800 shrink-0 mt-0.5" />
+                <p className="text-[11px] text-amber-950 font-medium leading-snug">
+                  <strong>Nincs kapcsolat a szerverrel.</strong> A standok, ételek és a program
+                  mentett adatból látszanak, tehát minden megtalálható. A szavazás és a
+                  fotófeltöltés addig nem működik, amíg a kapcsolat vissza nem jön.
+                </p>
+              </div>
+            )}
+
             <TelepitesSav />
             {/* Top Title Section */}
             <div className="text-center py-1">

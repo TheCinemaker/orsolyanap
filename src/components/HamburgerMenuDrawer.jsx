@@ -70,9 +70,14 @@ export default function HamburgerMenuDrawer({
     onClose();
   };
 
-  // Top 5 Realtime Voted Dishes
+  /* A közönségszavazás élő állása.
+     CSAK olyan étel kerülhet ide, amire tényleg szavaztak. Nullával is
+     listázva úgy nézett ki, mintha öt étel már vezetne — holott egyetlen
+     szavazat sem érkezett, és a sorrendet a véletlen adta. Ha még senki nem
+     szavazott, a lista üres, és ezt ki is írjuk. */
   const top5Items = [...menuItems]
     .filter((item) => item.category !== 'italok' && item.category !== 'ital')
+    .filter((item) => (item.votes || 0) > 0)
     .sort((a, b) => (b.votes || 0) - (a.votes || 0))
     .slice(0, 5);
 

@@ -21,6 +21,42 @@ const ORGANIZER_PIN = '0169';
  */
 const REEL_PAGE = 30;
 
+/**
+ * Vészüzem: a Netlify-ról kiszolgált mentett adat.
+ *
+ * Minden adat és minden kép a Supabase-ből jön. Ha az nem válaszol — elfogy
+ * a havi forgalmi keret, leáll a szolgáltatás, vagy csak gyenge a mobilnet a
+ * tömegben —, az app korábban ÜRESEN töltődött be: a látogató azt látta,
+ * hogy nincs egyetlen stand sem.
+ *
+ * A pillanatkép a `scripts/pillanatkep.mjs`-sel készül, és a buildben utazik.
+ * Csak akkor töltődik le, ha tényleg kell — normál működésben nem kerül
+ * semmibe.
+ */
+const PILLANATKEP = '/pillanatkep.json';
+
+/**
+ * A képeket a Netlify-ról szolgáljuk ki, ne a Supabase-ből.
+ *
+ * A képek adják a forgalom szinte egészét: egy látogató pár MB képet tölt le
+ * és 20 kB adatot. A Supabase ingyenes csomagja havi 5 GB-ot ad, a Netlifyé
+ * 100-at — így a keret gyakorlatilag nem fogyhat el a hétvégén.
+ *
+ * ÁRA: ha egy stand lecseréli a fotóját, az csak egy új pillanatkép és egy
+ * `git push` után látszik. Az ADAT (új étel, elfogyott tétel, szavazat)
+ * továbbra is élőben jön, ez csak a képekre vonatkozik.
+ *
+ * Kikapcsolás: állítsd `false`-ra. Ilyenkor minden kép a Supabase-ből jön,
+ * ahogy korábban.
+ */
+const KEPEK_A_BUILDBOL = true;
+
+/** A Storage-útvonalból ugyanaz a fájlnév, amit a pillanatkep.mjs használ. */
+const mentettNev = (url) => {
+  const jel = url?.split?.('/storage/v1/object/public/')?.[1];
+  return jel ? jel.replace(/[^A-Za-z0-9._-]/g, '_') : null;
+};
+
 const OrsolyaContext = createContext();
 
 export function OrsolyaProvider({ children }) {
@@ -60,6 +96,23 @@ export function OrsolyaProvider({ children }) {
   // Hányszor nyílt meg az app, és hány különböző készülékről.
   const [visitStats, setVisitStats] = useState(null);
   const [hasMoreReels, setHasMoreReels] = useState(false);
+  /** Mentett adatból dolgozunk? Ilyenkor nincs szavazás és nincs szerkesztés. */
+  const [mentettAdat, setMentettAdat] = useState(false);
+  /** A buildben lévő képek fájlnevei. Üres halmaz = mindent a Supabase ad. */
+  const mentettKepek = useRef(new Set());
+
+  /**
+   * Ha a képnek van helyi másolata, azt adjuk vissza.
+   *
+   * Csak az INDULÓ lekérésre alkalmazzuk. Egy menét közben feltöltött új
+   * fotónak nincs helyi másolata, és az helyesen a Supabase-ből jön — azt
+   * akár a feltöltés pillanatában látni akarjuk.
+   */
+  const kepUtvonal = (url) => {
+    if (!KEPEK_A_BUILDBOL) return url;
+    const nev = mentettNev(url);
+    return nev && mentettKepek.current.has(nev) ? `/mentett-kepek/${nev}` : url;
+  };
   /** Melyik fotón nyíljon meg a teljes képernyős folyám. */
   const [reelStartId, setReelStartId] = useState(null);
   const [loadingMoreReels, setLoadingMoreReels] = useState(false);
@@ -194,6 +247,7 @@ export function OrsolyaProvider({ children }) {
           const formattedEx = exData.map((e) => ({
             ...e,
             hasDrinks: e.has_drinks !== undefined ? e.has_drinks : e.hasDrinks,
+            image: kepUtvonal(e.image),
             coordinates: e.coordinates || (e.latitude && e.longitude ? [Number(e.latitude), Number(e.longitude)] : null)
           }));
           setExhibitors(formattedEx);
@@ -204,7 +258,9 @@ export function OrsolyaProvider({ children }) {
           console.error('Supabase menu_items fetch error:', itemErr.message);
           setMenuItems([]);
         } else if (itemData) {
-          const validOrsolyaItems = itemData.filter((item) => item.exhibitor_id);
+          const validOrsolyaItems = itemData
+            .filter((item) => item.exhibitor_id)
+            .map((item) => ({ ...item, image: kepUtvonal(item.image) }));
           setMenuItems(validOrsolyaItems);
         }
 
@@ -231,10 +287,7 @@ export function OrsolyaProvider({ children }) {
         }
       } catch (err) {
         console.error('Supabase fetch exception:', err);
-        setExhibitors([]);
-        setMenuItems([]);
-        setReels([]);
-        setEvents([]);
+        await mentettAdatra(err);
       } finally {
         setIsLoadingData(false);
       }
@@ -371,6 +424,18 @@ export function OrsolyaProvider({ children }) {
      így a gomb egy tároló-törlés vagy másik lapfül után is "Szavazva"
      állapotban marad, és nem kínal fel egy második szavazatot, amit az
      adatbázis amúgy is visszautasítana. */
+  /* A mentett képek jegyzékét még az adat előtt beolvassuk, hogy a képcseréhez
+     már rendelkezésre álljon. Ha nincs meg, minden marad a Supabase-en. */
+  useEffect(() => {
+    if (!KEPEK_A_BUILDBOL) return;
+    fetch('/mentett-kepek.json')
+      .then((r) => (r.ok ? r.json() : []))
+      .then((lista) => {
+        mentettKepek.current = new Set(Array.isArray(lista) ? lista : []);
+      })
+      .catch(() => {});
+  }, []);
+
   useEffect(() => {
     if (!isSupabaseConfigured) return;
     let eldobva = false;
@@ -444,6 +509,35 @@ export function OrsolyaProvider({ children }) {
   const openReels = (reelId = null) => {
     setReelStartId(reelId);
     setActiveView('reels');
+  };
+
+  /**
+   * Átváltás a mentett adatra.
+   *
+   * Üres listák helyett azt mutatjuk, ami a legutóbbi mentéskor igaz volt.
+   * A szavazás, a kedvelés és a standos szerkesztés ilyenkor nem működik —
+   * ezért állítjuk a jelzőt, hogy a felület meg tudja mondani a látogatónak,
+   * miért.
+   */
+  const mentettAdatra = async (eredetiHiba) => {
+    try {
+      const r = await fetch(PILLANATKEP, { cache: 'no-cache' });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const mentes = await r.json();
+      setExhibitors((mentes.exhibitors || []).map((x) => ({ ...x, hasDrinks: x.has_drinks })));
+      setMenuItems(mentes.menuItems || []);
+      setEvents(mentes.events || []);
+      setReels([]); // A fotófolyám élő tartalom, mentett változata nincs.
+      setMentettAdat(mentes.keszult || true);
+      console.warn('Mentett adatra váltottam, mert a szerver nem válaszolt:', eredetiHiba?.message || eredetiHiba);
+    } catch (err) {
+      // Ha még ez sem megy, nincs mit tenni: marad az üres állapot.
+      console.error('A mentett adat sem érhető el:', err?.message || err);
+      setExhibitors([]);
+      setMenuItems([]);
+      setReels([]);
+      setEvents([]);
+    }
   };
 
   // Focus exhibitor on map
@@ -1245,6 +1339,7 @@ export function OrsolyaProvider({ children }) {
         votedItemIds,
         voteForItem,
         visitStats,
+        mentettAdat,
         likedReelIds,
         openReels,
         reelStartId,

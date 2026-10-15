@@ -27,7 +27,12 @@ táblában **nincs `price` oszlop**. Ha a mentés payloadja mégis tartalmazza,
 a Supabase `PGRST204`-cel az *egész* kérést elutasítja, és a standos nem tud
 ételt szerkeszteni. Ez egyszer már megtörtént.
 
-**Kép SOHA nem kerül a `public/` mappába.** A Vite onnan változtatás nélkül
+**A `public/mentett-kepek/` a tudatos kivétel.** Ez a vészüzemi pillanatkép
+(`scripts/pillanatkep.mjs`), és alapból innen is szolgáljuk ki a képeket, hogy
+a Supabase forgalmi kerete ne fogyjon el. Ne töröld, és ne alkalmazd rá a lenti
+szabályt — de a saját fájljaidat se tedd mellé.
+
+**Minden más kép SOHA nem kerül a `public/` mappába.** A Vite onnan változtatás nélkül
 átmásol mindent a `dist/`-be, és a deploy kiszállítja. Egyszer 36 MB PNG
 ment ki így. A képek helye a Supabase Storage; az adatbázisba csak a
 publikus URL kerül.
