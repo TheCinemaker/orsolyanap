@@ -197,6 +197,14 @@ function MainApp() {
             )}
 
             <TelepitesSav />
+
+            {/* Kőszegi időjárás a vásár két napjára.
+                MINDEN FÜLÖN látszik, nem csak a standlistán: az app az
+                Ételek fülön nyílik, tehát egy standlistára tett kártyát a
+                látogatók többsége soha nem látta volna. Szabadtéri vásáron
+                ez az első kérdés, és egy sor helyet kér. */}
+            <IdojarasKartya />
+
             {/* Top Title Section */}
             <div className="text-center py-1">
               {/* Másfélszeres méret: ez a lap címe, eddig alig volt nagyobb
@@ -226,10 +234,6 @@ function MainApp() {
               <>
                 {/* Live Facebook/Instagram Style Reels Bar - Only on Main Tents Feed */}
                 <LiveReelBar />
-
-                {/* Kőszegi időjárás a vásár két napjára. Szabadtéren ez az
-                    első kérdés; az adat a kiemet.hu forrásaiból jön. */}
-                <IdojarasKartya />
 
                 {/* Exhibitors Feed */}
                 <div className="space-y-4 pt-2">
