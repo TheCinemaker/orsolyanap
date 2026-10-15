@@ -5,7 +5,7 @@
  *   node scripts/kepek-feltoltese.mjs --mind          minden stand, aminek van új fotója
  *   node scripts/kepek-feltoltese.mjs --logok         logók a logok/ mappából
  *   node scripts/kepek-feltoltese.mjs --koteg <mappa> egy mappa, ételnév szerint szétosztva
- *   ... --koteg <mappa> --proba                      megmutatja, mit tenne, de nem tölt fel
+ *   ... bármelyikhez --proba                        megmutatja, mit tenne, de nem tölt fel
  *
  * HONNAN OLVAS:
  *   ételfotó: etelfotok/<stand neve>/<étel neve>.png
@@ -37,6 +37,12 @@ import {
 } from './lib.mjs';
 
 const arg = process.argv[2];
+
+/* A `--proba` MINDEN módra érvényes. Eddig két ágban külön volt kiolvasva,
+   az ételfotóknál viszont egyáltalán nem: `kepek-feltoltese.mjs "Stand"
+   --proba` némán, valóban feltöltött. A próba azért van, hogy éles adaton is
+   meg lehessen nézni, mi történne — ha ír, pont a biztosíték hiányzik. */
+const proba = process.argv.includes('--proba');
 if (!arg) {
   console.error(
     'Használat: node scripts/kepek-feltoltese.mjs "<stand neve>" | --mind | --logok | --koteg <mappa>'
@@ -222,7 +228,6 @@ if (arg === '--koteg') {
     }
   }
 
-  const proba = process.argv.includes('--proba');
 
   console.log(`
   ${files.length} fájl, ${plan.length} feltöltendő tétel`);
@@ -268,7 +273,6 @@ else if (arg === '--logok') {
     console.error(`Nincs ilyen mappa: ${logoDir}`);
     process.exit(1);
   }
-  const proba = process.argv.includes('--proba');
   const files = legfrissebbValtozatok(fs.readdirSync(logoDir).filter(isImage));
   const { manual, restFiles } = applyMapping(readMapping(logoDir), files, exhibitors, 'logók');
 
@@ -392,7 +396,13 @@ else {
     console.log(`\n  ${stand.name}`);
     console.log(`    ${files.length} fájl, ${plan.length} párosítva, ${fresh.length} feltöltendő`);
 
-    if (fresh.length) {
+    if (fresh.length && proba) {
+      fresh.forEach((p) => {
+        const it = items.find((i) => i.id === p.id);
+        const mark = p.manual ? '  (kézi párosítás)' : p.forced ? '  (kényszerű párosítás)' : '';
+        console.log(`    ${p.file.padEnd(40)} -> ${it.name}${it.image ? '  (CSERE)' : ''}${mark}`);
+      });
+    } else if (fresh.length) {
       const outDir = path.join(tmp, safe(stand.id));
       compress(imageGlob(dir), outDir, FOOD);
       await send(fresh, dir, outDir, 'menu_items', 'etelek');
@@ -407,7 +417,8 @@ else {
 
 function report() {
   console.log('');
-  console.log(`  Feltöltve: ${uploaded} kép` + (lecserelt ? `, ebből ${lecserelt} csere` : ''));
+  if (proba) console.log('  Próba volt, semmit nem töltöttem fel.');
+  else console.log(`  Feltöltve: ${uploaded} kép` + (lecserelt ? `, ebből ${lecserelt} csere` : ''));
   if (skipped.length) {
     console.log(`  Kimaradt ${skipped.length} — ezekhez döntés kell:`);
     skipped.forEach((s) => console.log(`    - ${s}`));
