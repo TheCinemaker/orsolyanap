@@ -1,21 +1,27 @@
 /**
- * Kőszegi időjárás a kiemet.hu két adatforrásából.
+ * Kőszegi időjárás: mostani állapot és a vásár két napja.
  *
- * Mindkettő kulcs nélkül, böngészőből hívható, ahogy a kiemet.hu is teszi:
- *   - a mostani érték a kőszegi mérőállomásról (smartmixin),
- *   - az előrejelzés az Open-Meteo-ból, a város koordinátáira.
+ * MIÉRT AZ OPEN-METEO ÉS NEM A KŐSZEGI MÉRŐÁLLOMÁS:
+ * a kiemet.hu a `api2.smartmixin.io` állomást is használja, de a SAJÁT
+ * Netlify-függvényén keresztül. Az állomás ugyanis egyetlen CORS-fejlécet sem
+ * küld — sem a mi címünkre, sem a kiemet.hu-ra —, tehát böngészőből nem
+ * hívható: a kérés elindul, és a böngésző dobja el a választ. Ez az app
+ * statikus hosting, szerveroldali kód nélkül, tehát nincs mibe proxyt tenni.
  *
- * MIÉRT NEM TALÁLUNK KI SEMMIT: ha egy forrás nem válaszol, az a rész
- * egyszerűen kimarad. Egy szabadtéri vásáron a „ma nem esik" téves állítás
- * rosszabb, mint a hiányzó adat — a vendég esőkabát nélkül indul el.
+ * Az Open-Meteo `access-control-allow-origin: *`-ot küld, kulcsot nem kér, és
+ * ugyanarra a koordinátára (47.3971, 16.546) ad adatot. Egy kérésben jön a
+ * mostani érték és a napi előrejelzés is.
+ *
+ * MIÉRT NEM TALÁLUNK KI SEMMIT: ha a kérés nem sikerül, a kártya nem jelenik
+ * meg. Egy szabadtéri vásáron a téves „ma nem esik" rosszabb, mint a hiányzó
+ * adat — a vendég esőkabát nélkül indul el.
  *
  * MIÉRT VAN GYORSÍTÓTÁR: egy forgalmas napon ezer telefon nyitja az appot.
- * Tíz percig a munkamenet tárolójából dolgozunk, így sem az állomást, sem az
- * Open-Meteót nem terheljük, és a vendég is azonnal látja az adatot.
+ * Tíz percig a munkamenet tárolójából dolgozunk.
  */
-const ALLOMAS = 'https://api2.smartmixin.io/api/stations/72461/?refresh=1';
-const ELOREJELZES =
+const URL_IDOJARAS =
   'https://api.open-meteo.com/v1/forecast?latitude=47.3971&longitude=16.546' +
+  '&current=temperature_2m,relative_humidity_2m,precipitation,weather_code' +
   '&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum' +
   '&timezone=Europe%2FBerlin';
 
@@ -23,34 +29,16 @@ const TAROLO = 'orsolya_idojaras';
 const FRISS_MP = 10 * 60 * 1000;
 
 /** Hat másodperc után elvágjuk: a vendég ne várjon egy akadó kérésre. */
-async function keres(url, fejek) {
+async function keres(url) {
   const abort = new AbortController();
   const ido = setTimeout(() => abort.abort(), 6000);
   try {
-    const r = await fetch(url, { headers: fejek, signal: abort.signal });
+    const r = await fetch(url, { signal: abort.signal });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     return await r.json();
   } finally {
     clearTimeout(ido);
   }
-}
-
-/**
- * A mostani állapot szöveggel.
- *
- * Ugyanaz a logika, mint a kiemet.hu-ban: a mért csapadék és a páratartalom
- * alapján, mert az állomás nem ad leírást, csak számokat.
- */
-function mostSzoveg(m) {
-  const rr = m.RR_1H ?? m.RR ?? 0;
-  const u = m.U ?? 50;
-  if (rr > 1) return 'esik';
-  if (rr > 0.1) return 'szemerkél';
-  if (u > 90) return 'párás, ködös';
-  if (u > 80) return 'borús';
-  if (u > 60) return 'változóan felhős';
-  if (u > 40) return 'kevés felhő';
-  return 'tiszta idő';
 }
 
 /** WMO-kód -> rövid magyar szöveg és egy jelkulcs az ikonhoz. */
@@ -67,6 +55,13 @@ export function kodSzerint(kod) {
   return { szoveg: '', jel: 'felho' };
 }
 
+/** A mostani állapot két szóban. Az eső erősebb jel, mint a felhőzet. */
+function mostSzoveg(c) {
+  if ((c.precipitation ?? 0) > 1) return 'esik';
+  if ((c.precipitation ?? 0) > 0.1) return 'szemerkél';
+  return kodSzerint(c.weather_code).szoveg.toLowerCase();
+}
+
 /**
  * @param {string[]} napok a keresett napok ISO dátummal (a vásár két napja)
  * @returns {Promise<{most: object|null, napok: object[]}>}
@@ -79,35 +74,26 @@ export async function idojaras(napok) {
     // Nincs tároló: egyszerűen újra lekérjük.
   }
 
-  // Egymástól függetlenül: ha az egyik elhasal, a másik megmarad.
-  const [allomas, elore] = await Promise.allSettled([
-    keres(ALLOMAS, { Accept: 'application/json', 'X-SmartMixin-Context': 'UI' }),
-    keres(ELOREJELZES),
-  ]);
+  const d = await keres(URL_IDOJARAS);
 
   let most = null;
-  if (allomas.status === 'fulfilled') {
-    const m = allomas.value?.last_measure;
-    if (m && typeof m.T === 'number') {
-      most = { fok: Math.round(m.T), szoveg: mostSzoveg(m) };
-    }
+  if (typeof d?.current?.temperature_2m === 'number') {
+    most = { fok: Math.round(d.current.temperature_2m), szoveg: mostSzoveg(d.current) };
   }
 
   const lista = [];
-  if (elore.status === 'fulfilled') {
-    const d = elore.value?.daily;
-    if (d?.time) {
-      for (const nap of napok) {
-        const i = d.time.indexOf(nap);
-        if (i < 0) continue;
-        lista.push({
-          nap,
-          kod: d.weathercode?.[i],
-          max: Math.round(d.temperature_2m_max?.[i]),
-          min: Math.round(d.temperature_2m_min?.[i]),
-          csapadek: d.precipitation_sum?.[i] ?? 0,
-        });
-      }
+  const n = d?.daily;
+  if (n?.time) {
+    for (const nap of napok) {
+      const i = n.time.indexOf(nap);
+      if (i < 0) continue;
+      lista.push({
+        nap,
+        kod: n.weathercode?.[i],
+        max: Math.round(n.temperature_2m_max?.[i]),
+        min: Math.round(n.temperature_2m_min?.[i]),
+        csapadek: n.precipitation_sum?.[i] ?? 0,
+      });
     }
   }
 
