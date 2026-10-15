@@ -99,9 +99,9 @@ $$;
 -- ---------------------------------------------------------------------------
 --  A szervező üzenete
 --
---  A szervezőnek nincs standja, ezért nincs PIN-je sem: a szervezői kóddal
---  ír, és a neve kerül a bejegyzés mellé. Így a vendég látja, hogy ez nem egy
---  standtól jött, hanem a rendezvénytől.
+--  Az adminnak nincs standja, ezért nincs PIN-je sem: az admin kóddal ír, és
+--  „Admin" kerül a bejegyzés mellé. Így a vendég látja, hogy ez nem egy
+--  standtól jött.
 -- ---------------------------------------------------------------------------
 create or replace function post_szervezo_hir(
   p_kod text,
@@ -127,7 +127,7 @@ begin
   insert into stand_hirek (exhibitor_id, szerzo, szoveg)
   values (
     null,
-    coalesce(nullif(btrim(coalesce(p_szerzo, '')), ''), 'Szervezők'),
+    coalesce(nullif(btrim(coalesce(p_szerzo, '')), ''), 'Admin'),
     left(btrim(p_szoveg), 280)
   )
   returning * into v_sor;

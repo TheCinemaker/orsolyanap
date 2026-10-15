@@ -146,8 +146,16 @@
   törölni, és ezért nem is írja felül az előzőt: a vendég látja, hogy a
   „Kész a gulyás!" öt perce vagy két órája szól.
 
-  Amit eddig kiírtál, ott van a mező alatt. Ha elírtad, a kuka ikonnal
-  visszavehető.
+  JAVÍTÁS ÉS VISSZAVONÁS
+  Amit eddig kiírtál, ott van a mező alatt, időponttal.
+
+    ceruza ikon   javítás. A szöveg a helyén nyílik, átírod, „Mentés".
+                  Az IDŐPONT MARAD az eredeti, és a vendég egy halvány
+                  „· javítva" jelzést lát a szöveg után. Elírás, vagy ha
+                  máshogy akarod fogalmazni — bátran.
+    kuka ikon     visszavonás. Lekerül a tábláról.
+
+  Enterrel is mehet a kiírás és a mentés. Shift+Enter új sor.
 
   MIT ÉRDEMES KIÍRNI
     - Kész az első adag, gyertek!

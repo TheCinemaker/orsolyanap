@@ -125,7 +125,7 @@ export default function InfoTabla() {
                     szervezoi ? 'border-amber-300 bg-amber-50/50' : 'border-stone-200'
                   }`}
                 >
-                  {/* A szervezői üzenet nem standtól jön: csillag jelzi, nem
+                  {/* Az admin üzenete nem standtól jön: csillag jelzi, nem
                       logó, különben úgy látszana, mintha egy stand írta. */}
                   {szervezoi ? (
                     <span className="w-9 h-9 rounded-md border border-amber-300 bg-amber-100 shrink-0 flex items-center justify-center">
@@ -146,7 +146,7 @@ export default function InfoTabla() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline gap-2 flex-wrap">
                       <span className="text-[11px] font-black text-stone-900 leading-tight">
-                        {szervezoi ? h.szerzo || 'Szervezők' : stand?.name || 'Stand'}
+                        {szervezoi ? h.szerzo || 'Admin' : stand?.name || 'Stand'}
                       </span>
                       <span className="text-[10px] font-bold text-stone-500 inline-flex items-center gap-1">
                         <Clock className="w-2.5 h-2.5" />

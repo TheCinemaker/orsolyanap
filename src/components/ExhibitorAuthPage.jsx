@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
 import VisitKoszegLogo from './VisitKoszegLogo';
 import { Key, ArrowRight, ArrowLeft, ShieldCheck, Copy, Check, Plus, X, Lock, Store, Utensils, Calendar } from 'lucide-react';
@@ -23,6 +23,7 @@ export default function ExhibitorAuthPage() {
   } = useOrsolya();
 
   const [pinInput, setPinInput] = useState('');
+  const pinRef = useRef(null);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [copiedPinId, setCopiedPinId] = useState(null);
   const [editingPinExhibitorId, setEditingPinExhibitorId] = useState(null);
@@ -151,19 +152,31 @@ export default function ExhibitorAuthPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2 text-center">
+            <label
+              htmlFor="stand-pin"
+              className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-2 text-center cursor-pointer"
+            >
               Stand Belépési PIN Kód
             </label>
-            <div className="relative">
-              <Key className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-stone-400" />
+            {/* A kulcs ikon a mező FÖLÖTT lóg (absolute), ezért a rá eső
+                kattintás nem a beviteli mezőt találta el, hanem az SVG-t —
+                gépen, egérrel ez a bal szélen pont elég ahhoz, hogy úgy
+                tűnjön, nem lehet beírni. A `pointer-events-none` átengedi,
+                a soron lévő onClick pedig bárhonnan a mezőre fókuszál. */}
+            <div className="relative cursor-text" onClick={() => pinRef.current?.focus()}>
+              <Key className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" />
               <input
+                id="stand-pin"
+                ref={pinRef}
                 type="password"
                 placeholder="****"
                 required
                 maxLength={8}
+                inputMode="numeric"
+                autoComplete="off"
                 value={pinInput}
                 onChange={(e) => setPinInput(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-stone-50 border border-stone-300 rounded-md text-stone-900 text-center font-mono text-2xl tracking-widest focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                className="relative z-10 w-full pl-12 pr-4 py-3 bg-stone-50 border border-stone-300 rounded-md text-stone-900 text-center font-mono text-2xl tracking-widest focus:outline-none focus:ring-2 focus:ring-amber-500/40"
                 autoFocus
               />
             </div>
@@ -449,8 +462,8 @@ export default function ExhibitorAuthPage() {
               </button>
             </div>
 
-            {/* Szervezői üzenet az infótáblára. A szervezőnek nincs standja,
-                tehát a stand kezelőjéből nem érné el. */}
+            {/* Admin üzenet az infótáblára. Az adminnak nincs standja, tehát
+                a stand kezelőjéből nem érné el. */}
             <div className="pt-2">
               <InfoTablaIro szervezo />
             </div>

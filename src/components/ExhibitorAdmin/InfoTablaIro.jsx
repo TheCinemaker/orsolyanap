@@ -79,13 +79,13 @@ export default function InfoTablaIro({ szervezo = false }) {
     <section className="bg-white border border-amber-300 rounded-md overflow-hidden shadow-xs">
       <h3 className="px-3.5 py-2.5 bg-amber-50 border-b border-amber-200 text-sm font-bold text-stone-900 flex items-center gap-2">
         <Megaphone className="w-4 h-4 text-amber-800" />
-        <span>{szervezo ? 'Szervezői üzenet az Infótáblára' : 'Üzenet az Infótáblára'}</span>
+        <span>{szervezo ? 'Admin üzenet az Infótáblára' : 'Üzenet az Infótáblára'}</span>
       </h3>
 
       <div className="p-3.5 space-y-3">
         <p className="text-[11px] text-stone-600 font-medium leading-snug">
           Amit ide írsz, egy-két másodperc múlva ott van minden látogató
-          telefonján, {szervezo ? '„Szervezők" aláírással' : 'a stand nevével'} és a
+          telefonján, {szervezo ? '„Admin" aláírással' : 'a stand nevével'} és a
           pontos időponttal. Rövid mondat a legjobb.
         </p>
 

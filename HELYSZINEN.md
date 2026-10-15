@@ -296,16 +296,16 @@ Ha egy standos szól, hogy nem tud kiírni:
 2. Van neki internet? A toast megmondja: „Nem sikerült kiírni. Van internet?"
 3. Lefutott az SQL? Ha nem, senki nem tud kiírni, nem csak ő.
 
-**A szervező is írhat.** Neki nincs standja, ezért a PIN-jegyzék oldalán van
-az írólapja: `0169`-cel belépve, a szavazás állása fölött. A bejegyzés mellé
-„Szervezők" kerül, csillaggal, nem egy stand logójával.
+**Az admin is írhat.** Neki nincs standja, ezért a PIN-jegyzék oldalán van az
+írólapja: `0169`-cel belépve, a szavazás állása fölött. A bejegyzés mellé
+„Admin" kerül, csillaggal, nem egy stand logójával.
 
 **Minden beírás javítható.** A stand a sajátját, a szervező bármelyiket: a
 bejegyzés mellett ceruza, a javítás a helyén nyílik. Az **időpont marad az
 eredeti**, és a szöveg után megjelenik a „· javítva" — egy fél órája kiírt
 üzenet nem ugorhat előre a táblán csak azért, mert elírás volt benne.
 
-A szervezői kóddal bármelyik üzenet le is vehető a tábláról, magán a tábla
+Az admin kóddal bármelyik üzenet le is vehető a tábláról, magán a tábla
 oldalán, a kuka ikonnal.
 
 A **standok állandó megjegyzése** (`exhibitors.notice`) más dolog: az, ami
