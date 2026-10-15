@@ -4,7 +4,7 @@ import OrsolyaInfoModal from './OrsolyaInfoModal';
 import FavoritesModal from './FavoritesModal';
 import MobileBottomNav from './MobileBottomNav';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { Utensils, MapPin, Store, Heart, Search, X, Info, Calendar, Clock, Menu, ThumbsUp, Megaphone } from 'lucide-react';
+import { Utensils, MapPin, Store, Heart, Search, X, Info, Calendar, Menu, ThumbsUp, Megaphone } from 'lucide-react';
 import HamburgerMenuDrawer from './HamburgerMenuDrawer';
 import { olvasatlanSzam } from '../lib/infotabla';
 
@@ -74,15 +74,13 @@ export default function Header({
     <>
       <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-stone-200/80 shadow-xs">
         {/* Event Banner */}
-        <div className="bg-gradient-to-r from-amber-800 via-amber-900 to-amber-950 text-amber-50 text-xs sm:text-sm font-bold px-3 py-0.5 flex items-center justify-between shadow-inner">
-          <div className="flex items-center gap-1.5 overflow-hidden">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />
-            <span className="truncate uppercase tracking-wider font-extrabold text-amber-100">ORSOLYA-NAPI VÁSÁR – NATÚRPARK ÍZEI • CIVIL ÍZEK UTCÁJA</span>
-          </div>
-          <div className="hidden sm:flex items-center gap-3 opacity-90 text-xs whitespace-nowrap">
-            <span className="flex items-center gap-1"><Calendar className="w-3 h-3 text-amber-300" /> okt. 17–18.</span>
-            <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-amber-300" /> 10:00–18:00</span>
-          </div>
+        {/* Csak a rendezvény neve. A dátum és a nyitvatartás az infó-ablakban
+            és a programfüzetben van, a „Civil Ízek Utcája” pedig a lap
+            címsorában — itt mindhárom csak zsúfolta a sávot. */}
+        <div className="bg-gradient-to-r from-amber-800 via-amber-900 to-amber-950 text-amber-50 px-3 py-1 shadow-inner">
+          <p className="truncate text-center text-xs sm:text-sm uppercase tracking-wider font-extrabold text-amber-100">
+            Orsolya-napi Gasztrofesztivál – Natúrpark Ízei
+          </p>
         </div>
 
         {/* Main Navbar */}

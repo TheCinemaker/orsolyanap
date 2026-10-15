@@ -198,7 +198,9 @@ function MainApp() {
             <TelepitesSav />
             {/* Top Title Section */}
             <div className="text-center py-1">
-              <h1 className="text-xs sm:text-sm font-black text-amber-950 uppercase tracking-widest">
+              {/* Másfélszeres méret: ez a lap címe, eddig alig volt nagyobb
+                  a körülötte lévő feliratoknál. */}
+              <h1 className="text-lg sm:text-xl font-black text-amber-950 uppercase tracking-widest">
                 {mainTab === 'program'
                   ? 'PROGRAMFÜZET'
                   : mainTab === 'info'
