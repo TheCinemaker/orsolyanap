@@ -358,6 +358,7 @@ Ennek két következménye van, és mindkettőbe beléptünk már:
 | `ExhibitorAdmin/ExhibitorDashboard.jsx` | a stand kezelője (1127 sor) |
 | `ExhibitorAdmin/InfoTablaIro.jsx` | írólap az infótáblához, stand és admin módban |
 | `ExhibitorAdmin/SzavazasPanel.jsx` | hiteles szavazásállás a naplóból |
+| `ExhibitorAdmin/KoordinataFelvetel.jsx` | térkép-pin bemérése a telefon GPS-éből, a helyszínen |
 
 **Segédek**
 
@@ -612,7 +613,8 @@ került.
 
 - **31 stand térkép-pinje becsült.** A `KOORDINATAK_ELLENORIZENDO.txt`
   listázza őket, és a tizedesjegyek száma alapján magától frissül. A
-  helyszíni körön a `koordinatak.mjs` írja be a mért pontokat.
+  helyszínen a `KoordinataFelvetel` felület méri be őket a telefon GPS-éből
+  (admin kóddal), a `koordinatak.mjs` pedig a tartalék út szövegfájlból.
 - **Az `ExhibitorDashboard.jsx` 8 hook-figyelmeztetést ad.** Meglévő dolog:
   egy `if (!activeExhibitor) return null;` áll az összes `useState` előtt.
   Nem egysoros javítás, mert a `profileData` kezdőértéke

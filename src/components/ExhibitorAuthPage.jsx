@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
 import VisitKoszegLogo from './VisitKoszegLogo';
-import { Key, ArrowRight, ArrowLeft, ShieldCheck, Copy, Check, Plus, X, Lock, Store, Utensils, Calendar } from 'lucide-react';
+import { Key, ArrowRight, ArrowLeft, ShieldCheck, Copy, Check, Plus, X, Lock, Store, Utensils, Calendar, Crosshair } from 'lucide-react';
 import { useScrollLock } from '../hooks/useScrollLock';
 import SzavazasPanel from './ExhibitorAdmin/SzavazasPanel';
 import InfoTablaIro from './ExhibitorAdmin/InfoTablaIro';
+import KoordinataFelvetel from './ExhibitorAdmin/KoordinataFelvetel';
 
 export default function ExhibitorAuthPage() {
   const {
@@ -23,6 +24,7 @@ export default function ExhibitorAuthPage() {
   } = useOrsolya();
 
   const [pinInput, setPinInput] = useState('');
+  const [koordinataNyitva, setKoordinataNyitva] = useState(false);
   const pinRef = useRef(null);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [copiedPinId, setCopiedPinId] = useState(null);
@@ -423,6 +425,10 @@ export default function ExhibitorAuthPage() {
         </div>
       )}
 
+      {koordinataNyitva && (
+        <KoordinataFelvetel onClose={() => setKoordinataNyitva(false)} />
+      )}
+
       {/* ------------------------------------------------------------------ */}
       {/* ORGANIZER PIN DIRECTORY MODAL */}
       {/* ------------------------------------------------------------------ */}
@@ -461,6 +467,16 @@ export default function ExhibitorAuthPage() {
                 <span>Új Csapat</span>
               </button>
             </div>
+
+            {/* Koordináta-felvétel: a 31 becsült térkép-pin bemérése a
+                helyszínen, a telefon GPS-éből. */}
+            <button
+              onClick={() => setKoordinataNyitva(true)}
+              className="w-full flex items-center justify-center gap-2 px-3.5 py-3 bg-amber-900 hover:bg-amber-950 text-white font-extrabold text-xs rounded-md shadow-xs transition-all cursor-pointer"
+            >
+              <Crosshair className="w-4 h-4 text-amber-300" />
+              <span>Koordináta-felvétel a helyszínen</span>
+            </button>
 
             {/* Admin üzenet az infótáblára. Az adminnak nincs standja, tehát
                 a stand kezelőjéből nem érné el. */}

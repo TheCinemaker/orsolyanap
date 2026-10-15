@@ -222,11 +222,42 @@ hiányzik logó.
 
 ## 5. Péntek: a térkép-pinek bemérése
 
+### A gyors út: az app méri be, nem te írod be
+
+A telefonodon lépj be a `0169` kóddal, és nyomd meg a **„Koordináta-felvétel
+a helyszínen"** gombot. Egy lista jön fel, elöl a még becsült standokkal.
+
+**Odaállsz a sátor elé, és rákoppintasz a nevére.** Pár másodpercig mér,
+aztán magától beírja. Nincs jegyzetelés, nincs fájl, nincs szkript.
+
+Amit magától megtesz:
+
+- **Hat másodpercig figyel, és a legjobb olvasatot tartja meg.** A telefon
+  első GPS-válasza gyakran 30-50 méteres, és csak utána javul. Ha már 8 méter
+  alatti, korán megáll.
+- **A 25 méternél pontatlanabbat nem fogadja el.** Annyival a szomszéd
+  sátorhoz vinné a látogatót, és az rosszabb, mint a becsült pin. Ilyenkor
+  várj pár másodpercet, és nyomd meg újra.
+- **A Kőszegen kívüli pontot elutasítja.**
+- **Hálózat nélkül is megtartja a mérést.** A pont a készülékre kerül, és
+  felmegy, amint van net; a fejlécben látszik, hány vár. Nem kell visszamenni
+  a sátorhoz.
+- A bemért standot pipával mutatja, a koordinátájával együtt. Ha félrement,
+  az „Újra" gombbal újramérhető.
+
+Közben a térképen azonnal a helyén lesz a pin, tehát menet közben
+ellenőrizheted.
+
 Jelenleg 31 pin **becsült** — egy szabályos rács a sétány két oldalán, aminek
 semmi köze a valósághoz. Ez a leglátványosabb hibalehetőség: a vendég
-rákoppint, odamegy, és nincs ott a stand.
+rákoppint, odamegy, és nincs ott a stand. Az appos felvétellel viszont
+nyugodtan menj végig mind a 31-en: egy koppintás sátranként.
 
-**Ne állj meg 31 ponton.** Elég ennyi:
+### A tartalék út: szövegfájl és szkript
+
+Ha a telefonos felvétel nem járható (nincs GPS-engedély, lemerült telefon),
+a mért pontok jöhetnek szövegfájlban is, soronként egy stand. Ekkor nem kell
+mind a 31 ponton megállni:
 
 1. Sétáld végig a sort, és írd le a sátrak **sorrendjét**.
 2. Minden **ötödik** sátornál állj meg és vedd fel a GPS-pontot.

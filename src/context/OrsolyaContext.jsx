@@ -862,6 +862,33 @@ export function OrsolyaProvider({ children }) {
     }
   };
 
+  /**
+   * Bemért térkép-koordináta mentése.
+   *
+   * A helyszíni felvételhez (`KoordinataFelvetel`): a telefon GPS-éből jövő
+   * pontot írja be. A kliens állapotát AZONNAL frissíti, hogy a lista a
+   * sátor előtt is lássa a haladást, és `false`-szal tér vissza, ha a mentés
+   * nem ment át — a felvevő felület ilyenkor várólistára teszi, és nem
+   * veszik el a mérés.
+   */
+  const mentCoordinatat = async (exhibitorId, coords) => {
+    setExhibitors((prev) =>
+      prev.map((ex) => (ex.id === exhibitorId ? { ...ex, coordinates: coords } : ex))
+    );
+    if (!isSupabaseConfigured) return false;
+    try {
+      const { error } = await supabase
+        .from('exhibitors')
+        .update({ coordinates: coords })
+        .eq('id', exhibitorId);
+      if (error) throw error;
+      return true;
+    } catch (err) {
+      console.warn('Koordinata mentes nem sikerult:', err?.message || err);
+      return false;
+    }
+  };
+
   // Toggle exhibitor hasDrinks
   const updateExhibitorDrinks = async (exhibitorId, hasDrinks) => {
     setExhibitors((prev) =>
@@ -1604,6 +1631,7 @@ export function OrsolyaProvider({ children }) {
         focusedExhibitorIdOnMap,
         focusExhibitorOnMap,
         updateExhibitorDrinks,
+        mentCoordinatat,
         votedItemIds,
         voteForItem,
         visitStats,
