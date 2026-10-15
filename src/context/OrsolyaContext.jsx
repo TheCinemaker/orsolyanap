@@ -393,6 +393,12 @@ export function OrsolyaProvider({ children }) {
               setStandHirek((prev) =>
                 prev.some((h) => h.id === payload.new.id) ? prev : [payload.new, ...prev]
               );
+            } else if (payload.eventType === 'UPDATE' && payload.new) {
+              // Javított üzenet: a szöveg cserélődik, a helye nem — a
+              // created_at szándékosan marad az eredeti.
+              setStandHirek((prev) =>
+                prev.map((h) => (h.id === payload.new.id ? { ...h, ...payload.new } : h))
+              );
             } else if (payload.eventType === 'DELETE' && payload.old) {
               setStandHirek((prev) => prev.filter((h) => h.id !== payload.old.id));
             }
@@ -716,13 +722,76 @@ export function OrsolyaProvider({ children }) {
     }
   };
 
-  /** A saját üzenet visszavétele: elírás, vagy már nem igaz. */
+  /**
+   * A szervező üzenete az infótáblára.
+   *
+   * A szervezőnek nincs standja, ezért PIN-je sem: a szervezői kóddal ír, és
+   * a bejegyzés mellé a neve kerül, nem egy standé. Így a vendég látja, hogy
+   * ez a rendezvénytől jött.
+   */
+  const postSzervezoHir = async (szoveg, szerzo) => {
+    const szov = String(szoveg ?? '').trim();
+    if (!isSuperAdmin || szov.length < 2) return false;
+    try {
+      const { data, error } = await supabase.rpc('post_szervezo_hir', {
+        p_kod: ORGANIZER_PIN,
+        p_szoveg: szov,
+        p_szerzo: szerzo || null,
+      });
+      if (error) throw error;
+      if (data) setStandHirek((prev) => (prev.some((h) => h.id === data.id) ? prev : [data, ...prev]));
+      showToast('Kiírva az infótáblára', 'success');
+      return true;
+    } catch (err) {
+      console.error('Infotabla szervezoi poszt hiba:', err.message);
+      showToast('Nem sikerült kiírni. Van internet?', 'error');
+      return false;
+    }
+  };
+
+  /**
+   * Üzenet javítása.
+   *
+   * Elírás, vagy máshogy akarja fogalmazni. Mindenki a sajátját javíthatja, a
+   * szervező bármelyiket — ugyanaz a kulcs dönt, mint a visszavételnél.
+   *
+   * Az időpont marad az eredeti: ha változna, a bejegyzés előreugrana a
+   * táblán, mintha most írták volna.
+   */
+  const editStandHir = async (id, szoveg) => {
+    const kod = isSuperAdmin ? ORGANIZER_PIN : activeExhibitor?.pin;
+    const szov = String(szoveg ?? '').trim();
+    if (!kod || szov.length < 2) return false;
+    try {
+      const { data, error } = await supabase.rpc('edit_stand_hir', {
+        p_id: id,
+        p_pin: kod,
+        p_szoveg: szov,
+      });
+      if (error) throw error;
+      if (data) setStandHirek((prev) => prev.map((h) => (h.id === id ? { ...h, ...data } : h)));
+      showToast('Javítva', 'success');
+      return true;
+    } catch (err) {
+      console.error('Infotabla javitas hiba:', err.message);
+      showToast('Nem sikerült javítani.', 'error');
+      return false;
+    }
+  };
+
+  /**
+   * Üzenet visszavétele.
+   *
+   * A stand a sajátját veheti vissza, a szervező bármelyiket: nyilvános
+   * táblán kell legyen mód levenni azt, ami nem odavaló.
+   */
   const deleteStandHir = async (id) => {
-    if (!activeExhibitor) return false;
+    const kod = isSuperAdmin ? ORGANIZER_PIN : activeExhibitor?.pin;
+    if (!kod) return false;
     try {
       const { data, error } = await supabase.rpc('delete_stand_hir', {
         p_id: id,
-        p_pin: activeExhibitor.pin,
+        p_pin: kod,
       });
       if (error) throw error;
       if (data) setStandHirek((prev) => prev.filter((h) => h.id !== id));
@@ -1404,6 +1473,8 @@ export function OrsolyaProvider({ children }) {
         events,
         standHirek,
         postStandHir,
+        postSzervezoHir,
+        editStandHir,
         deleteStandHir,
         postReel,
         likeReel,

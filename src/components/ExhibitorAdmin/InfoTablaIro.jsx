@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Megaphone, Send, Clock, Trash2 } from 'lucide-react';
+import { Megaphone, Send, Clock, Trash2, Pencil, X } from 'lucide-react';
 import { useOrsolya } from '../../context/OrsolyaContext';
 
 /**
@@ -20,21 +20,50 @@ const OTLETEK = [
   'Elfogyott a pörkölt, köszönjük!',
 ];
 
-export default function InfoTablaIro() {
-  const { activeExhibitor, standHirek, postStandHir, deleteStandHir } = useOrsolya();
+/* A szervezőnek nem étel-állapotot kell kiírnia, hanem a vásárt mozgatni. */
+const SZERVEZOI_OTLETEK = [
+  'Megnyitottunk! Jó étvágyat mindenkinek!',
+  'Aki még nem szavazott a kedvenc ételére, most tegye meg!',
+  'A bográcsok rotyognak, érdemes körbejárni a sétányt.',
+  'Fél óra és kezdődik a következő műsor.',
+];
+
+/**
+ * `szervezo` módban a szervezői kóddal írunk, nem egy stand PIN-jével, és a
+ * bejegyzés mellé a szervező neve kerül. Ugyanaz a felület, mert ugyanaz a
+ * dolga — csak a szerző és a kész mondatok mások.
+ */
+export default function InfoTablaIro({ szervezo = false }) {
+  const {
+    activeExhibitor,
+    standHirek,
+    postStandHir,
+    postSzervezoHir,
+    editStandHir,
+    deleteStandHir,
+  } = useOrsolya();
   const [szoveg, setSzoveg] = useState('');
   const [kuldes, setKuldes] = useState(false);
+  const [javitas, setJavitas] = useState(null);
+  const [javitottSzoveg, setJavitottSzoveg] = useState('');
+
+  const otletek = szervezo ? SZERVEZOI_OTLETEK : OTLETEK;
 
   const sajat = standHirek
-    .filter((h) => h.exhibitor_id === activeExhibitor?.id)
+    .filter((h) => (szervezo ? !h.exhibitor_id : h.exhibitor_id === activeExhibitor?.id))
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
   const kuld = async () => {
     if (szoveg.trim().length < 2 || kuldes) return;
     setKuldes(true);
-    const ok = await postStandHir(szoveg);
+    const ok = szervezo ? await postSzervezoHir(szoveg) : await postStandHir(szoveg);
     setKuldes(false);
     if (ok) setSzoveg('');
+  };
+
+  const mentJavitas = async (id) => {
+    const ok = await editStandHir(id, javitottSzoveg);
+    if (ok) setJavitas(null);
   };
 
   const ora = (iso) =>
@@ -50,14 +79,14 @@ export default function InfoTablaIro() {
     <section className="bg-white border border-amber-300 rounded-md overflow-hidden shadow-xs">
       <h3 className="px-3.5 py-2.5 bg-amber-50 border-b border-amber-200 text-sm font-bold text-stone-900 flex items-center gap-2">
         <Megaphone className="w-4 h-4 text-amber-800" />
-        <span>Üzenet az Infótáblára</span>
+        <span>{szervezo ? 'Szervezői üzenet az Infótáblára' : 'Üzenet az Infótáblára'}</span>
       </h3>
 
       <div className="p-3.5 space-y-3">
         <p className="text-[11px] text-stone-600 font-medium leading-snug">
           Amit ide írsz, egy-két másodperc múlva ott van minden látogató
-          telefonján, a stand nevével és a pontos időponttal. Rövid mondat a
-          legjobb.
+          telefonján, {szervezo ? '„Szervezők" aláírással' : 'a stand nevével'} és a
+          pontos időponttal. Rövid mondat a legjobb.
         </p>
 
         <div className="flex items-start gap-2">
@@ -73,7 +102,7 @@ export default function InfoTablaIro() {
                 kuld();
               }
             }}
-            placeholder="Pl. Kész a gulyás!"
+            placeholder={szervezo ? 'Pl. Megnyitottunk! Jó étvágyat!' : 'Pl. Kész a gulyás!'}
             className="flex-1 px-3 py-2 bg-stone-50 border border-stone-200 rounded-md text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40 resize-none"
           />
           <button
@@ -89,7 +118,7 @@ export default function InfoTablaIro() {
 
         {/* Kész mondatok: a sátorban egy koppintás legyen, ne fogalmazás. */}
         <div className="flex flex-wrap gap-1.5">
-          {OTLETEK.map((o) => (
+          {otletek.map((o) => (
             <button
               key={o}
               type="button"
@@ -115,18 +144,74 @@ export default function InfoTablaIro() {
                   <Clock className="w-2.5 h-2.5" />
                   {ora(h.created_at)}
                 </span>
-                <p className="text-xs text-stone-900 font-semibold leading-snug flex-1 break-words">
-                  {h.szoveg}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => deleteStandHir(h.id)}
-                  title="Visszavonom"
-                  aria-label="Üzenet visszavonása"
-                  className="shrink-0 p-1 text-stone-400 hover:text-rose-700 cursor-pointer"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
+
+                {javitas === h.id ? (
+                  /* Javítás a helyén: nem kell új mezőt keresni, és az
+                     eredeti szöveg ott van, amit átírhat. */
+                  <div className="flex-1 flex items-start gap-1.5">
+                    <textarea
+                      rows={2}
+                      autoFocus
+                      value={javitottSzoveg}
+                      maxLength={280}
+                      onChange={(e) => setJavitottSzoveg(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          mentJavitas(h.id);
+                        }
+                        if (e.key === 'Escape') setJavitas(null);
+                      }}
+                      className="flex-1 px-2 py-1 bg-white border border-amber-400 rounded-md text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40 resize-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => mentJavitas(h.id)}
+                      disabled={javitottSzoveg.trim().length < 2}
+                      className="shrink-0 px-2 py-1 bg-emerald-800 hover:bg-emerald-700 disabled:bg-stone-200 disabled:text-stone-400 text-white text-[11px] font-extrabold rounded-md cursor-pointer disabled:cursor-not-allowed"
+                    >
+                      Mentés
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setJavitas(null)}
+                      aria-label="Mégsem"
+                      className="shrink-0 p-1 text-stone-400 hover:text-stone-700 cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-xs text-stone-900 font-semibold leading-snug flex-1 break-words">
+                      {h.szoveg}
+                      {h.modositva && (
+                        <span className="text-[10px] font-bold text-stone-400"> · javítva</span>
+                      )}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setJavitas(h.id);
+                        setJavitottSzoveg(h.szoveg);
+                      }}
+                      title="Javítom"
+                      aria-label="Üzenet javítása"
+                      className="shrink-0 p-1 text-stone-400 hover:text-amber-800 cursor-pointer"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteStandHir(h.id)}
+                      title="Visszavonom"
+                      aria-label="Üzenet visszavonása"
+                      className="shrink-0 p-1 text-stone-400 hover:text-rose-700 cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </>
+                )}
               </div>
             ))}
           </div>

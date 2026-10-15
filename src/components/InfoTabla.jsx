@@ -1,5 +1,5 @@
 import React from 'react';
-import { Megaphone, Clock, Info } from 'lucide-react';
+import { Megaphone, Clock, Info, Trash2, Star } from 'lucide-react';
 import { useOrsolya } from '../context/OrsolyaContext';
 import { olvasottnakJelol } from '../lib/infotabla';
 
@@ -46,7 +46,7 @@ const friss = (iso) => {
 };
 
 export default function InfoTabla() {
-  const { standHirek, exhibitors } = useOrsolya();
+  const { standHirek, exhibitors, isSuperAdmin, deleteStandHir } = useOrsolya();
 
   /* Az időt percenként újraszámoljuk, különben a „3 perccel ezelőtt" ott
      marad a képernyőn fél órára is. */
@@ -106,6 +106,7 @@ export default function InfoTabla() {
         <ul className="space-y-2">
           {lista.map((h, i) => {
             const stand = standNev.get(h.exhibitor_id);
+            const szervezoi = !h.exhibitor_id;
             const elozo = lista[i - 1];
             const ujNap = !elozo || napCimke(elozo.created_at) !== napCimke(h.created_at);
             const frissSzoveg = friss(h.created_at);
@@ -119,8 +120,18 @@ export default function InfoTabla() {
                     </span>
                   </li>
                 )}
-                <li className="bg-white border border-stone-200 rounded-md p-3 flex items-start gap-2.5">
-                  {stand?.image ? (
+                <li
+                  className={`bg-white border rounded-md p-3 flex items-start gap-2.5 ${
+                    szervezoi ? 'border-amber-300 bg-amber-50/50' : 'border-stone-200'
+                  }`}
+                >
+                  {/* A szervezői üzenet nem standtól jön: csillag jelzi, nem
+                      logó, különben úgy látszana, mintha egy stand írta. */}
+                  {szervezoi ? (
+                    <span className="w-9 h-9 rounded-md border border-amber-300 bg-amber-100 shrink-0 flex items-center justify-center">
+                      <Star className="w-4 h-4 text-amber-800 fill-amber-700" />
+                    </span>
+                  ) : stand?.image ? (
                     <img
                       src={stand.image}
                       alt=""
@@ -135,7 +146,7 @@ export default function InfoTabla() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline gap-2 flex-wrap">
                       <span className="text-[11px] font-black text-stone-900 leading-tight">
-                        {stand?.name || 'Stand'}
+                        {szervezoi ? h.szerzo || 'Szervezők' : stand?.name || 'Stand'}
                       </span>
                       <span className="text-[10px] font-bold text-stone-500 inline-flex items-center gap-1">
                         <Clock className="w-2.5 h-2.5" />
@@ -149,8 +160,26 @@ export default function InfoTabla() {
                     </div>
                     <p className="text-sm text-stone-900 font-semibold leading-snug mt-0.5 whitespace-pre-wrap break-words">
                       {h.szoveg}
+                      {/* Ha javították, azt kiírjuk: a vendég lássa, hogy a
+                          szöveg nem az eredeti, de az időpont az. */}
+                      {h.modositva && (
+                        <span className="text-[10px] font-bold text-stone-400"> · javítva</span>
+                      )}
                     </p>
                   </div>
+
+                  {/* Csak szervezői belépéssel: nyilvános táblán kell legyen
+                      mód levenni azt, ami nem odavaló. */}
+                  {isSuperAdmin && (
+                    <button
+                      onClick={() => deleteStandHir(h.id)}
+                      title="Levétel a tábláról"
+                      aria-label="Üzenet levétele"
+                      className="shrink-0 p-1.5 text-stone-400 hover:text-rose-700 cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </li>
               </React.Fragment>
             );

@@ -4,6 +4,7 @@ import VisitKoszegLogo from './VisitKoszegLogo';
 import { Key, ArrowRight, ArrowLeft, ShieldCheck, Copy, Check, Plus, X, Lock, Store, Utensils, Calendar } from 'lucide-react';
 import { useScrollLock } from '../hooks/useScrollLock';
 import SzavazasPanel from './ExhibitorAdmin/SzavazasPanel';
+import InfoTablaIro from './ExhibitorAdmin/InfoTablaIro';
 
 export default function ExhibitorAuthPage() {
   const {
@@ -429,6 +430,12 @@ export default function ExhibitorAuthPage() {
                 <Plus className="w-3.5 h-3.5" />
                 <span>Új Csapat</span>
               </button>
+            </div>
+
+            {/* Szervezői üzenet az infótáblára. A szervezőnek nincs standja,
+                tehát a stand kezelőjéből nem érné el. */}
+            <div className="pt-2">
+              <InfoTablaIro szervezo />
             </div>
 
             {/* A szavazás állása a PIN-jegyzék ELŐTT: a rendezvény alatt ez az,

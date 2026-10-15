@@ -17,10 +17,21 @@
 
 create table if not exists stand_hirek (
   id            uuid primary key default gen_random_uuid(),
-  exhibitor_id  text not null references exhibitors(id) on delete cascade,
+  -- Üres, ha a szervező írta: annak nincs standja. A szerző ilyenkor a
+  -- `szerzo` oszlopban van.
+  exhibitor_id  text references exhibitors(id) on delete cascade,
+  szerzo        text,
   szoveg        text not null,
-  created_at    timestamptz not null default now()
+  created_at    timestamptz not null default now(),
+  -- Mikor javították. A created_at NEM változik javításnál: ha változna,
+  -- a bejegyzés előreugrana a táblán, mintha most írták volna.
+  modositva     timestamptz
 );
+
+-- Ha a tábla már létezett a szervezői üzenetek előttről:
+alter table stand_hirek add column if not exists szerzo text;
+alter table stand_hirek alter column exhibitor_id drop not null;
+alter table stand_hirek add column if not exists modositva timestamptz;
 
 create index if not exists stand_hirek_ido_idx on stand_hirek (created_at desc);
 create index if not exists stand_hirek_stand_idx on stand_hirek (exhibitor_id, created_at desc);
@@ -86,6 +97,104 @@ end;
 $$;
 
 -- ---------------------------------------------------------------------------
+--  A szervező üzenete
+--
+--  A szervezőnek nincs standja, ezért nincs PIN-je sem: a szervezői kóddal
+--  ír, és a neve kerül a bejegyzés mellé. Így a vendég látja, hogy ez nem egy
+--  standtól jött, hanem a rendezvénytől.
+-- ---------------------------------------------------------------------------
+create or replace function post_szervezo_hir(
+  p_kod text,
+  p_szoveg text,
+  p_szerzo text default null
+)
+returns json
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_sor stand_hirek;
+begin
+  if btrim(coalesce(p_kod, '')) <> '0169' then
+    raise exception 'nincs jogosultsag';
+  end if;
+
+  if length(btrim(coalesce(p_szoveg, ''))) < 2 then
+    raise exception 'ures uzenet';
+  end if;
+
+  insert into stand_hirek (exhibitor_id, szerzo, szoveg)
+  values (
+    null,
+    coalesce(nullif(btrim(coalesce(p_szerzo, '')), ''), 'Szervezők'),
+    left(btrim(p_szoveg), 280)
+  )
+  returning * into v_sor;
+
+  return json_build_object(
+    'id', v_sor.id,
+    'exhibitor_id', v_sor.exhibitor_id,
+    'szerzo', v_sor.szerzo,
+    'szoveg', v_sor.szoveg,
+    'created_at', v_sor.created_at
+  );
+end;
+$$;
+
+-- ---------------------------------------------------------------------------
+--  Üzenet javítása
+--
+--  Elírás, vagy máshogy akarja fogalmazni. Mindenki a sajátját javíthatja: a
+--  stand a PIN-jével, a szervező a szervezői kóddal (ő bármelyiket).
+--
+--  Az időpont marad az eredeti, és a `modositva` jelzi, hogy nyúltak hozzá.
+--  Így a vendég nem lát „most" feliratot egy kétórás üzenet mellett, de azt
+--  látja, hogy a szöveg javítva lett.
+-- ---------------------------------------------------------------------------
+create or replace function edit_stand_hir(p_id uuid, p_pin text, p_szoveg text)
+returns json
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_sor stand_hirek;
+begin
+  if length(btrim(coalesce(p_szoveg, ''))) < 2 then
+    raise exception 'ures uzenet';
+  end if;
+
+  update stand_hirek h
+     set szoveg = left(btrim(p_szoveg), 280),
+         modositva = now()
+   where h.id = p_id
+     and (
+       btrim(coalesce(p_pin, '')) = '0169'
+       or exists (
+         select 1 from exhibitors e
+          where e.id = h.exhibitor_id
+            and btrim(e.pin) = btrim(coalesce(p_pin, ''))
+       )
+     )
+  returning * into v_sor;
+
+  if v_sor.id is null then
+    raise exception 'nincs jogosultsag';
+  end if;
+
+  return json_build_object(
+    'id', v_sor.id,
+    'exhibitor_id', v_sor.exhibitor_id,
+    'szerzo', v_sor.szerzo,
+    'szoveg', v_sor.szoveg,
+    'created_at', v_sor.created_at,
+    'modositva', v_sor.modositva
+  );
+end;
+$$;
+
+-- ---------------------------------------------------------------------------
 --  Üzenet visszavétele
 --
 --  Elírás, vagy már nem igaz. Csak a saját üzenetét veheti vissza a stand.
@@ -99,12 +208,18 @@ as $$
 declare
   v_db integer;
 begin
+  -- A szervezői kód BÁRMELYIK üzenetet leveheti a tábláról. Nyilvános
+  -- felületen kell legyen mód visszavenni azt, ami nem odavaló -- és a
+  -- sajátját amúgy is csak az adott stand tudja törölni.
   delete from stand_hirek h
    where h.id = p_id
-     and exists (
-       select 1 from exhibitors e
-        where e.id = h.exhibitor_id
-          and btrim(e.pin) = btrim(coalesce(p_pin, ''))
+     and (
+       btrim(coalesce(p_pin, '')) = '0169'
+       or exists (
+         select 1 from exhibitors e
+          where e.id = h.exhibitor_id
+            and btrim(e.pin) = btrim(coalesce(p_pin, ''))
+       )
      );
   get diagnostics v_db = row_count;
   return v_db > 0;
@@ -132,6 +247,10 @@ end $$;
 --  annak tagja. Ez a szavazásnál egyszer már látszólagos tiltást okozott.
 -- ---------------------------------------------------------------------------
 revoke all on function post_stand_hir(text, text, text) from public;
+revoke all on function post_szervezo_hir(text, text, text) from public;
+grant execute on function post_szervezo_hir(text, text, text) to anon, authenticated;
 revoke all on function delete_stand_hir(uuid, text) from public;
+revoke all on function edit_stand_hir(uuid, text, text) from public;
+grant execute on function edit_stand_hir(uuid, text, text) to anon, authenticated;
 grant execute on function post_stand_hir(text, text, text) to anon, authenticated;
 grant execute on function delete_stand_hir(uuid, text) to anon, authenticated;
