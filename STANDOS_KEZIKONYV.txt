@@ -74,6 +74,18 @@
 
   A rész alján: „Bemutatkozás & Adatok Mentése". Mentés nélkül elveszik.
 
+  AZ ÉLŐ ÜZENET HÁROM HELYEN JELENIK MEG, azonnal, minden telefonon:
+    - a főlap tetején, az „Élő a standokról" sávban, a stand nevével
+    - a stand kártyáján, ha valaki rákoppint
+    - mindegyik ételeteknél, a kártyán
+
+  Ezért ez a leggyorsabb módja annak, hogy szóljatok a vásárnak: mikor lesz
+  kész a pörkölt, hogy most sültek ki a rétesek, hogy fél óra múlva zenélnek
+  nálatok.
+
+  ÉS HA MÁR NEM ÉRVÉNYES, TÖRÖLJÉTEK. A mező mellett ott az „Üzenet törlése".
+  A „várható elkészülés 12:45" délután ötkor már félrevezeti a vendéget.
+
 
 ================================================================================
 4. ÚJ ÉTEL VAGY ITAL FELVÉTELE

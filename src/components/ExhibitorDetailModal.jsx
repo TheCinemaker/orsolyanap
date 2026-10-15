@@ -1,6 +1,6 @@
 import React from 'react';
 import { useOrsolya } from '../context/OrsolyaContext';
-import { X, MapPin, Phone, Mail, Heart, Utensils, Map, ThumbsUp, CupSoda, Calendar, Share2 } from 'lucide-react';
+import { X, MapPin, Phone, Mail, Heart, Utensils, Map, ThumbsUp, CupSoda, Calendar, Share2, Megaphone } from 'lucide-react';
 import { useScrollLock } from '../hooks/useScrollLock';
 import { hatterBezaras } from '../lib/bezaras';
 
@@ -51,6 +51,15 @@ export default function ExhibitorDetailModal({ exhibitor, onClose, onSelectDish 
         >
           <X className="w-5 h-5" />
         </button>
+
+        {/* Élő üzenet a standtól. A kép után, minden más elé: ez a
+            legromlandóbb információ az egész kártyán. */}
+        {exhibitor.notice?.trim?.() && (
+          <div className="bg-amber-50 border border-amber-300 rounded-md px-3 py-2.5 flex items-start gap-2">
+            <Megaphone className="w-4 h-4 text-amber-800 shrink-0 mt-0.5" />
+            <p className="text-xs font-semibold text-amber-950 leading-snug">{exhibitor.notice}</p>
+          </div>
+        )}
 
         {/* Large Photo */}
         {exhibitor.image && (

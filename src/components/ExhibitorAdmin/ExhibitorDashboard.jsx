@@ -433,9 +433,24 @@ export default function ExhibitorDashboard() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider mb-1">
-                Élő Üzenet / Megjegyzés a Standnál
-              </label>
+              <div className="flex items-center justify-between mb-1 gap-2">
+                <label className="block text-xs font-bold text-stone-700 uppercase tracking-wider">
+                  Élő Üzenet / Megjegyzés a Standnál
+                </label>
+                {/* Egy koppintással ki lehessen venni. Az élő üzenet a
+                    legromlandóbb adat az appban: a „várható elkészülés
+                    12:45" délután ötkor már félrevezeti a vendéget, és
+                    kitörölni eddig csak a szöveg kijelölésével lehetett. */}
+                {profileData.notice?.trim?.() && (
+                  <button
+                    type="button"
+                    onClick={() => setProfileData({ ...profileData, notice: '' })}
+                    className="shrink-0 text-[11px] font-extrabold text-rose-800 hover:text-rose-900 underline decoration-dotted cursor-pointer"
+                  >
+                    Üzenet törlése
+                  </button>
+                )}
+              </div>
               <input
                 type="text"
                 placeholder="Pl. A marhapörkölt frissen rotyog, várható elkészülés 12:45!"
@@ -443,6 +458,10 @@ export default function ExhibitorDashboard() {
                 onChange={(e) => setProfileData({ ...profileData, notice: e.target.value })}
                 className="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 rounded-md text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
               />
+              <p className="text-[11px] text-stone-500 font-medium mt-1 leading-snug">
+                Mentés után azonnal megjelenik a főlapon, az „Élő a standokról"
+                sávban, és az ételeidnél is. Ha már nem érvényes, töröld.
+              </p>
             </div>
           </div>
 

@@ -9,6 +9,7 @@ import ExhibitorDashboard from './components/ExhibitorAdmin/ExhibitorDashboard';
 import ExhibitorAuthPage from './components/ExhibitorAuthPage';
 import MapView from './components/MapView';
 import LiveReelBar from './components/LiveReelBar';
+import EloUzenetek from './components/EloUzenetek';
 import TelepitesSav from './components/TelepitesSav';
 import ReelsGallery from './components/ReelsGallery';
 import BackToTopButton from './components/BackToTopButton';
@@ -216,6 +217,10 @@ function MainApp() {
               <>
                 {/* Live Facebook/Instagram Style Reels Bar - Only on Main Tents Feed */}
                 <LiveReelBar />
+
+                {/* Amit a standosok épp most írtak be. Üres marad, ha senki
+                    nem írt semmit. */}
+                <EloUzenetek onOpenDetails={(ex) => setSelectedDetailExhibitor(ex)} />
 
                 {/* Exhibitors Feed */}
                 <div className="space-y-4 pt-2">

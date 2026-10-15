@@ -229,6 +229,13 @@ A zárolás számlálóval működik, mert két réteg egymásra nyílhat.
 egymásra csúsznak. A tesztek sorrendje számít: a specifikusabb elöl
 (`szakiskola` a `egymi` előtt).
 
+**Az `ExhibitorCard.jsx` halott kód.** A standlista a
+`CompactExhibitorCard`-ot használja. Emiatt az élő üzenet
+(`exhibitors.notice`) hónapokig sehol nem jelent meg: a standos beírta,
+mentette, és csak ebben a nem használt komponensben lett volna látható. Most
+az `EloUzenetek.jsx`, a `MenuItemCard` és az `ExhibitorDetailModal` írja ki.
+Aki a standkártyán változtat, a `CompactExhibitorCard`-ban keresse.
+
 **AI-jelölés.** Az ételfotók generált illusztrációk. Ezt négy helyen kiírjuk
 (kártyákon sarokfelirat, kijelzőn lábléc, infó-modálban bekezdés). Ne vedd
 ki: jelölés nélkül a fotó ígéretnek látszik.
