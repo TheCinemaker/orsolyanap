@@ -4,9 +4,32 @@ Ez a lap a vásár két napjára és az azt megelőző péntekre szól. Feltéte
 hogy egy laptopnál állsz, sátorépítés közben, és valaki épp most szólt, hogy
 „ezt még betennéd?".
 
-**A legfontosabb szabály:** minden parancsnak van `--proba` kapcsolója, ami
+**KÓDZÁRLAT A HÉTVÉGÉRE.** Szombaton és vasárnap NEM nyúlunk a kódhoz, és
+nincs `git push`. Minden push egy új deploy, és egy elrontott deploy a vásár
+közepén fehér képernyő. Amit ezen a hétvégén változtatunk, az kizárólag
+**adat**: koordináta, kép, étel, szöveg, állapot — ezek azonnal látszanak,
+kirakás nélkül.
+
+Ha mégis muszáj kódhoz nyúlni (tényleg eltört valami): előbb a Netlify
+felületén **Restore deploy** az utolsó működő verzióra, és csak utána
+gondolkodunk javításon.
+
+**A második szabály:** minden parancsnak van `--proba` kapcsolója, ami
 megmutatja, mit csinálna, de nem ír semmit. Kapkodva, telefonos netről, zajban
 ezt használd előbb. Egy rossz adat visszajavítása tízszer annyi idő.
+
+**Amit kód nélkül meg tudsz változtatni** (ez a hétvégén a teljes eszköztár):
+
+| Mit | Hogyan |
+|---|---|
+| térkép-pin | appból, admin kóddal (5. fejezet) |
+| étel neve, leírása, jelölése, napja, fotója | a standos felületről, vagy szkripttel |
+| kész / fő az étel / elfogyott | a standos felületről, egy koppintás |
+| új étel, új stand | `etel-felvetel.mjs`, `stand-felvetel.mjs` |
+| stand bemutatkozása, megjegyzése, logója | standos felület vagy szkript |
+| programleírás | `program-leirasok.mjs` |
+| üzenet a vásárnak | infótábla, admin kóddal |
+| fotó a folyamba | az appból, bárki |
 
 ---
 
@@ -481,6 +504,25 @@ platformspecifikus bináris került a `package.json`-ba (macOS-en futtatott
 **Egy stand nem tudja menteni az ételét** → valószínűleg `price` mező került a
 mentésbe. A `menu_items` táblában nincs ilyen oszlop, és a Supabase emiatt az
 *egész* kérést visszautasítja.
+
+**Egy standos nem tud belépni** → a belépés az adatbázisban ellenőrzi a kódot
+(`login_exhibitor`). Először a kódot nézd meg a `KIALLITO_PIN_KODOK.txt`-ben
+(`node scripts/pin-lista.mjs` újragenerálja). Ha a kód jó, de nem enged be,
+lépj be te a `0169`-cel, és a jegyzékből nyisd meg a standját — onnan minden
+ugyanúgy szerkeszthető.
+
+**Nem lehet kiírni az infótáblára** → ez három dolgon múlhat, ebben a
+sorrendben: be van-e léptetve, van-e internet (a toast megmondja), és
+lefutott-e a `supabase-infotabla.sql`. Ha az utolsó a baj, akkor senki nem
+tud kiírni, nem csak ő.
+
+**Fehér képernyő az éles oldalon** → ne a sátorban kezdj hibát keresni. A
+Netlify felületén **Deploys → az utolsó működő verzió → Restore deploy**, egy
+kattintás, és fél percen belül visszaáll. A hibát utána nézzük meg.
+
+**„Nem jön be az oldal"** → melyik címet nyitotta meg? A hivatalos a
+`orsolya.visitkoszeg.hu`, a tartalék a `orsolya.netlify.app` — ugyanaz a
+build, és ha az egyik akad, a másik megy.
 
 **Elromlott egy adat** → a legtöbb szkript naplózza, mit csinált, és a
 képfeltöltés sosem töröl: a régi fájl a gépen marad.

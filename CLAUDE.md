@@ -320,15 +320,14 @@ előtt. Nem egysoros javítás, mert a `profileData` kezdőértéke
 
 ## Ami nyitott
 
-- **14 stand térkép-pinje becsült** (21 standból). A helyszíni körön kell
-  pontosítani a `koordinatak.mjs`-szel; a `KOORDINATAK_ELLENORIZENDO.txt`
-  listázza őket. A fájl a tizedesjegyek száma alapján válogat, tehát
-  magától frissül.
-- **A helyszíni pontok (színpad, mosdó, parkoló) készen vannak**, a szervező
-  mérte be mind a 19-et. Ezek a `src/data/helyszinek.js`-ben vannak és nem az
+- **31 stand térkép-pinje becsült** (38-ból, 2026. október 16-i állás). A
+  helyszínen az appból mérhetők be, admin kóddal („Koordináta-felvétel"), vagy
+  szövegfájlból a `koordinatak.mjs`-szel; a `KOORDINATAK_ELLENORIZENDO.txt`
+  listázza őket. A fájl a tizedesjegyek száma alapján válogat, tehát magától
+  frissül.
+- **A helyszíni pontok (színpad, mosdó, parkoló) készen vannak**, mind a 20
+  bemért pont. Ezek a `src/data/helyszinek.js`-ben vannak és nem az
   adatbázisban, mert a rendezvény fix infrastruktúrája. Újat egy sor felvenni.
-- **A Fitt-Box Egyesületnek nincs étele** felvéve, így a katalógusban nem
-  jelenik meg. Nem hiba, hanem hiányzó étlap.
 - **A standos felület Storage-ba tölt** (`uploadImage`, `feltoltes/` prefix),
   nem base64-be: a böngésző tömöríti is a képet. A `kezikonyvek.mjs` ebből
   ad standonkénti útmutatót a `STANDOS_KEZIKONYV.txt` alapján.

@@ -618,7 +618,23 @@ került.
 
 ---
 
-## 14. Ami nyitott
+## 14. Hétvégi kódzárlat (2026. október 17-18.)
+
+A rendezvény két napján **nincs kódváltozás és nincs `git push`.** Minden
+push egy új deploy, és egy elrontott deploy a vásár közepén fehér képernyő —
+pont akkor, amikor ezer ember nyitja meg.
+
+Amit ilyenkor is szabad, mert nem jár kirakással: **adat**. Koordináta, kép,
+étel, leírás, állapot, infótábla-üzenet. Ezek a Supabase-ből jönnek, és a
+telefonokon azonnal látszanak.
+
+Ha a hétvégén tényleg eltörik valami: **először a Netlify felületén Restore
+deploy** az utolsó működő verzióra, és csak utána nézzük meg, mi volt a baj.
+A sátorban hibát keresni a leglassabb út.
+
+---
+
+## 15. Ami nyitott
 
 - **31 stand térkép-pinje becsült.** A `KOORDINATAK_ELLENORIZENDO.txt`
   listázza őket, és a tizedesjegyek száma alapján magától frissül. A
