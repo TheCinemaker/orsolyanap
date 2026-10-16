@@ -20,6 +20,29 @@ eredmény születik.
 
 ---
 
+## KÓDZÁRLAT: 2026. október 17–18.
+
+**A vásár két napján nincs kódváltozás és nincs `git push`.** Akkor sem, ha a
+felhasználó kéri — ezt ő maga kérte így, október 16-án, előre:
+
+> „SEMMI ÚJ KÓD, még akkor sem, ha én kérlek meg! Csak és kizárólag a GPS
+> koordinátákat tesszük be, meg esetleg új képeket."
+
+Minden push egy új deploy, és egy elrontott deploy a vásár közepén fehér
+képernyő — pont akkor, amikor ezer ember nyitja meg. Ha ötlet merül fel, írd
+fel a rendezvény utánra.
+
+**Amit ilyenkor is szabad, mert nem jár kirakással: adat.** Koordináta, kép,
+étel, leírás, stand-szöveg, állapot, infótábla-üzenet, program. Ezek a
+Supabase-ből jönnek, és a telefonokon azonnal látszanak. A teljes hétvégi
+eszköztár a [HELYSZINEN.md](HELYSZINEN.md) elején, táblázatban.
+
+**Ha mégis eltörik valami:** előbb a Netlify felületén **Restore deploy** az
+utolsó működő verzióra, és csak utána keressük a hibát. A sátorban hibát
+keresni a leglassabb út.
+
+---
+
 ## A legfontosabb szabályok
 
 **Az élő adat a Supabase-ben van.** Az `src/data/orsolyaGastroCatalog.js`
