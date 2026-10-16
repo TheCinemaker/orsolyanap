@@ -185,6 +185,18 @@ export function OrsolyaProvider({ children }) {
 
   const isVotingOpen = Boolean(forceVotingOpen || Date.now() >= FESTIVAL_VOTING_START);
 
+  /* A nyitás magától is bekövetkezik, nem csak a következő újrarajzoláskor.
+     A `Date.now()` a renderben fut: aki szombat reggel 7:50-kor nyitotta meg
+     a lapot, annál a szavazógomb 8:00-kor is zárva maradt volna, amíg valami
+     más nem mozdul a felületen. Egy ébresztő a nyitás pillanatára. */
+  const [, ebreszto] = useState(0);
+  useEffect(() => {
+    const hatra = FESTIVAL_VOTING_START - Date.now();
+    if (hatra <= 0 || hatra > 24 * 60 * 60 * 1000) return undefined;
+    const ora = setTimeout(() => ebreszto((n) => n + 1), hatra + 1000);
+    return () => clearTimeout(ora);
+  }, [FESTIVAL_VOTING_START]);
+
   const toggleForceVotingOpen = () => {
     setForceVotingOpen((prev) => {
       const next = !prev;
