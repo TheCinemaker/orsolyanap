@@ -97,6 +97,17 @@ export const POINTS_OF_INTEREST = [
     hint: 'A belvárosi vásár területén',
     coordinates: [47.388268096763575, 16.54210846846198],
   },
+  {
+    // A Diáksétánytól alig 60 méterre, de a sátorsoron kívül: a bojtárkupont
+    // a standnál kapja a vendég, a próbát viszont itt állja ki. Pin nélkül a
+    // „külső várárok" csak egy szó lenne egy gyerekkel a kézben.
+    id: 'bojtarproba-vararok',
+    kind: 'programhelyszin',
+    label: 'Bojtárpróba',
+    title: 'Bojtárpróba – külső várárok',
+    hint: 'Szombaton 10-17 óráig, gyerekeknek',
+    coordinates: [47.388957167884925, 16.53845290964363],
+  },
 
   // --- Mosdók ---
   { id: 'wc-1', kind: 'mosdo', label: 'WC', title: 'Mosdó', coordinates: [47.38986609705391, 16.541004739294507] },
