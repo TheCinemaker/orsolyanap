@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { CalendarDays, Clock, MapPin, Music2, Utensils, Trophy, ShoppingBasket } from 'lucide-react';
+import { CalendarDays, Clock, MapPin, Music2, Utensils, Trophy, ShoppingBasket, Baby } from 'lucide-react';
 import { useOrsolya } from '../context/OrsolyaContext';
 
 const DAY_LABELS = {
@@ -22,6 +22,8 @@ function iconFor(category) {
   if (category === 'gasztro program') return Utensils;
   if (category === 'verseny') return Trophy;
   if (category === 'rendezvény') return ShoppingBasket;
+  // Gyerekprogramnál a hangjegy félrevezet: azok nem fellépések.
+  if (category === 'gyerekprogram') return Baby;
   return Music2;
 }
 
