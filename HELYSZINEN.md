@@ -398,6 +398,17 @@ onnantól minden kép újra a Supabase-ből jön.
 
 ## 8. Kirakás az internetre
 
+**Az app két címen érhető el, ugyanazzal a tartalommal:**
+
+| cím | mire |
+|---|---|
+| `https://orsolya.visitkoszeg.hu` | a hivatalos cím: plakát, Facebook, standos útmutató |
+| `https://orsolya.netlify.app` | ugyanaz a build, tartaléknak — ha a saját domain DNS-e vagy tanúsítványa akad meg, ezen a címen változatlanul megy |
+
+Ha a vásár alatt valaki azt mondja, hogy „nem jön be az oldal", ez az első
+kérdés: melyik címet nyitotta meg? A tartalék cím azonnal használható.
+
+
 **Adatváltozáshoz nem kell semmit kirakni.** A standok, ételek, képek,
 programok mind az adatbázisból jönnek — amint a szkript lefutott, a telefonokon
 is ott van. A szavazás és a látogatásszámláló élőben frissül.

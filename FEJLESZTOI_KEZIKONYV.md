@@ -565,12 +565,21 @@ curl -s -H "apikey: $ANON" "$URL/rest/v1/exhibitors?select=pin&limit=1"
 **Adatváltozáshoz nem kell push.** A standok, ételek, képek, programok az
 adatbázisból jönnek; amint a szkript lefutott, a telefonokon is ott van.
 
+**Két címen ugyanaz az oldal.** A `https://orsolya.visitkoszeg.hu` a hivatalos
+cím — ezt hirdetik a plakátok és a Facebook-posztok, és a megosztás-adatok
+(`og:url`, `og:image` az `index.html`-ben) is erre mutatnak. A
+`https://orsolya.netlify.app` ugyanaz a build, és akkor jó, ha a saját domain
+DNS-e vagy tanúsítványa akad meg: ilyenkor az app ezen a címen változatlanul
+megy. Ha a hivatalos cím megváltozik, az `index.html` megosztás-adatait és a
+`STANDOS_KEZIKONYV.txt` fejlécét is át kell írni (utóbbi után
+`node scripts/kezikonyvek.mjs`).
+
 **Kódváltozáshoz** `git push origin main`, a Netlify magától épít. A deploy
 ~1-2 perc. Ellenőrizd, hogy az új bundle tényleg kiment:
 
 ```bash
-js=$(curl -s https://orsolya.netlify.app/ | grep -o 'assets/index-[A-Za-z0-9_-]*\.js' | head -1)
-curl -s "https://orsolya.netlify.app/$js" | grep -c "<egy új szövegrész>"
+js=$(curl -s https://orsolya.visitkoszeg.hu/ | grep -o 'assets/index-[A-Za-z0-9_-]*\.js' | head -1)
+curl -s "https://orsolya.visitkoszeg.hu/$js" | grep -c "<egy új szövegrész>"
 ```
 
 **Sorrend, ha séma is változik:** előbb a kód, utána az SQL. A régi kód + új

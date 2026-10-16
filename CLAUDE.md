@@ -187,6 +187,10 @@ többi marad rövid.
 React 19 + Vite + Tailwind 4, Supabase (adat + Storage), Netlify (statikus
 hosting, nincs szerveroldali kód).
 
+Két cím, ugyanaz a build: a hivatalos a **`orsolya.visitkoszeg.hu`** (ide
+mutatnak a megosztás-adatok és a standos útmutató), a `orsolya.netlify.app`
+pedig a tartalék, ha a saját domain akad meg.
+
 ```
 src/App.jsx              útvonalválasztás: ?view=signage vagy a látogatói app
 src/context/OrsolyaContext.jsx   minden adat és művelet egy helyen
