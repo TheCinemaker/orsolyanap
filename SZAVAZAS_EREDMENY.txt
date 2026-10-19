@@ -1,0 +1,127 @@
+====================================================================================================
+     ORSOLYA-NAPI VÁSÁR 2026 — KÖZÖNSÉGSZAVAZÁS AZ APPBAN
+     Civil Ízek Utcája, Diáksétány • 2026. október 17–18.
+====================================================================================================
+
+Ez a LÁTOGATÓK szavazása a visitkoszeg appban, nem a zsűri döntése.
+A Civil Főzőverseny hivatalos eredményét a zsűri hirdette ki vasárnap.
+
+Egy készülék egy ételre egyszer szavazhatott; a lenti számok a szavazási
+napló (item_votes) alapján készültek, nem a gyorsítótárazott oszlopból.
+
+  Összes szavazat:        261
+  Szavazó készülék:       76
+  Szavazatot kapott étel: 72
+  Érintett stand:         24 a 38-ból
+
+====================================================================================================
+  ÉTELEK SZAVAZAT SZERINT
+====================================================================================================
+   #   db   Étel                                             Szervezet
+----------------------------------------------------------------------------------------------------
+   1   25   Székelykáposzta                                  Újvárosi Tagóvoda
+   2   14   Vadpörkölt nokedlival, uborkával                 Bersek Iskola
+   3   13   Lángos                                           Bersek Iskola
+   4   11   Csülkös babgulyás                                Bersek Iskola
+   5   11   Pincepörkölt                                     Újvárosi Tagóvoda
+   6   10   Palacsinta                                       Bersek Iskola
+   7    9   Császármorzsa házi lekvárral                     Újvárosi Tagóvoda
+   8    9   Gesztenyepüré                                    Bersek Iskola
+   9    9   Házi sütemények                                  Újvárosi Tagóvoda
+  10    9   Többféle házi készítésű sütemény                 Bersek Iskola
+  11    8   Amerika fánk csokiöntettel                       Bersek Iskola
+  12    8   Gesztenyepüré tejszínhabbal                      Újvárosi Tagóvoda
+  13    8   Zsákbamacska                                     Újvárosi Tagóvoda
+  14    7   Alkoholmentes puncs                              Bersek Iskola
+  15    7   Chilis bab                                       Bersek Iskola
+  16    7   Palacsinta                                       Újvárosi Tagóvoda
+  17    6   Forralt bor                                      Bersek Iskola
+  18    5   Tea                                              Bersek Iskola
+  19    4   Bucinudli sváb módra                             Kőszegfalvi Baráti Kör
+  20    4   Harcsapaprikás sztrapacskával                    Kőszeg Meseváros Felsővárosi Tagóvodája
+  21    3   Hegyaljai szarvasragú házi sütőtökös zsályás gno Árpád-házi Szent Margit Általános Iskola SZM
+  22    3   Hentesmester káposztája                          Dr. Nagy László EGYMI
+  23    3   Pejsli zsemlegombóccal                           Kőszegi Birkózók
+  24    3   Sütőtök Cappuccino                               Fitt-Box Egyesület
+  25    3   Tócsi                                            Kőszegi Ifjúsági Tűzoltók
+  26    3   Töltött káposzta tűzoltó módra                   Kőszegi Ifjúsági Tűzoltók
+  27    3   Vörösboros marhapörkölt házi galuskával          Balog Iskola
+  28    2   Betyáros húsgombóc házi galuskával               Balog Iskola
+  29    2   Csülkös pacal cipóban                            Cák Község Önkormányzata
+  30    2   Gurulós húsos savanyúan                          Árpád-házi Szent Margit Általános Iskola SZM
+  31    2   Módos gazda babos káposztája szarvaskolbásszal   Dr. Nagy László EGYMI Szakiskola
+  32    2   Nápolyi pizza                                    Balog Iskola
+  33    2   Pásztortarhonya                                  Árpád-házi Szent Margit Óvoda
+  34    2   Slambuc tűzoltó módra                            Kőszegi Ifjúsági Tűzoltók
+  35    2   Vadas krumpligombóccal                           Kőszegi Birkózók
+  36    2   Vaddisznópörkölt knédlivel                       Kovács Miklós
+  37    2   Velős pacal babusgatós kovászos kenyérrel, ecete Árpád-házi Szent Margit Általános Iskola SZM
+  38    2   Velős pirítós                                    Kőszegi Ifjúsági Tűzoltók
+  39    1   Alkoholmentes puncs                              Kőszegi Ifjúsági Tűzoltók
+  40    1   Almás-diós őszi somlói galuska                   Tézsula Hagyományőrző Egyesület
+  41    1   Bajnokok hentes tokánya tarhonyával              Kőszegi Lóránt Gyula Futball Club
+  42    1   BBQ Pulled Pork szendvics                        Fitt-Box Egyesület
+  43    1   Csülökpörkölt táncos körítéssel                  Dance Jam Kőszeg
+  44    1   Egyéb finomságok                                 Kőszegi Birkózók
+  45    1   Fordított lacipecsenye, sült paprika ágyon       Hajnalcsillag Néptáncegyüttes
+  46    1   Füstölgő Boszorkányleves                         Borbarát Hölgyek Egyesülete
+  47    1   Gesztenyés somlói galuska tejszínhabbal          Balog Iskola
+  48    1   Gesztenyés túrógombóc fahéjas almaszósszal       Balog Iskola
+  49    1   Grillezett húsok, krumpli és káposztasaláta      Kőszegi Birkózók
+  50    1   Gulyásleves                                      Kőszegi Atlétikai Club Sportegyesület
+  51    1   Harcsapaprikás túrós csuszával                   Jimmy Gym
+  52    1   Házi sütemények                                  Fitt-Box Egyesület
+  53    1   Házi sütemények                                  Balog Iskola
+  54    1   Házi sütemények                                  Kőszegi Ifjúsági Tűzoltók
+  55    1   Házi sütemények                                  Kőszegi Birkózók
+  56    1   Házi sütemények                                  Tézsula Hagyományőrző Egyesület
+  57    1   Húsleves gazdagon, laktóz- és tojásmentesen      Kőszegi Baptista Gyülekezet
+  58    1   Őszi Ízek Harmóniája                             Fitt-Box Egyesület
+  59    1   Parázson sült gesztenye                          Kovács Miklós
+  60    1   Pásztorok húsos-babos káposztája                 Árpád-házi Szent Margit Óvoda
+  61    1   Pulled pork szendvics coleslaw salátával         Balog Iskola
+  62    1   Ropogósra sült bőrös császár párolt káposztával  Kőszegi Turisztikai Szövetség Egyesület
+  63    1   Sós sütemények                                   Hajnalcsillag Néptáncegyüttes
+  64    1   Spirál burgonya                                  Kőszegi Ifjúsági Tűzoltók
+  65    1   Sütemények                                       Kőszeg Város Fúvószenekara és jubileumi sátra
+  66    1   Sütemények, finomságok                           Árpád-házi Szent Margit Óvoda
+  67    1   Szarvaspörkölt galuskával                        Kőszegi Atlétikai Club Sportegyesület
+  68    1   Székelykáposzta                                  Dr. Nagy László EGYMI
+  69    1   Vadraguleves                                     Kőszegi Birkózók
+  70    1   Vasi Dödölle                                     Fitt-Box Egyesület
+  71    1   Vasi Kamra Kincsei – Páros Ízhatás               Fitt-Box Egyesület
+  72    1   Zsákbamacska                                     Kőszegi Ifjúsági Tűzoltók
+
+====================================================================================================
+  SZERVEZETEK ÖSSZESÍTVE
+====================================================================================================
+   #   db   Szervezet
+----------------------------------------------------------------------------------------------------
+   1   99   Bersek Iskola
+   2   77   Újvárosi Tagóvoda
+   3   14   Kőszegi Ifjúsági Tűzoltók
+   4   11   Balog Iskola
+   5    9   Kőszegi Birkózók
+   6    8   Fitt-Box Egyesület
+   7    7   Árpád-házi Szent Margit Általános Iskola SZM
+   8    4   Kőszegfalvi Baráti Kör
+   9    4   Kőszeg Meseváros Felsővárosi Tagóvodája
+  10    4   Dr. Nagy László EGYMI
+  11    4   Árpád-házi Szent Margit Óvoda
+  12    3   Kovács Miklós
+  13    2   Cák Község Önkormányzata
+  14    2   Dr. Nagy László EGYMI Szakiskola
+  15    2   Tézsula Hagyományőrző Egyesület
+  16    2   Hajnalcsillag Néptáncegyüttes
+  17    2   Kőszegi Atlétikai Club Sportegyesület
+  18    1   Kőszegi Lóránt Gyula Futball Club
+  19    1   Dance Jam Kőszeg
+  20    1   Borbarát Hölgyek Egyesülete
+  21    1   Jimmy Gym
+  22    1   Kőszegi Baptista Gyülekezet
+  23    1   Kőszegi Turisztikai Szövetség Egyesület
+  24    1   Kőszeg Város Fúvószenekara és jubileumi sátra
+
+====================================================================================================
+  Készült: 2026. 10. 19. 8:24:10
+====================================================================================================
